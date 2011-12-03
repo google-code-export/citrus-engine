@@ -1,13 +1,13 @@
 package com.citrusengine.objects.platformer
 {
+
 	import Box2DAS.Common.V2;
 	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Body;
-	import flash.display.MovieClip;
-	
-	import com.citrusengine.core.CitrusEngine;
+
 	import com.citrusengine.math.MathVector;
-	import com.citrusengine.objects.PhysicsObject;
+
+	import flash.display.MovieClip;
 	
 	/**
 	 * A platform that moves between two points. The MovingPlatform has several properties that

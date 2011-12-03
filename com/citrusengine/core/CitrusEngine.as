@@ -224,7 +224,12 @@
 		
 		private function handleConsoleSetCommand(objectName:String, paramName:String, paramValue:String):void
 		{
-			var object:CitrusObject = _state.getObjectByName(objectName);
+			var object:CitrusObject;
+			
+			if (_state is Starling)
+			 	object = (_state.stage.getChildAt(0) as StarlingState).getObjectByName(objectName);
+			else
+				object = _state.getObjectByName(objectName);
 			if (!object)
 			{
 				trace("Warning: There is no object named " + objectName);

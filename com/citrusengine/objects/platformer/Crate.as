@@ -1,10 +1,9 @@
 package com.citrusengine.objects.platformer
 {
-	import Box2DAS.Collision.Shapes.b2MassData;
-	import Box2DAS.Dynamics.b2Body;
-	import flash.display.MovieClip;
-	
+
 	import com.citrusengine.objects.PhysicsObject;
+
+	import flash.display.MovieClip;
 	
 	/**
 	 * A very simple physics object. I just needed to add bullet mode and zero restitution

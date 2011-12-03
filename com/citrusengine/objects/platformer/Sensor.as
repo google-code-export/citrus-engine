@@ -1,12 +1,14 @@
 package com.citrusengine.objects.platformer
 {
+
 	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Body;
-	import flash.display.MovieClip;
-	
+
 	import com.citrusengine.objects.PhysicsObject;
-	
+
 	import org.osflash.signals.Signal;
+
+	import flash.display.MovieClip;
 	
 	/**
 	 * Sensors simply listen for when an object begins and ends contact with them. They disaptch a signal

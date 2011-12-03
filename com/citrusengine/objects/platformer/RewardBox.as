@@ -1,12 +1,16 @@
 package com.citrusengine.objects.platformer 
 {
-	import Box2DAS.Dynamics.b2Body;
+
 	import Box2DAS.Dynamics.ContactEvent;
+	import Box2DAS.Dynamics.b2Body;
+
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.objects.PhysicsObject;
+
+	import org.osflash.signals.Signal;
+
 	import flash.display.MovieClip;
 	import flash.utils.getDefinitionByName;
-	import org.osflash.signals.Signal;
 	
 	/**
 	 * The RewardBox is a special type of platform that you can "bump" to make a reward come out. It is meant to be similar

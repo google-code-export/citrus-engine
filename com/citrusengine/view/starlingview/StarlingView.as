@@ -1,12 +1,12 @@
 package com.citrusengine.view.starlingview {
 
-	import flash.display.MovieClip;
 	import com.citrusengine.view.spriteview.Box2DDebugArt;
-	import starling.display.Quad;
 	import starling.display.Sprite;
 
-	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.CitrusView;
+	import com.citrusengine.view.ISpriteView;
+
+	import flash.display.MovieClip;
 
 	/**
 	 * @author Aymeric
@@ -64,9 +64,16 @@ package com.citrusengine.view.starlingview {
 		}
 
 		override protected function createArt(citrusObject:Object):Object {
-			var viewObject:ISpriteView = citrusObject as ISpriteView;
 			
-			if (citrusObject.view != Box2DDebugArt && citrusObject.view != flash.display.MovieClip) {
+			var viewObject:ISpriteView = citrusObject as ISpriteView;
+
+			if (citrusObject.view == com.citrusengine.view.spriteview.Box2DDebugArt)
+				citrusObject.view = com.citrusengine.view.starlingview.Box2DDebugArt;
+				
+			if (citrusObject.view == flash.display.MovieClip)
+				citrusObject.view = starling.display.Sprite;
+						
+			if (citrusObject.view != com.citrusengine.view.spriteview.Box2DDebugArt) {
 				
 				var art:StarlingArt = new StarlingArt(viewObject);
 				
@@ -85,6 +92,7 @@ package com.citrusengine.view.starlingview {
 		 * @inherit 
 		 */
 		override protected function destroyArt(citrusObject:Object):void {
+			
 			var spriteArt:StarlingArt = _viewObjects[citrusObject];
 			spriteArt.destroy();
 			spriteArt.parent.removeChild(spriteArt);

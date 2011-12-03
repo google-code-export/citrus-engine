@@ -12,7 +12,7 @@ package com.citrusengine.core
 	 * create a state that represents all your levels. You can get and set the reference to your active
 	 * state via the CitrusEngine class.
 	 */	
-	public class State extends Sprite implements IState
+	public class State extends Sprite
 	{
 		private var _objects:Vector.<CitrusObject> = new Vector.<CitrusObject>();
 		private var _view:CitrusView;
