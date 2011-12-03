@@ -1,5 +1,7 @@
-﻿package com.citrusengine.core
-{
+﻿package com.citrusengine.core {
+
+	import starling.core.Starling;
+
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	
@@ -12,12 +14,12 @@
 	 */	
 	public class CitrusEngine extends MovieClip
 	{
-		public static const VERSION:String = "2.10.50";
+		public static const VERSION:String = "3.00.00";
 		
 		private static var _instance:CitrusEngine;
 		
-		private var _state:State;
-		private var _newState:State;
+		private var _state:*;
+		private var _newState:*;
 		private var _stateDisplayIndex:uint = 0;
 		private var _startTime:Number;
 		private var _gameTime:Number;
@@ -63,19 +65,23 @@
 		 * hasn't occured yet, then this will reference your new state; this is because actual state-changes only happen pre-tick.
 		 * That way you don't end up changing states in the middle of a state's tick, effectively fucking stuff up. 
 		 */		
-		public function get state():State
-		{
+		public function get state():*
+		{			
 			if (_newState)
 				return _newState;
-			else
-				return _state;
+			else {
+				if (_state is Starling)
+					return (_state.stage.getChildAt(0) as StarlingState);
+				else
+					return _state;
+			}
 		}
 		
 		/**
 		 * We only ACTUALLY change states on enter frame so that we don't risk changing states in the middle of a state update.
 		 * However, if you use the state getter, it will grab the new one for you, so everything should work out just fine.
 		 */		
-		public function set state(value:State):void
+		public function set state(value:*):void
 		{
 			_newState = value;
 		}
@@ -150,13 +156,25 @@
 			{
 				if (_state)
 				{
-					_state.destroy();
-					removeChild(_state);
+					if (_state is Starling) {
+						(_state.stage.getChildAt(0) as StarlingState).destroy();
+					} else {
+						_state.destroy();
+						removeChild(_state as State);
+					}
 				}
 				_state = _newState;
 				_newState = null;
-				addChildAt(_state, _stateDisplayIndex);
-				_state.initialize();
+				
+				if (_state is Starling) {	
+					_state.start();
+					_state.antiAliasing = 1;
+					(_state.stage.getChildAt(0) as StarlingState).initialize();
+				} else {
+					addChildAt(_state as State, _stateDisplayIndex);
+					_state.initialize();
+				}
+				
 			}
 			
 			//Update the state
@@ -167,8 +185,12 @@
 				var timeDelta:Number = timeSinceLastFrame / 1000;
 				_gameTime = nowTime;
 				
-				_state.update(timeDelta);
+				if (_state is Starling)
+					(_state.stage.getChildAt(0) as StarlingState).update(timeDelta);
+				else
+					_state.update(timeDelta);
 			}
+			
 		}
 		
 		private function handleStageDeactivated(e:Event):void
