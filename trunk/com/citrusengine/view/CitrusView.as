@@ -1,9 +1,9 @@
-package com.citrusengine.view
-{
+package com.citrusengine.view {
+
 	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.utils.LoadManager;
-	import flash.display.Sprite;
+
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	
@@ -65,7 +65,7 @@ package com.citrusengine.view
 		public var cameraLensHeight:Number;
 		
 		protected var _viewObjects:Dictionary = new Dictionary();
-		protected var _root:Sprite;
+		protected var _root:*;
 		protected var _viewInterface:Class;
 		
 		/**
@@ -73,7 +73,7 @@ package com.citrusengine.view
 		 * You can override which type of CitrusView you would like to create via the State.createView() protected method.
 		 * At the time of this writing, only the SpriteView is available, but in the future, blitting is expected to be supported.
 		 */		
-		public function CitrusView(root:Sprite, viewInterface:Class)
+		public function CitrusView(root:*, viewInterface:Class)
 		{
 			_root = root;
 			_viewInterface = viewInterface;
@@ -185,7 +185,7 @@ package com.citrusengine.view
 			if (bounds)
 				cameraBounds = bounds;
 			if (easing)
-				cameraEasing = easing
+				cameraEasing = easing;
 		}
 		
 		/**

@@ -1,21 +1,19 @@
-package com.citrusengine.objects.platformer
-{
+package com.citrusengine.objects.platformer {
+
 	import Box2DAS.Collision.Shapes.b2PolygonShape;
 	import Box2DAS.Common.V2;
-	import Box2DAS.Dynamics.b2Body;
+	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Fixture;
 	import Box2DAS.Dynamics.b2FixtureDef;
-	import Box2DAS.Dynamics.ContactEvent;
-	import com.citrusengine.math.MathVector;
+
 	import com.citrusengine.objects.PhysicsObject;
 	import com.citrusengine.physics.CollisionCategories;
 	import com.citrusengine.utils.Box2DShapeMaker;
+
 	import flash.display.MovieClip;
 	import flash.utils.clearTimeout;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.setTimeout;
-	
-	
 	
 	/**
 	 * This is a common example of a side-scrolling bad guy. He has limited logic, basically

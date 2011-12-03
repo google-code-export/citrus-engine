@@ -58,7 +58,7 @@ package com.citrusengine.view.blittingview
 		
 		public function initialize(citrusObject:Object):void
 		{
-			this.citrusObject = citrusObject
+			this.citrusObject = citrusObject;
 		}
 		
 		/**
