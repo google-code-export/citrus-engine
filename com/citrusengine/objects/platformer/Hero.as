@@ -11,7 +11,6 @@ package com.citrusengine.objects.platformer
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.objects.PhysicsObject;
 	
-	import flash.media.Video;
 	import flash.ui.Keyboard;
 	import flash.utils.clearTimeout;
 	import flash.utils.getDefinitionByName;

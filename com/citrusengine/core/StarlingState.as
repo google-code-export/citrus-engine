@@ -1,31 +1,23 @@
-package com.citrusengine.core
-{
+package com.citrusengine.core {
+
+	import starling.display.Sprite;
+
 	import com.citrusengine.view.CitrusView;
-	import com.citrusengine.view.spriteview.SpriteView;
-	import flash.display.Sprite;
-	
-	
+	import com.citrusengine.view.starlingview.StarlingView;
+
 	/**
-	 * The State class is very important. It usually contains the logic for a particular state the game is in.
-	 * There can only ever be one state running at a time. You should extend the State class
-	 * to create logic and scripts for your levels. You can build one state for each level, or
-	 * create a state that represents all your levels. You can get and set the reference to your active
-	 * state via the CitrusEngine class.
-	 */	
-	public class State extends Sprite implements IState
-	{
+	 * @author Aymeric
+	 */
+	public class StarlingState extends Sprite implements IState {
+		
 		private var _objects:Vector.<CitrusObject> = new Vector.<CitrusObject>();
 		private var _view:CitrusView;
 		private var _input:Input;
-		
-		public function State()
-		{
+
+		public function StarlingState() {
 			
 		}
 		
-		/**
-		 * Called by the Citrus Engine.
-		 */		
 		public function destroy():void
 		{
 			//Call destroy on all objects, and remove all art from the stage.
@@ -172,7 +164,7 @@ package com.citrusengine.core
 		 */		
 		protected function createView():CitrusView
 		{
-			return new SpriteView(this);
+			return new StarlingView(this);
 		}
 	}
 }

@@ -1,8 +1,9 @@
-package com.citrusengine.physics
-{
-	import Box2DAS.Common.b2Base;
+package com.citrusengine.physics {
+
 	import Box2DAS.Common.V2;
+	import Box2DAS.Common.b2Base;
 	import Box2DAS.Dynamics.b2World;
+
 	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.spriteview.Box2DDebugArt;
@@ -116,7 +117,7 @@ package com.citrusengine.physics
 		
 		public function get animation():String
 		{
-			return ""
+			return "";
 		}
 		
 		public function get view():*
