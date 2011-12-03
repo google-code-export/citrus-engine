@@ -22,9 +22,9 @@ package com.citrusengine.view.starlingview {
 	 * @author Aymeric
 	 */
 	public class StarlingArt extends Sprite {
-		
+
 		public var content:DisplayObject;
-		
+
 		public var loader:Loader;
 
 		private var _citrusObject:ISpriteView;
@@ -39,113 +39,108 @@ package com.citrusengine.view.starlingview {
 
 			_citrusObject = object;
 		}
-		
+
 		public function destroy():void {
-			
+
 			if (content is MovieClip) {
 				Starling.juggler.remove(content as MovieClip);
 				_textureAtlas.dispose();
 				content.dispose();
-				
+
 			} else if (content is Image) {
 				_texture.dispose();
 				content.dispose();
 			}
-				
+
 		}
-		
-		public function get registration():String
-		{
+
+		public function get registration():String {
 			return _registration;
 		}
-		
-		public function set registration(value:String):void 
-		{
+
+		public function set registration(value:String):void {
+			
 			if (_registration == value || !content)
 				return;
-				
+
 			_registration = value;
-			
-			if (_registration == "topLeft")
-			{
+
+			if (_registration == "topLeft") {
 				content.x = 0;
 				content.y = 0;
-			}
-			else if (_registration == "center")
-			{
+			} else if (_registration == "center") {
 				content.x = -content.width / 2;
 				content.y = -content.height / 2;
 			}
 		}
-		
-		public function get view():*
-		{
+
+		public function get view():* {
 			return _view;
 		}
-		
-		public function set view(value:*):void
-		{
+
+		public function set view(value:*):void {
+			
 			if (_view == value)
 				return;
-			
+
 			_view = value;
-			
-			if (_view)
-			{
-				if (_view is String)
-				{
+
+			if (_view) {
+				if (_view is String) {
 					// view property is a path to an image?
 					var classString:String = _view;
 					var suffix:String = classString.substring(classString.length - 4).toLowerCase();
-					if (suffix == ".swf" || suffix == ".png" || suffix == ".gif" || suffix == ".jpg")
-					{
+					if (suffix == ".swf" || suffix == ".png" || suffix == ".gif" || suffix == ".jpg") {
 						loader = new Loader();
 						loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleContentLoaded);
 						loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, handleContentIOError);
 						loader.load(new URLRequest(classString));
 					}
-					// view property is a fully qualified class name in string form.
-					else
-					{
+					// view property is a fully qualified class name in string form. 
+					else {
 						var artClass:Class = getDefinitionByName(classString) as Class;
 						content = new artClass();
 						addChild(content);
 					}
-				}
-				else if (_view is Class)
-				{
-					//view property is a class reference
+				} else if (_view is Class) {
+					// view property is a class reference
 					content = new citrusObject.view();
 					addChild(content);
 				} else if (_view is Object) {
-					//TODO : check performance
+					// TODO : check performance
 					addChild(_view);
 				} else {
 					throw new Error("SpriteArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
 					return;
 				}
-				
+
 				if (content && content.hasOwnProperty("initialize"))
 					content["initialize"](_citrusObject);
 			}
 		}
-		
-		public function get animation():String
-		{
+
+		public function get animation():String {
 			return _animation;
 		}
-		
-		public function set animation(value:String):void
-		{
+
+		public function set animation(value:String):void {
+
 			if (_animation == value)
 				return;
 
 			_animation = value;
-			
+
 			if (content is MovieClip) {
 
 				if (_animation != null && _animation != "" && _textureAtlas.getTextures(_animation) != null) {
-					gotoAndPlay(_animation);
+
+					// TODO: find a better way than hard code...
+					if (_animation == "duck" || _animation == "jump" || animation == "die" || animation == "hurt") {
+						gotoAndStop(_animation);
+					} else {
+						gotoAndPlay(_animation);
+					}
+
 				}
 			}
 		}
@@ -161,10 +156,10 @@ package com.citrusengine.view.starlingview {
 		public function get citrusObject():ISpriteView {
 			return _citrusObject;
 		}
-		
+
 		public function update(stateView:StarlingView):void {
-			
-			//position = object position + (camera position * inverse parallax)
+
+			// position = object position + (camera position * inverse parallax)
 			x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
 			y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 			rotation = _citrusObject.rotation;
@@ -175,38 +170,55 @@ package com.citrusengine.view.starlingview {
 			animation = _citrusObject.animation;
 			group = _citrusObject.group;
 		}
-		
+
 		private function handleContentLoaded(evt:Event):void {
-			
+
 			if (evt.target.loader.content is flash.display.MovieClip) {
-				
+
 				_textureAtlas = DynamicAtlas.fromMovieClipContainer(evt.target.loader.content);
-				content = new MovieClip(_textureAtlas.getTextures("walk"), 24);
+				content = new MovieClip(_textureAtlas.getTextures(animation), 24);
 				Starling.juggler.add(content as MovieClip);
 			}
-			
+
 			if (evt.target.loader.content is Bitmap) {
 				_texture = Texture.fromBitmap(evt.target.loader.content);
 				content = new Image(_texture);
 			}
-			
+
 			addChild(content);
 		}
-		
+
 		private function gotoAndPlay(label:String):void {
-			
+
 			var mc:MovieClip = content as MovieClip;
-			
+
 			while (mc.numFrames > 0) {
 				mc.removeFrameAt(0);
 			}
-			
+
 			for each (var texture:Texture in _textureAtlas.getTextures(label)) {
 				mc.addFrame(texture);
 			}
+
+			mc.loop = true;
 		}
-		
-		private function handleContentIOError(evt:IOErrorEvent):void  {
+
+		private function gotoAndStop(label:String):void {
+
+			var mc:MovieClip = content as MovieClip;
+
+			while (mc.numFrames > 0) {
+				mc.removeFrameAt(0);
+			}
+
+			for each (var texture:Texture in _textureAtlas.getTextures(label)) {
+				mc.addFrame(texture);
+			}
+
+			mc.loop = false;
+		}
+
+		private function handleContentIOError(evt:IOErrorEvent):void {
 			throw new Error(evt.text);
 		}
 	}

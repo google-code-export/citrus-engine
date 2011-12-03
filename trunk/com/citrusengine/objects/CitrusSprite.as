@@ -1,11 +1,14 @@
 package com.citrusengine.objects
 {
+
 	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.SpriteDebugArt;
-	import flash.utils.Dictionary;
+
 	import org.osflash.signals.Signal;
+
+	import flash.utils.Dictionary;
 	
 	/**
 	 * This is the primary class for creating graphical game objects.

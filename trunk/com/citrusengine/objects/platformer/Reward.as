@@ -1,14 +1,18 @@
 package com.citrusengine.objects.platformer 
 {
+
 	import Box2DAS.Common.V2;
+	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Fixture;
 	import Box2DAS.Dynamics.b2FixtureDef;
-	import Box2DAS.Dynamics.ContactEvent;
+
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.objects.PhysicsObject;
 	import com.citrusengine.physics.CollisionCategories;
-	import flash.utils.getDefinitionByName;
+
 	import org.osflash.signals.Signal;
+
+	import flash.utils.getDefinitionByName;
 	
 	/**
 	 * The Reward class is meant to pop out of a RewardBox when the player bumps it. A Reward object is the equivelant of a "mushroom"

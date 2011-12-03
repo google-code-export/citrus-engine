@@ -1,9 +1,11 @@
 package com.citrusengine.objects.platformer
 {
+
 	import Box2DAS.Dynamics.ContactEvent;
+
 	import com.citrusengine.utils.Box2DShapeMaker;
+
 	import flash.display.MovieClip;
-	
 	import flash.utils.getDefinitionByName;
 	
 	/**

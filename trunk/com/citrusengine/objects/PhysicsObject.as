@@ -1,21 +1,19 @@
-package com.citrusengine.objects
-{
+package com.citrusengine.objects {
+
 	import Box2DAS.Collision.Shapes.b2PolygonShape;
 	import Box2DAS.Collision.Shapes.b2Shape;
 	import Box2DAS.Common.V2;
-	import Box2DAS.Dynamics.Joints.b2Joint;
-	import Box2DAS.Dynamics.Joints.b2JointDef;
 	import Box2DAS.Dynamics.b2Body;
 	import Box2DAS.Dynamics.b2BodyDef;
 	import Box2DAS.Dynamics.b2Fixture;
 	import Box2DAS.Dynamics.b2FixtureDef;
-	import com.citrusengine.physics.CollisionCategories;
-	
+
 	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.physics.Box2D;
+	import com.citrusengine.physics.CollisionCategories;
 	import com.citrusengine.view.ISpriteView;
-	
+
 	import flash.display.MovieClip;
 	
 	/**

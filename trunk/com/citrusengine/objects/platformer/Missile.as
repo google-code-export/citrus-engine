@@ -1,14 +1,17 @@
 package com.citrusengine.objects.platformer 
 {
+	
 	import Box2DAS.Common.V2;
-	import Box2DAS.Dynamics.b2Filter;
 	import Box2DAS.Dynamics.ContactEvent;
+
 	import com.citrusengine.objects.PhysicsObject;
 	import com.citrusengine.physics.CollisionCategories;
+
+	import org.osflash.signals.Signal;
+
 	import flash.display.MovieClip;
 	import flash.utils.clearTimeout;
 	import flash.utils.setTimeout;
-	import org.osflash.signals.Signal;
 	
 	/**
 	 * A missile is an object that moves at a particular trajectory and speed, and explodes when it comes into contact with something.

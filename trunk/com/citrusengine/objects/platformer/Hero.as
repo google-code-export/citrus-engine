@@ -1,22 +1,22 @@
 package com.citrusengine.objects.platformer
 {
+
 	import Box2DAS.Common.V2;
-	import Box2DAS.Dynamics.b2Fixture;
 	import Box2DAS.Dynamics.ContactEvent;
-	import Box2DAS.Dynamics.b2Body;
-	import com.citrusengine.physics.CollisionCategories;
-	import com.citrusengine.utils.Box2DShapeMaker;
-	import flash.display.MovieClip;
-	
+	import Box2DAS.Dynamics.b2Fixture;
+
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.objects.PhysicsObject;
-	
+	import com.citrusengine.physics.CollisionCategories;
+	import com.citrusengine.utils.Box2DShapeMaker;
+
+	import org.osflash.signals.Signal;
+
+	import flash.display.MovieClip;
 	import flash.ui.Keyboard;
 	import flash.utils.clearTimeout;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.setTimeout;
-	
-	import org.osflash.signals.Signal;
 	
 	/**
 	 * This is a common, simple, yet solid implementation of a side-scrolling Hero. 
