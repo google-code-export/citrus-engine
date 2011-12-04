@@ -65,11 +65,11 @@ package com.citrusengine.view.starlingview {
 			
 			//TODO : enhance performance
 			
-			_bmd.fillRect(_bmd.rect, 0);
+			/*_bmd.fillRect(_bmd.rect, 0);
 			_bmd.draw(_debugDrawer);
 			
 			_box2DView.texture.dispose();
-			_box2DView.texture = Texture.fromBitmapData(_bmd);
+			_box2DView.texture = Texture.fromBitmapData(_bmd);*/
 		}
 	}
 }

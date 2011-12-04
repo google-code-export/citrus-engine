@@ -1,16 +1,18 @@
 package com.citrusengine.view.starlingview {
 
-	import com.citrusengine.view.spriteview.Box2DDebugArt;
 	import starling.display.Sprite;
 
 	import com.citrusengine.view.CitrusView;
 	import com.citrusengine.view.ISpriteView;
+	import com.citrusengine.view.spriteview.Box2DDebugArt;
 
 	import flash.display.MovieClip;
 
 	/**
-	 * @author Aymeric
-	 */
+	 * StarlingView is based on  Adobe Stage3D to render graphics and the Starling framework. 
+	 * It creates and manages graphics like the traditional Flash display list thanks to Starling :
+	 * (addChild(), removeChild()) using Starling DisplayObjects (MovieClip, Image, Sprite, Quad etc).
+	 */	
 	public class StarlingView extends CitrusView {
 
 		private var _viewRoot:Sprite;
@@ -67,6 +69,7 @@ package com.citrusengine.view.starlingview {
 			
 			var viewObject:ISpriteView = citrusObject as ISpriteView;
 
+			//Changing to appropriate Box2DDebugArt
 			if (citrusObject.view == com.citrusengine.view.spriteview.Box2DDebugArt)
 				citrusObject.view = com.citrusengine.view.starlingview.Box2DDebugArt;
 				

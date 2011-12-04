@@ -6,8 +6,13 @@ package com.citrusengine.core {
 	import com.citrusengine.view.starlingview.StarlingView;
 
 	/**
-	 * The StarlingState class is very similar to the State class. It is just this class adapted for Starling
-	 * Take a look on the State class to find all informations!
+	 * The StarlingState class is very similar to the State class. It is just the same class adapted for Starling :
+	 * 
+	 * <p>The StarlingState class is very important. It usually contains the logic for a particular state the game is in.
+	 * There can only ever be one state running at a time. You should extend the StarlingState class
+	 * to create logic and scripts for your levels. You can build one state for each level, or
+	 * create a state that represents all your levels. You can get and set the reference to your active
+	 * state via the CitrusEngine class.</p>
 	 */
 	public class StarlingState extends Sprite {
 

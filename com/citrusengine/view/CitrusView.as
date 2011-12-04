@@ -14,10 +14,8 @@ package com.citrusengine.view {
 	 * <p>This is the class by which you will grab a reference to the graphical representations of your Citrus Objects,
 	 * which will be useful if you need to add mouse event handlers to them, or add graphics effects and filter.</p>
 	 * 
-	 * <p>The CitrusView was meant to be extended to support multiple rendering methods, such as blitting, or even 3D. The goal 
-	 * is to provide as much decoupling as possible of the data/logic from the view. In the near future, it is our goal to
-	 * provide multiple rendering methods such as blitting right out of the box, so that the developer can choose which method
-	 * they would like to work with.</p> 
+	 * <p>The CitrusView was meant to be extended to support multiple rendering methods, such as blitting, or even 3D thanks to Starling. The goal 
+	 * is to provide as much decoupling as possible of the data/logic from the view.</p> 
 	 */	
 	public class CitrusView
 	{
@@ -71,7 +69,8 @@ package com.citrusengine.view {
 		/**
 		 * There is one CitrusView per state, so when a new state is initialized, it creates the view instance.
 		 * You can override which type of CitrusView you would like to create via the State.createView() protected method.
-		 * At the time of this writing, only the SpriteView is available, but in the future, blitting is expected to be supported.
+		 * Thanks to the State class, you have access to traditional flash display list or blitting
+		 * If you want to target Stage3D you have to use the StarlingState class
 		 */		
 		public function CitrusView(root:*, viewInterface:Class)
 		{

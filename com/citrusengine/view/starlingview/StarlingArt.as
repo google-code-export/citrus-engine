@@ -19,8 +19,18 @@ package com.citrusengine.view.starlingview {
 	import flash.utils.getDefinitionByName;
 
 	/**
-	 * @author Aymeric
-	 */
+	 * This is the class that all art objects use for the StarlingView state view. If you are using the StarlingView (as opposed to the blitting view, for instance),
+	 * then all your graphics will be an instance of this class. This class does the following things:
+	 * 
+	 * 1) Creates the appropriate graphic depending on your CitrusObject's view property (loader, sprite, or bitmap), and loads it if it is a non-embedded graphic.
+	 * 2) Aligns the graphic with the appropriate registration (topLeft or center).
+	 * 3) Calls the MovieClip's appropriate frame label based on the CitrusObject's animation property.
+	 * 4) Updates the graphic's properties to be in-synch with the CitrusObject's properties once per frame.
+	 * 
+	 * These objects will be created by the Citrus Engine's StarlingView, so you should never make them yourself. When you use state.getArt() to gain access to your game's graphics
+	 * (for adding click events, for instance), you will get an instance of this object. It extends Sprite, so you can do all the expected stuff with it, 
+	 * such as add click listeners, change the alpha, etc.
+	 **/
 	public class StarlingArt extends Sprite {
 
 		public var content:DisplayObject;
