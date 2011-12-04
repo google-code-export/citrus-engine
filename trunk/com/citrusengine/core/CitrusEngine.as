@@ -28,6 +28,8 @@
 		private var _sound:SoundManager;
 		private var _console:Console;
 		
+		private var _starlingAntialiasing:uint = 1;
+		
 		public static function getInstance():CitrusEngine
 		{
 			return _instance;
@@ -84,6 +86,9 @@
 		public function set state(value:*):void
 		{
 			_newState = value;
+			if (_newState is Starling) {
+				_newState.antiAliasing = _starlingAntialiasing;
+			}
 		}
 		
 		/**
@@ -132,6 +137,14 @@
 			return _console;
 		}
 		
+		public function get starlingAntialiasing():uint {
+			return _starlingAntialiasing;
+		}
+
+		public function set starlingAntialiasing(starlingAntialiasing:uint):void {
+			_starlingAntialiasing = starlingAntialiasing;
+		}
+		
 		/**
 		 * Set up things that need the stage access.
 		 */
@@ -166,9 +179,8 @@
 				_state = _newState;
 				_newState = null;
 				
-				if (_state is Starling) {	
+				if (_state is Starling) {
 					_state.start();
-					_state.antiAliasing = 1;
 					(_state.stage.getChildAt(0) as StarlingState).initialize();
 				} else {
 					addChildAt(_state as State, _stateDisplayIndex);
