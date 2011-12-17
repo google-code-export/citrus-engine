@@ -3,8 +3,6 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
-	import flash.geom.Rectangle;
-	import flash.utils.getDefinitionByName;
 	
 	/**
 	 * Animation Sequence represents a single animation sprite sheet. You will create one animation sequence per animation that your
@@ -20,7 +18,6 @@
 		public var invertedBitmapData:BitmapData;
 		public var name:String;
 		
-		private var _currFrame:Number = 0;
 		private var _frameWidth:Number;
 		private var _frameHeight:Number;
 		private var _numFrames:Number;

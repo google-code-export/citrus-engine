@@ -1,10 +1,10 @@
 package com.citrusengine.objects.common
 {
+
 	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.core.CitrusObject;
-	import com.citrusengine.view.BlittingArt;
-	import com.citrusengine.view.BlittingView;
-	import flash.utils.Dictionary;
+	import com.citrusengine.view.blittingview.BlittingArt;
+	import com.citrusengine.view.blittingview.BlittingView;
 	
 	/**
 	 * An emitter creates particles at a specified rate with specified distribution properties. You can set the emitter's x and y

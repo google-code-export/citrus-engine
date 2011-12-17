@@ -37,11 +37,15 @@ package com.citrusengine.view.starlingview {
 
 		public var loader:Loader;
 
+		// properties :
 		private var _citrusObject:ISpriteView;
 		private var _registration:String;
 		private var _view:*;
 		private var _animation:String;
 		private var _group:int;
+		private var _fpsMC:uint;
+		private var _loopAnimation:Array;
+
 		private var _texture:Texture;
 		private var _textureAtlas:TextureAtlas;
 
@@ -69,7 +73,7 @@ package com.citrusengine.view.starlingview {
 		}
 
 		public function set registration(value:String):void {
-			
+
 			if (_registration == value || !content)
 				return;
 
@@ -89,7 +93,7 @@ package com.citrusengine.view.starlingview {
 		}
 
 		public function set view(value:*):void {
-			
+
 			if (_view == value)
 				return;
 
@@ -116,6 +120,7 @@ package com.citrusengine.view.starlingview {
 					// view property is a class reference
 					content = new citrusObject.view();
 					addChild(content);
+					
 				} else if (_view is Object) {
 					// TODO : check performance
 					addChild(_view);
@@ -145,12 +150,17 @@ package com.citrusengine.view.starlingview {
 				if (_animation != null && _animation != "" && _textureAtlas.getTextures(_animation) != null) {
 
 					// TODO: find a better way than hard code...
-					if (_animation == "duck" || _animation == "jump" || animation == "die" || animation == "hurt") {
-						gotoAndStop(_animation);
-					} else {
-						gotoAndPlay(_animation);
+
+					var animLoop:Boolean = false;
+					for each (var anim:String in _loopAnimation) {
+
+						if (anim == _animation) {
+							animLoop = true;
+							break;
+						}
 					}
 
+					(content as MovieClip).changeTextures(_textureAtlas.getTextures(_animation), _fpsMC, animLoop);
 				}
 			}
 		}
@@ -163,22 +173,50 @@ package com.citrusengine.view.starlingview {
 			_group = value;
 		}
 
+		public function get fpsMC():uint {
+			return _fpsMC;
+		}
+
+		public function set fpsMC(fpsMC:uint):void {
+			_fpsMC = fpsMC;
+		}
+
+		public function get loopAnimation():Array {
+			return _loopAnimation;
+		}
+
+		public function set loopAnimation(loopAnimation:Array):void {
+			_loopAnimation = loopAnimation;
+		}
+
 		public function get citrusObject():ISpriteView {
 			return _citrusObject;
 		}
 
 		public function update(stateView:StarlingView):void {
 
-			// position = object position + (camera position * inverse parallax)
-			x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
-			y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+			// The position = object position + (camera position * inverse parallax)
+			
+			if (content is Box2DDebugArt) {
+				Starling.current.nativeStage.getChildAt(1).x = Starling.current.nativeStage.getChildAt(1).x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
+				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				Starling.current.nativeStage.getChildAt(1).visible = _citrusObject.visible;
+
+			} else {
+				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
+				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				visible = _citrusObject.visible;
+			}
+			
 			rotation = _citrusObject.rotation;
-			visible = _citrusObject.visible;
+			
 			scaleX = _citrusObject.inverted ? -1 : 1;
 			registration = _citrusObject.registration;
 			view = _citrusObject.view;
 			animation = _citrusObject.animation;
 			group = _citrusObject.group;
+			fpsMC = _citrusObject.fpsMC;
+			_loopAnimation = _citrusObject.loopAnimation;
 		}
 
 		private function handleContentLoaded(evt:Event):void {
@@ -186,7 +224,7 @@ package com.citrusengine.view.starlingview {
 			if (evt.target.loader.content is flash.display.MovieClip) {
 
 				_textureAtlas = DynamicAtlas.fromMovieClipContainer(evt.target.loader.content);
-				content = new MovieClip(_textureAtlas.getTextures(animation), 24);
+				content = new MovieClip(_textureAtlas.getTextures(animation), _fpsMC);
 				Starling.juggler.add(content as MovieClip);
 			}
 
@@ -198,38 +236,9 @@ package com.citrusengine.view.starlingview {
 			addChild(content);
 		}
 
-		private function gotoAndPlay(label:String):void {
-
-			var mc:MovieClip = content as MovieClip;
-
-			while (mc.numFrames > 0) {
-				mc.removeFrameAt(0);
-			}
-
-			for each (var texture:Texture in _textureAtlas.getTextures(label)) {
-				mc.addFrame(texture);
-			}
-
-			mc.loop = true;
-		}
-
-		private function gotoAndStop(label:String):void {
-
-			var mc:MovieClip = content as MovieClip;
-
-			while (mc.numFrames > 0) {
-				mc.removeFrameAt(0);
-			}
-
-			for each (var texture:Texture in _textureAtlas.getTextures(label)) {
-				mc.addFrame(texture);
-			}
-
-			mc.loop = false;
-		}
-
 		private function handleContentIOError(evt:IOErrorEvent):void {
 			throw new Error(evt.text);
 		}
+
 	}
 }

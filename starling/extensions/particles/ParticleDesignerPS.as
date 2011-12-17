@@ -274,9 +274,7 @@ package starling.extensions.particles
     }
 }
 
-import starling.extensions.particles.Particle;
-
-class PDParticle extends Particle
+class PDParticle extends starling.extensions.particles.Particle
 {
     public var colorArgb:ColorArgb;
     public var colorArgbDelta:ColorArgb;

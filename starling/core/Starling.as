@@ -33,8 +33,6 @@ package starling.core
     
     import starling.animation.Juggler;
     import starling.display.DisplayObject;
-    import starling.display.Image;
-    import starling.display.Quad;
     import starling.display.Stage;
     import starling.events.ResizeEvent;
     import starling.events.TouchPhase;
@@ -104,7 +102,7 @@ package starling.core
     public class Starling
     {
         /** The version of the Starling framework. */
-        public static const VERSION:String = "0.9";
+        public static const VERSION:String = "0.9.1";
         
         // members
         
@@ -132,14 +130,15 @@ package starling.core
         // construction
         
         /** Creates a new Starling instance. 
-         *  @param rootClass  A subclass of a Starling display object. Its contents will represent
-         *                    the root of the display tree.
+         *  @param rootClass  A subclass of a Starling display object. It will be created as soon as
+         *                    initialization is finished and will become the first child of the
+         *                    Starling stage.
          *  @param stage      The Flash (2D) stage.
          *  @param viewPort   A rectangle describing the area into which the content will be 
          *                    rendered. @default stage size
          *  @param stage3D    The Stage3D object into which the content will be rendered.
          *                    @default the first available Stage3D.
-         *  @param renderMode Use this parameter to force software rendering. 
+         *  @param renderMode Use this parameter to force "software" rendering. 
          */
         public function Starling(rootClass:Class, stage:flash.display.Stage, 
                                  viewPort:Rectangle=null, stage3D:Stage3D=null,
@@ -162,7 +161,6 @@ package starling.core
             mEnableErrorChecking = false;
             mLastFrameTimestamp = getTimer() / 1000.0;
             mPrograms = new Dictionary();
-            mSupport = new RenderSupport();
             
             if (sCurrent == null)
                 makeCurrent();
@@ -196,6 +194,7 @@ package starling.core
             
             if (mContext) mContext.dispose();
             if (mTouchProcessor) mTouchProcessor.dispose();
+            if (mSupport) mSupport.dispose();
         }
         
         // functions
@@ -208,14 +207,10 @@ package starling.core
             mContext.enableErrorChecking = mEnableErrorChecking;
             updateViewPort();
             
+            mSupport = new RenderSupport();
+            
             trace("[Starling] Initialization complete.");
             trace("[Starling] Display Driver:" + mContext.driverInfo);
-        }
-        
-        private function initializePrograms():void
-        {
-            Quad.registerPrograms(this);
-            Image.registerPrograms(this);
         }
         
         private function initializeRoot():void
@@ -249,13 +244,14 @@ package starling.core
             mTouchProcessor.advanceTime(passedTime);
             
             mSupport.setOrthographicProjection(mStage.stageWidth, mStage.stageHeight);
-            mSupport.setDefaultBlendFactors(true);
             mSupport.clear(mStage.color, 1.0);
             
             mStage.render(mSupport, 1.0);
-            mContext.present();
+
+            mSupport.finishQuadBatch();
+            mSupport.nextFrame();
             
-            mSupport.resetMatrix();
+            mContext.present();
         }
         
         private function updateNativeOverlay():void
@@ -316,7 +312,6 @@ package starling.core
         private function onContextCreated(event:Event):void
         {            
             initializeGraphicsAPI();
-            initializePrograms();
             initializeRoot();
             
             mTouchProcessor.simulateMultitouch = mSimulateMultitouch;
@@ -401,7 +396,7 @@ package starling.core
         /** Registers a vertex- and fragment-program under a certain name. */
         public function registerProgram(name:String, vertexProgram:ByteArray, fragmentProgram:ByteArray):void
         {
-            if (mPrograms.hasOwnProperty(name))
+            if (name in mPrograms)
                 throw new Error("Another program with this name is already registered");
             
             var program:Program3D = mContext.createProgram();
@@ -424,6 +419,12 @@ package starling.core
         public function getProgram(name:String):Program3D
         {
             return mPrograms[name] as Program3D;
+        }
+        
+        /** Indicates if a set of vertex- and fragment-programs is registered under a certain name. */
+        public function hasProgram(name:String):Boolean
+        {
+            return name in mPrograms;
         }
         
         // properties

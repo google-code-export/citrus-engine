@@ -9,7 +9,7 @@ package com.citrusengine.view.starlingview {
 	import flash.display.MovieClip;
 
 	/**
-	 * StarlingView is based on  Adobe Stage3D to render graphics and the Starling framework. 
+	 * StarlingView is based on  Adobe Stage3D and the Starling framework to render graphics. 
 	 * It creates and manages graphics like the traditional Flash display list thanks to Starling :
 	 * (addChild(), removeChild()) using Starling DisplayObjects (MovieClip, Image, Sprite, Quad etc).
 	 */	
@@ -75,20 +75,15 @@ package com.citrusengine.view.starlingview {
 				
 			if (citrusObject.view == flash.display.MovieClip)
 				citrusObject.view = starling.display.Sprite;
-						
-			if (citrusObject.view != com.citrusengine.view.spriteview.Box2DDebugArt) {
 				
-				var art:StarlingArt = new StarlingArt(viewObject);
-				
-				// Perform an initial update
-				art.update(this);
+			var art:StarlingArt = new StarlingArt(viewObject);
+			
+			// Perform an initial update
+			art.update(this);
 
-				updateGroupForSprite(art);
-				
-				return art;
-			}
-
-			return null;
+			updateGroupForSprite(art);
+			
+			return art;
 		}
 
 		/**

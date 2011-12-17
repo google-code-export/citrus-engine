@@ -149,5 +149,13 @@ package com.citrusengine.physics {
 		{
 			return "topLeft";
 		}
+		
+		public function get fpsMC():uint {
+			return 0;
+		}
+		
+		public function get loopAnimation():Array {
+			return [];
+		}
 	}
 }

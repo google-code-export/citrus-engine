@@ -1,4 +1,4 @@
-package starling.extensions.textureAtlas{
+package starling.extensions.textureAtlas {
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
