@@ -110,5 +110,16 @@ package com.citrusengine.view
 		 * your art, you should handle the registration in your embedded class.
 		 */
 		function get registration():String;
+		
+		/**
+		 * The fps for the MovieClip, Starling only!
+		 */
+		function get fpsMC():uint;
+		
+		/**
+		 * Playing in loop animation, Starling only!
+		 */
+		 
+		 function get loopAnimation():Array;
 	}
 }

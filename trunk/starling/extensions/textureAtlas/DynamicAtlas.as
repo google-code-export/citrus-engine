@@ -1,6 +1,11 @@
 package starling.extensions.textureAtlas
 {
 
+	import starling.text.BitmapFont;
+	import starling.text.TextField;
+	import starling.textures.Texture;
+	import starling.textures.TextureAtlas;
+
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
@@ -12,14 +17,7 @@ package starling.extensions.textureAtlas
 	import flash.text.Font;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
-    import flash.utils.getQualifiedClassName;
-
-    import starling.text.BitmapFont;
-	import starling.textures.Texture;
-	import starling.textures.TextureAtlas;
-	import starling.text.TextField;
-	
-	import starling.extensions.textureAtlas.TextureItem;
+	import flash.utils.getQualifiedClassName;	
 	
 	/**
 	 * DynamicAtlas.as

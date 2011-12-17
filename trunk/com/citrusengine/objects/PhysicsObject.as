@@ -19,7 +19,7 @@ package com.citrusengine.objects {
 	/**
 	 * You should extend this class to take advantage of Box2D. This class provides template methods for defining
 	 * and creating Box2D bodies, fixtures, shapes, and joints. If you are not familiar with Box2D, you should first
-	 * learn about it via the "Box2D Manual" (Google it).
+	 * learn about it via the <a href="http://www.box2d.org/manual.html">Box2D Manual</a>.
 	 */	
 	public class PhysicsObject extends CitrusObject implements ISpriteView
 	{
@@ -47,6 +47,8 @@ package com.citrusengine.objects {
 		protected var _rotation:Number = 0;
 		protected var _width:Number = 1;
 		protected var _height:Number = 1;
+		protected var _fpsMC:uint = 24;
+		protected var _loopAnimation:Array = ["walk"];
 		
 		private var _group:Number = 0;
 		private var _offsetX:Number = 0;
@@ -221,6 +223,22 @@ package com.citrusengine.objects {
 			_view = value;
 		}
 		
+		public function get fpsMC():uint {
+			return _fpsMC;
+		}
+
+		public function set fpsMC(fpsMC:uint):void {
+			_fpsMC = fpsMC;
+		}
+		
+		public function get loopAnimation():Array {
+			return _loopAnimation;
+		}
+
+		public function set loopAnimation(loopAnimation:Array):void {
+			_loopAnimation = loopAnimation;
+		}
+		
 		public function get animation():String
 		{
 			return _animation;
@@ -382,7 +400,8 @@ package com.citrusengine.objects {
 		 */		
 		protected function createJoint():void
 		{
-			
+
 		}
+
 	}
 }
