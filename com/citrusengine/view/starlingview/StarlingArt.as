@@ -40,13 +40,18 @@ package com.citrusengine.view.starlingview {
 		public var loader:Loader;
 
 		// properties :
+		
+		// determines animations playing in loop you can update in your State : StarlingArt.loopAnimation = ["walk", "run"];
+		private static var _loopAnimation:Array = ["walk"];
+		
 		private var _citrusObject:ISpriteView;
 		private var _registration:String;
 		private var _view:*;
 		private var _animation:String;
 		private var _group:int;
-		private var _fpsMC:uint;
-		private var _loopAnimation:Array;
+		
+		// fps for this MovieClip, it can be different between objects, to set it : view.getArt(myHero).fpsMC = 25; 
+		private var _fpsMC:uint = 30;
 
 		private var _texture:Texture;
 		private var _textureAtlas:TextureAtlas;
@@ -68,6 +73,14 @@ package com.citrusengine.view.starlingview {
 				content.dispose();
 			}
 
+		}
+		
+		static public function get loopAnimation():Array {
+			return _loopAnimation;
+		}
+
+		static public function set loopAnimation(loopAnimation:Array):void {
+			_loopAnimation = loopAnimation;
 		}
 
 		public function get registration():String {
@@ -181,14 +194,6 @@ package com.citrusengine.view.starlingview {
 			_fpsMC = fpsMC;
 		}
 
-		public function get loopAnimation():Array {
-			return _loopAnimation;
-		}
-
-		public function set loopAnimation(loopAnimation:Array):void {
-			_loopAnimation = loopAnimation;
-		}
-
 		public function get citrusObject():ISpriteView {
 			return _citrusObject;
 		}
@@ -230,7 +235,6 @@ package com.citrusengine.view.starlingview {
 			} else {
 
 				// The position = object position + (camera position * inverse parallax)
-
 				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
 				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 				visible = _citrusObject.visible;
@@ -240,9 +244,6 @@ package com.citrusengine.view.starlingview {
 				view = _citrusObject.view;
 				animation = _citrusObject.animation;
 				group = _citrusObject.group;
-				fpsMC = _citrusObject.fpsMC;
-				loopAnimation = _citrusObject.loopAnimation;
-
 			}
 		}
 
@@ -256,6 +257,7 @@ package com.citrusengine.view.starlingview {
 			}
 
 			if (evt.target.loader.content is Bitmap) {
+				
 				_texture = Texture.fromBitmap(evt.target.loader.content);
 				content = new Image(_texture);
 			}
