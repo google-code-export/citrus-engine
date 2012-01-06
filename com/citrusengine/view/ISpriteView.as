@@ -117,9 +117,8 @@ package com.citrusengine.view
 		function get fpsMC():uint;
 		
 		/**
-		 * Playing in loop animation, Starling only!
+		 * Animation playing in loop, Starling only!
 		 */
-		 
 		 function get loopAnimation():Array;
 	}
 }

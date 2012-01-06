@@ -1,5 +1,7 @@
 package com.citrusengine.view.starlingview {
 
+	import Box2DAS.Dynamics.b2DebugDraw;
+
 	import starling.core.Starling;
 	import starling.display.DisplayObject;
 	import starling.display.Image;
@@ -120,7 +122,7 @@ package com.citrusengine.view.starlingview {
 					// view property is a class reference
 					content = new citrusObject.view();
 					addChild(content);
-					
+
 				} else if (_view is Object) {
 					// TODO : check performance
 					addChild(_view);
@@ -148,8 +150,6 @@ package com.citrusengine.view.starlingview {
 			if (content is MovieClip) {
 
 				if (_animation != null && _animation != "" && _textureAtlas.getTextures(_animation) != null) {
-
-					// TODO: find a better way than hard code...
 
 					var animLoop:Boolean = false;
 					for each (var anim:String in _loopAnimation) {
@@ -195,28 +195,55 @@ package com.citrusengine.view.starlingview {
 
 		public function update(stateView:StarlingView):void {
 
-			// The position = object position + (camera position * inverse parallax)
-			
 			if (content is Box2DDebugArt) {
-				Starling.current.nativeStage.getChildAt(1).x = Starling.current.nativeStage.getChildAt(1).x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
-				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
-				Starling.current.nativeStage.getChildAt(1).visible = _citrusObject.visible;
+
+				// Box2D view is not on the Starling display list, but on the classical flash display list.
+				// So we need to move its view here, not in the StarlingView.
+
+				var box2dDebugArt:b2DebugDraw = (Starling.current.nativeStage.getChildAt(1) as b2DebugDraw);
+
+				if (stateView.cameraTarget) {
+
+					var diffX:Number = (-stateView.cameraTarget.x + stateView.cameraOffset.x) - box2dDebugArt.x;
+					var diffY:Number = (-stateView.cameraTarget.y + stateView.cameraOffset.y) - box2dDebugArt.y;
+					var velocityX:Number = diffX * stateView.cameraEasing.x;
+					var velocityY:Number = diffY * stateView.cameraEasing.y;
+					box2dDebugArt.x += velocityX;
+					box2dDebugArt.y += velocityY;
+
+					// Constrain to camera bounds
+					if (stateView.cameraBounds) {
+						if (-box2dDebugArt.x <= stateView.cameraBounds.left || stateView.cameraBounds.width < stateView.cameraLensWidth)
+							box2dDebugArt.x = -stateView.cameraBounds.left;
+						else if (-box2dDebugArt.x + stateView.cameraLensWidth >= stateView.cameraBounds.right)
+							box2dDebugArt.x = -stateView.cameraBounds.right + stateView.cameraLensWidth;
+
+						if (-box2dDebugArt.y <= stateView.cameraBounds.top || stateView.cameraBounds.height < stateView.cameraLensHeight)
+							box2dDebugArt.y = -stateView.cameraBounds.top;
+						else if (-box2dDebugArt.y + stateView.cameraLensHeight >= stateView.cameraBounds.bottom)
+							box2dDebugArt.y = -stateView.cameraBounds.bottom + stateView.cameraLensHeight;
+					}
+				}
+
+				box2dDebugArt.visible = _citrusObject.visible;
 
 			} else {
+
+				// The position = object position + (camera position * inverse parallax)
+
 				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
 				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 				visible = _citrusObject.visible;
+				rotation = _citrusObject.rotation;
+				scaleX = _citrusObject.inverted ? -1 : 1;
+				registration = _citrusObject.registration;
+				view = _citrusObject.view;
+				animation = _citrusObject.animation;
+				group = _citrusObject.group;
+				fpsMC = _citrusObject.fpsMC;
+				loopAnimation = _citrusObject.loopAnimation;
+
 			}
-			
-			rotation = _citrusObject.rotation;
-			
-			scaleX = _citrusObject.inverted ? -1 : 1;
-			registration = _citrusObject.registration;
-			view = _citrusObject.view;
-			animation = _citrusObject.animation;
-			group = _citrusObject.group;
-			fpsMC = _citrusObject.fpsMC;
-			_loopAnimation = _citrusObject.loopAnimation;
 		}
 
 		private function handleContentLoaded(evt:Event):void {
