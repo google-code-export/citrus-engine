@@ -123,7 +123,7 @@ package com.citrusengine.view.starlingview {
 					content = new citrusObject.view();
 					addChild(content);
 
-				} else if (_view is Object) {
+				} else if (_view is DisplayObject) {
 					// TODO : check performance
 					addChild(_view);
 				} else {
