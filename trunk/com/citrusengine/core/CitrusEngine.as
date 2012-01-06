@@ -209,6 +209,9 @@
 		{
 			if (_playing)
 			{
+				if (_state is Starling)
+					_state.stop();
+					
 				playing = false;
 				stage.addEventListener(Event.ACTIVATE, handleStageActivated);
 			}
@@ -216,6 +219,9 @@
 		
 		private function handleStageActivated(e:Event):void
 		{
+			if (_state is Starling)
+					_state.start();
+					
 			playing = true;
 			stage.removeEventListener(Event.ACTIVATE, handleStageActivated);
 		}

@@ -47,8 +47,6 @@ package com.citrusengine.objects {
 		protected var _rotation:Number = 0;
 		protected var _width:Number = 1;
 		protected var _height:Number = 1;
-		protected var _fpsMC:uint = 24;
-		protected var _loopAnimation:Array = ["walk"];
 		
 		private var _group:Number = 0;
 		private var _offsetX:Number = 0;
@@ -221,22 +219,6 @@ package com.citrusengine.objects {
 		public function set view(value:*):void
 		{
 			_view = value;
-		}
-		
-		public function get fpsMC():uint {
-			return _fpsMC;
-		}
-
-		public function set fpsMC(fpsMC:uint):void {
-			_fpsMC = fpsMC;
-		}
-		
-		public function get loopAnimation():Array {
-			return _loopAnimation;
-		}
-
-		public function set loopAnimation(loopAnimation:Array):void {
-			_loopAnimation = loopAnimation;
 		}
 		
 		public function get animation():String

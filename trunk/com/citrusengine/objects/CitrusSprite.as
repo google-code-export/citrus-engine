@@ -39,7 +39,6 @@ package com.citrusengine.objects
 		protected var _view:* = SpriteDebugArt;
 		protected var _inverted:Boolean = false;
 		protected var _animation:String = "";
-		protected var _loopAnimation:Array = [];
 		protected var _offsetX:Number = 0;
 		protected var _offsetY:Number = 0;
 		protected var _registration:String = "topLeft";
@@ -212,14 +211,6 @@ package com.citrusengine.objects
 		public function set registration(value:String):void
 		{
 			_registration = value;
-		}
-		
-		public function get fpsMC():uint {
-			return 0;
-		}
-		
-		public function get loopAnimation():Array {
-			return _loopAnimation;
 		}
 		
 		override public function update(timeDelta:Number):void
