@@ -1,9 +1,10 @@
 package com.citrusengine.core
 {
+
 	import com.citrusengine.view.CitrusView;
 	import com.citrusengine.view.spriteview.SpriteView;
+
 	import flash.display.Sprite;
-	
 	
 	/**
 	 * The State class is very important. It usually contains the logic for a particular state the game is in.
@@ -12,7 +13,7 @@ package com.citrusengine.core
 	 * create a state that represents all your levels. You can get and set the reference to your active
 	 * state via the CitrusEngine class.
 	 */	
-	public class State extends Sprite
+	public class State extends Sprite implements IState
 	{
 		private var _objects:Vector.<CitrusObject> = new Vector.<CitrusObject>();
 		private var _view:CitrusView;

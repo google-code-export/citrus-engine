@@ -14,7 +14,7 @@ package com.citrusengine.view {
 	 * <p>This is the class by which you will grab a reference to the graphical representations of your Citrus Objects,
 	 * which will be useful if you need to add mouse event handlers to them, or add graphics effects and filter.</p>
 	 * 
-	 * <p>The CitrusView was meant to be extended to support multiple rendering methods, such as blitting, or even 3D thanks to Starling. The goal 
+	 * <p>The CitrusView was meant to be extended to support multiple rendering methods, such as blitting, or even Stage3D thanks to Starling. The goal 
 	 * is to provide as much decoupling as possible of the data/logic from the view.</p> 
 	 */	
 	public class CitrusView
