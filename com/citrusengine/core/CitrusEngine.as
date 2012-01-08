@@ -11,6 +11,8 @@
 	 * 
 	 * <p>CitrusEngine is a singleton so that you can grab a reference to it anywhere, anytime. Don't abuse this power,
 	 * but use it wisely. With it, you can quickly grab a reference to the manager classes such as current State, Input and SoundManager.</p>
+	 * 
+	 * <p>CitrusEngine can access to the Stage3D power thanks to the <a href="http://starling-framework.org/">Starling Framework</a></p>
 	 */	
 	public class CitrusEngine extends MovieClip
 	{
@@ -18,8 +20,11 @@
 		
 		private static var _instance:CitrusEngine;
 		
-		private var _state:*;
-		private var _newState:*;
+		private var _starling:Starling;
+		private var _starlingAntialiasing:uint = 1;
+		
+		private var _state:IState;
+		private var _newState:IState;
 		private var _stateDisplayIndex:uint = 0;
 		private var _startTime:Number;
 		private var _gameTime:Number;
@@ -27,8 +32,6 @@
 		private var _input:Input;
 		private var _sound:SoundManager;
 		private var _console:Console;
-		
-		private var _starlingAntialiasing:uint = 1;
 		
 		public static function getInstance():CitrusEngine
 		{
@@ -63,19 +66,34 @@
 		}
 		
 		/**
+		 * You should call this function to create your Starling view. The RootClass is internal, it is never used elsewhere. 
+		 * StarlingState is added on the starling stage : <code>_starling.stage.addChildAt(_state as StarlingState, _stateDisplayIndex);</code> 
+		 */
+		public function setUpStarling():void {
+			starling = new Starling(RootClass, stage);
+		}
+		
+		public function get starling():Starling {
+			return _starling;
+		}
+
+		public function set starling(value:Starling):void {
+			_starling = value;
+			_starling.antiAliasing = _starlingAntialiasing;
+			_starling.start();
+		}
+		
+		/**
 		 * A reference to the active game state. Acutally, that's not entirely true. If you've recently changed states and a tick
 		 * hasn't occured yet, then this will reference your new state; this is because actual state-changes only happen pre-tick.
 		 * That way you don't end up changing states in the middle of a state's tick, effectively fucking stuff up. 
 		 */		
-		public function get state():*
+		public function get state():IState
 		{			
 			if (_newState)
 				return _newState;
 			else {
-				if (_state is Starling)
-					return (_state.stage.getChildAt(0) as StarlingState);
-				else
-					return _state;
+				return _state;
 			}
 		}
 		
@@ -83,12 +101,9 @@
 		 * We only ACTUALLY change states on enter frame so that we don't risk changing states in the middle of a state update.
 		 * However, if you use the state getter, it will grab the new one for you, so everything should work out just fine.
 		 */		
-		public function set state(value:*):void
+		public function set state(value:IState):void
 		{
-			_newState = value;
-			if (_newState is Starling) {
-				_newState.antiAliasing = _starlingAntialiasing;
-			}
+			_newState = value;			
 		}
 		
 		/**
@@ -141,8 +156,19 @@
 			return _starlingAntialiasing;
 		}
 
-		public function set starlingAntialiasing(starlingAntialiasing:uint):void {
-			_starlingAntialiasing = starlingAntialiasing;
+		/**
+		 * The antialiasing value allows you to set the anti-aliasing you want. Generally a value of 1 is totally acceptable 
+		 * but you can go further, technically you can go from 0 to 16, but here is the list of the most common values :
+		 * 
+		 * <ul><li>0 : No anti-aliasing.</li>
+		 * <li>2 : Minimal anti-aliasing.</li>
+		 * <li>4 : High quality anti-aliasing.</li>
+		 * <li>16 : Very high quality anti-aliasing.</li></ul>
+		 * 
+		 * <p>We will rarely need to go above 2, especially for 2D content, but you will decide depending on your use cases.</p>
+		 */
+		public function set starlingAntialiasing(value:uint):void {
+			_starlingAntialiasing = value;
 		}
 		
 		/**
@@ -169,24 +195,23 @@
 			{
 				if (_state)
 				{
-					if (_state is Starling) {
-						(_state.stage.getChildAt(0) as StarlingState).destroy();
+					_state.destroy();
+					if (_starling) {
+						_starling.stage.removeChild(_state as StarlingState);
+						_starling.nativeStage.removeChildAt(1); // Remove Box2D view
 					} else {
-						_state.destroy();
 						removeChild(_state as State);
 					}
 				}
 				_state = _newState;
 				_newState = null;
 				
-				if (_state is Starling) {
-					_state.start();
-					(_state.stage.getChildAt(0) as StarlingState).initialize();
+				if (_starling) {
+					_starling.stage.addChildAt(_state as StarlingState, _stateDisplayIndex);
 				} else {
 					addChildAt(_state as State, _stateDisplayIndex);
-					_state.initialize();
 				}
-				
+				_state.initialize();
 			}
 			
 			//Update the state
@@ -194,13 +219,10 @@
 			{
 				var nowTime:Number = new Date().time;
 				var timeSinceLastFrame:Number = nowTime - _gameTime;
-				var timeDelta:Number = timeSinceLastFrame / 1000;
+				var timeDelta:Number = timeSinceLastFrame * 0.001;
 				_gameTime = nowTime;
 				
-				if (_state is Starling)
-					(_state.stage.getChildAt(0) as StarlingState).update(timeDelta);
-				else
-					_state.update(timeDelta);
+				_state.update(timeDelta);
 			}
 			
 		}
@@ -209,8 +231,8 @@
 		{
 			if (_playing)
 			{
-				if (_state is Starling)
-					_state.stop();
+				if (_starling)
+					_starling.stop();
 					
 				playing = false;
 				stage.addEventListener(Event.ACTIVATE, handleStageActivated);
@@ -219,8 +241,8 @@
 		
 		private function handleStageActivated(e:Event):void
 		{
-			if (_state is Starling)
-					_state.start();
+			if (_starling)
+				_starling.start();
 					
 			playing = true;
 			stage.removeEventListener(Event.ACTIVATE, handleStageActivated);
@@ -242,12 +264,8 @@
 		
 		private function handleConsoleSetCommand(objectName:String, paramName:String, paramValue:String):void
 		{
-			var object:CitrusObject;
+			var object:CitrusObject = _state.getObjectByName(objectName);
 			
-			if (_state is Starling)
-			 	object = (_state.stage.getChildAt(0) as StarlingState).getObjectByName(objectName);
-			else
-				object = _state.getObjectByName(objectName);
 			if (!object)
 			{
 				trace("Warning: There is no object named " + objectName);
@@ -263,13 +281,17 @@
 				value = paramValue;
 			
 			if (object.hasOwnProperty(paramName))
-			{
 				object[paramName] = value;
-			}
 			else
-			{
 				trace("Warning: " + objectName + " has no parameter named " + paramName + ".");
-			}
 		}
 	}
+}
+
+/**
+ * RootClass is the root of Starling, it is never destroyed and only accessed through <code>_starling.stage</code>.
+ */
+import starling.display.Sprite;
+
+internal class RootClass extends Sprite {
 }
