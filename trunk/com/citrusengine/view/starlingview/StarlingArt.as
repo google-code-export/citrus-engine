@@ -1,5 +1,6 @@
 package com.citrusengine.view.starlingview {
 
+	import flash.utils.Dictionary;
 	import Box2DAS.Dynamics.b2DebugDraw;
 
 	import starling.core.Starling;
@@ -41,8 +42,8 @@ package com.citrusengine.view.starlingview {
 
 		// properties :
 		
-		// determines animations playing in loop you can update in your State : StarlingArt.loopAnimation = ["walk", "run"];
-		private static var _loopAnimation:Array = ["walk"];
+		// determines animations playing in loop. You can add one in your state class : StarlingArt.pushLoopAnimation("run");
+		private static var _loopAnimation:Dictionary = new Dictionary();
 		
 		private var _citrusObject:ISpriteView;
 		private var _registration:String;
@@ -59,6 +60,10 @@ package com.citrusengine.view.starlingview {
 		public function StarlingArt(object:ISpriteView) {
 
 			_citrusObject = object;
+			
+			if (_loopAnimation["walk"] != true) {
+				_loopAnimation["walk"] = true;
+			}
 		}
 
 		public function destroy():void {
@@ -75,12 +80,16 @@ package com.citrusengine.view.starlingview {
 
 		}
 		
-		static public function get loopAnimation():Array {
-			return _loopAnimation;
+		/**
+		 * Add a loop animation to the Dictionnary.
+		 * @param animName the loop animation name.
+		 */
+		static public function pushLoopAnimation(animName:String):void {
+			_loopAnimation[animName] = true;
 		}
-
-		static public function set loopAnimation(loopAnimation:Array):void {
-			_loopAnimation = loopAnimation;
+		
+		static public function get loopAnimation():Dictionary {
+			return _loopAnimation;
 		}
 
 		public function get registration():String {
@@ -164,15 +173,7 @@ package com.citrusengine.view.starlingview {
 
 				if (_animation != null && _animation != "" && _textureAtlas.getTextures(_animation) != null) {
 
-					var animLoop:Boolean = false;
-					for each (var anim:String in _loopAnimation) {
-
-						if (anim == _animation) {
-							animLoop = true;
-							break;
-						}
-					}
-
+					var animLoop:Boolean = _loopAnimation[_animation];
 					(content as MovieClip).changeTextures(_textureAtlas.getTextures(_animation), _fpsMC, animLoop);
 				}
 			}
