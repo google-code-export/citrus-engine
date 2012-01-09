@@ -20,8 +20,7 @@
 		
 		private static var _instance:CitrusEngine;
 		
-		private var _starling:Starling;
-		private var _starlingAntialiasing:uint = 1;
+		protected var _starling:Starling;
 		
 		private var _state:IState;
 		private var _newState:IState;
@@ -67,19 +66,12 @@
 		
 		/**
 		 * You should call this function to create your Starling view. The RootClass is internal, it is never used elsewhere. 
-		 * StarlingState is added on the starling stage : <code>_starling.stage.addChildAt(_state as StarlingState, _stateDisplayIndex);</code> 
+		 * StarlingState is added on the starling stage : <code>_starling.stage.addChildAt(_state as StarlingState, _stateDisplayIndex);</code>
+		 * @param antiAliasing : The antialiasing value allows you to set the anti-aliasing (0 - 16), generally a value of 1 is totally acceptable.
 		 */
-		public function setUpStarling():void {
-			starling = new Starling(RootClass, stage);
-		}
-		
-		public function get starling():Starling {
-			return _starling;
-		}
-
-		public function set starling(value:Starling):void {
-			_starling = value;
-			_starling.antiAliasing = _starlingAntialiasing;
+		public function setUpStarling(antiAliasing:uint = 1):void {
+			_starling = new Starling(RootClass, stage);
+			_starling.antiAliasing = antiAliasing;
 			_starling.start();
 		}
 		
@@ -150,25 +142,6 @@
 		public function get console():Console
 		{
 			return _console;
-		}
-		
-		public function get starlingAntialiasing():uint {
-			return _starlingAntialiasing;
-		}
-
-		/**
-		 * The antialiasing value allows you to set the anti-aliasing you want. Generally a value of 1 is totally acceptable 
-		 * but you can go further, technically you can go from 0 to 16, but here is the list of the most common values :
-		 * 
-		 * <ul><li>0 : No anti-aliasing.</li>
-		 * <li>2 : Minimal anti-aliasing.</li>
-		 * <li>4 : High quality anti-aliasing.</li>
-		 * <li>16 : Very high quality anti-aliasing.</li></ul>
-		 * 
-		 * <p>We will rarely need to go above 2, especially for 2D content, but you will decide depending on your use cases.</p>
-		 */
-		public function set starlingAntialiasing(value:uint):void {
-			_starlingAntialiasing = value;
 		}
 		
 		/**

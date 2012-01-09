@@ -195,7 +195,7 @@
 		{
 			var array:Array = [];
 			
-			var state:State = CitrusEngine.getInstance().state;
+			var state:State = CitrusEngine.getInstance().state as State;
 			for each (var objectXML:XML in levelData.CitrusObject)
 			{
 				var params:Object = { };
