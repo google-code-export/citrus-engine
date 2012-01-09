@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	backgroundColor="#D6D6D6" styleName="flashPanelStyle"
+	paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0"
+	width="300" height="300" resize="_resize(event)"
+	applicationComplete="_applicationComplete(event)">
+
+	<mx:Script>
+		<![CDATA[
+
+			import adobe.utils.MMExecute;
+
+			import mx.controls.ToolTip;
+			import mx.core.FlexGlobals;
+
+			import flash.events.Event;
+
+			private function _addObjects(evt:Event):void {
+
+				switch(evt.target) {
+
+					case addCoin:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addCoin', '" + instanceName.text.toString() + "');");
+						break;
+						
+					case addHero:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addHero', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addBaddy:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addBaddy', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addPlatform:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addPlatform', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addMovingPlatform:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addMovingPlatform', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addSensor:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addSensor', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addPhysicObject:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addPhysicObject', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addCloud:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addCloud', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addCannon:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addCannon', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addBackground:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addBackground', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addTeleporter:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addTeleporter', '" + instanceName.text.toString() + "');");
+						break;
+
+					case addTreadmill:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addTreadmill', '" + instanceName.text.toString() + "');");
+						break;
+				}
+				
+				instanceName.text = "";
+			}
+
+			private function _createFrames(evt:Event):void {
+
+				switch(evt.target) {
+
+					case createBaddy:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createBaddy');");
+						break;
+
+					case createCannon:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createCannon');");
+						break;
+					case createHero:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createHero');");
+						break;
+
+					case createMissile:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createMissile');");
+						break;
+
+					case createRewardBox:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createRewardBox');");
+						break;
+
+					case createTeleporter:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createTeleporter');");
+						break;
+
+					case createTreadmill:
+						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createTreadmill');");
+						break;
+				}
+			}
+
+			private function _applicationComplete(evt:Event):void {
+				resizeToolTip();
+			}
+
+			private function _resize(evt:Event):void {
+				resizeToolTip();
+			}
+
+			private function resizeToolTip():void {
+				ToolTip.maxWidth = Math.min(FlexGlobals.topLevelApplication.width, ToolTip.maxWidth);
+			}
+		]]>
+	</mx:Script>
+
+	<mx:TabNavigator width="100%" height="100%" id="tabNavi"
+		backgroundColor="#D6D6D6" paddingBottom="5" paddingLeft="5"
+		paddingRight="5" paddingTop="5" borderStyle="none">
+
+		<mx:Canvas label="Add objects" id="addObjects" width="100%"
+			height="100%" toolTip="Click only one time on each object. It is added to your library.">
+			<mx:VBox width="100%" height="100%">
+
+				<mx:HBox width="100%">
+					<mx:Button id="addHero" width="50%" click="_addObjects(event)"
+						label="Hero" toolTip="Add a hero to your level"/>
+
+					<mx:Button id="addBaddy" width="50%" click="_addObjects(event)"
+						label="Baddy" toolTip="Add a baddy to your level"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="addPlatform" width="50%" click="_addObjects(event)"
+						label="Platform" toolTip="Add a platform to your level"/>
+
+					<mx:Button id="addMovingPlatform" width="50%" click="_addObjects(event)" 
+					label="Moving platform" toolTip="Add a moving platform to your level"/>
+
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="addSensor" width="50%" click="_addObjects(event)"
+						label="Sensor" toolTip="Add a sensor to your level"/>
+
+					<mx:Button id="addPhysicObject" width="50%" click="_addObjects(event)"
+						label="Physic object" toolTip="Add a physic object to your level"/>
+
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="addCloud" width="50%" click="_addObjects(event)"
+						label="Cloud" toolTip="Add a cloud to your level"/>
+
+
+					<mx:Button id="addCoin" width="50%" click="_addObjects(event)"
+						label="Coin" toolTip="Add a coin to your level"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="addBackground" width="50%" click="_addObjects(event)"
+						label="Background" toolTip="Add a background to your level"/>
+
+					<mx:Button id="addTeleporter" width="50%" click="_addObjects(event)"
+						label="Teleporter" toolTip="Add a teleporter to your level"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="addTreadmill" width="50%" click="_addObjects(event)"
+						label="Treadmill" toolTip="Add a treadmill (extends Moving Platform) to your level"/>
+
+					<mx:Button id="addCannon" width="50%" click="_addObjects(event)"
+						label="Cannon" toolTip="Add a cannon to your level"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Label width="30%" text="instance name :"/>
+					<mx:TextInput id="instanceName" width="70%"
+						toolTip="Enter the instance name of your object"/>
+				</mx:HBox>
+
+			</mx:VBox>
+		</mx:Canvas>
+
+		<mx:Canvas label="Create frames" id="createFrames" width="100%"
+			height="100%" toolTip="Create frames for your Hero, Baddy...">
+			<mx:VBox width="100%">
+
+				<mx:HBox width="100%">
+					<mx:Button id="createBaddy" width="50%" click="_createFrames(event)"
+						label="Baddy" toolTip="Add labels and actions for a baddy"/>
+					<mx:Button id="createCannon" width="50%" click="_createFrames(event)"
+						label="Cannon" toolTip="Add labels and actions for a cannon"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="createHero" width="50%" click="_createFrames(event)"
+						label="Hero" toolTip="Add labels and actions for your hero"/>
+					<mx:Button id="createMissile" width="50%" click="_createFrames(event)"
+						label="Missile" toolTip="Add labels and actions for a missile"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="createRewardBox" width="50%" click="_createFrames(event)"
+						label="RewardBox" toolTip="Add labels and actions for a reward box"/>
+					<mx:Button id="createTeleporter" width="50%"
+						click="_createFrames(event)" label="Teleporter"
+						toolTip="Add labels and actions for a teleporter"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Button id="createTreadmill" width="50%" click="_createFrames(event)"
+						label="Treadmill" toolTip="Add labels and actions for a treadmill"/>
+				</mx:HBox>
+
+			</mx:VBox>
+		</mx:Canvas>
+
+		<mx:Canvas label="Copy/paste" id="copyPaste" width="100%"
+			height="100%" toolTip="Double click to copy/paste class name">
+			<mx:VBox width="100%">
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.CitrusSprite"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.PhysicsObject"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Baddy"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Cannon"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Coin"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Crate"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Hero"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Missile"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.MovingPlatform"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Platform"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Reward"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.RewardBox"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Sensor"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Teleporter"/>
+				</mx:HBox>
+
+				<mx:HBox width="100%">
+					<mx:Text width="100%" text="com.citrusengine.objects.platformer.Treadmill"/>
+				</mx:HBox>
+
+			</mx:VBox>
+		</mx:Canvas>
+	</mx:TabNavigator>
+
+</mx:Application>
