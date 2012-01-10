@@ -28,20 +28,28 @@ package com.citrusengine.objects.platformer {
 	{
 		[Property(value="1.3")]
 		public var speed:Number = 1.3;
+		
 		[Property(value="3")]
 		public var enemyKillVelocity:Number = 3;
+		
 		[Property(value="left")]
 		public var startingDirection:String = "left";
+		
 		[Property(value="400")]
 		public var hurtDuration:Number = 400;
+		
 		[Property(value="-100000")]
 		public var leftBound:Number = -100000;
+		
 		[Property(value="100000")]
 		public var rightBound:Number = 100000;
+		
 		[Citrus(value="10")]
 		public var wallSensorOffset:Number = 10;
+		
 		[Citrus(value="2")]
 		public var wallSensorWidth:Number = 2;
+		
 		[Citrus(value="2")]
 		public var wallSensorHeight:Number = 2;
 		
