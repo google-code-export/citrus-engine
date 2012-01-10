@@ -17,91 +17,14 @@
 
 			private function _addObjects(evt:Event):void {
 
-				switch(evt.target) {
-
-					case addCoin:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addCoin', '" + instanceName.text.toString() + "');");
-						break;
-						
-					case addHero:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addHero', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addBaddy:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addBaddy', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addPlatform:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addPlatform', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addMovingPlatform:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addMovingPlatform', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addSensor:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addSensor', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addPhysicObject:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addPhysicObject', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addCloud:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addCloud', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addCannon:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addCannon', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addBackground:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addBackground', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addTeleporter:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addTeleporter', '" + instanceName.text.toString() + "');");
-						break;
-
-					case addTreadmill:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'addTreadmill', '" + instanceName.text.toString() + "');");
-						break;
-				}
+				MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', '" + evt.target.id + "', '" + instanceName.text.toString() + "');");
 				
 				instanceName.text = "";
 			}
 
 			private function _createFrames(evt:Event):void {
 
-				switch(evt.target) {
-
-					case createBaddy:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createBaddy');");
-						break;
-
-					case createCannon:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createCannon');");
-						break;
-					case createHero:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createHero');");
-						break;
-
-					case createMissile:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createMissile');");
-						break;
-
-					case createRewardBox:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createRewardBox');");
-						break;
-
-					case createTeleporter:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createTeleporter');");
-						break;
-
-					case createTreadmill:
-						MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', 'createTreadmill');");
-						break;
-				}
+				MMExecute("fl.runScript(fl.configURI + 'Commands/CitrusEnginePanels.jsfl', '" + evt.target.id + "');");
 			}
 
 			private function _applicationComplete(evt:Event):void {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <macromedia-extension
   name="Citrus Engine Panels"
-  version="0.3.0"
+  version="0.3.1"
   type="flashpanel"
   requires-restart="true">
  <author name="Aymeric Lamboley" />
@@ -10,7 +10,9 @@
  </products>
  <description>
  <![CDATA[
-A flash extension to create easily Citrus Engine objects.
+A flash extension to create easily Citrus Engine objects with Library name, instance and layer.
+Frame creations with labels and actions.
+Simple text to copy/paste for the className variable into the property panel.
  ]]>
  </description>
  <ui-access>
