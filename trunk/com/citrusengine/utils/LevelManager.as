@@ -12,15 +12,15 @@ package com.citrusengine.utils {
 	 * that you give as constructor parameter : Alevel. 
 	 * 
 	 * The three ways to set up your level : 
-	 * <code>_levelManager.levels = [Level1, Level2];
-	 * _levelManager.levels = [[Level1, Level1_SWC], [level2, Level2_SWC]];
-	 * _levelManager.levels = [[Level1, "level1.swf"], [level2, "level2.swf"]];</code>
+	 * <code>levelManager.levels = [Level1, Level2];
+	 * levelManager.levels = [[Level1, Level1_SWC], [level2, Level2_SWC]];
+	 * levelManager.levels = [[Level1, "level1.swf"], [level2, "level2.swf"]];</code>
 	 * 
 	 * An instanciation exemple in your Main class:
-	 * <code>_levelManager = new LevelManager(ALevel);
-	 * _levelManager.onLevelChanged.add(_onLevelChanged);
-	 * _levelManager.levels = [Level1, Level2];
-	 * _levelManager.gotoLevel();</code>
+	 * <code>levelManager = new LevelManager(ALevel);
+	 * levelManager.onLevelChanged.add(_onLevelChanged);
+	 * levelManager.levels = [Level1, Level2];
+	 * levelManager.gotoLevel();</code>
 	 * 
 	 * The _onLevelChanged function gives in parameter the Alevel that you associate to your state : <code>state = lvl;</code>
 	 * Then you can associate other function :
@@ -85,7 +85,8 @@ package com.citrusengine.utils {
 		}
 
 		/**
-		 * Call gotoLevel() function to the LevelManager instance to launch your first level, or you may specify it.
+		 * Call the LevelManager instance's gotoLevel() function to launch your first level, or you may specify it.
+		 * @param index : the level index from 1 to ... ; different from the levels' array indexes.
 		 */
 		public function gotoLevel(index:int = -1):void {
 
@@ -138,6 +139,10 @@ package com.citrusengine.utils {
 
 		}
 		
+		public function get levels():Array {
+			return _levels;
+		}
+		
 		public function set levels(levels:Array):void {
 			_levels = levels;
 		}
@@ -153,6 +158,5 @@ package com.citrusengine.utils {
 		public function get nameCurrentLevel():String {
 			return _currentLevel.nameLevel;
 		}
-
 	}
 }
