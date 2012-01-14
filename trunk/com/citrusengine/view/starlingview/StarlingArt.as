@@ -1,6 +1,5 @@
 package com.citrusengine.view.starlingview {
 
-	import flash.utils.Dictionary;
 	import Box2DAS.Dynamics.b2DebugDraw;
 
 	import starling.core.Starling;
@@ -19,6 +18,7 @@ package com.citrusengine.view.starlingview {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
+	import flash.utils.Dictionary;
 	import flash.utils.getDefinitionByName;
 
 	/**
@@ -42,7 +42,7 @@ package com.citrusengine.view.starlingview {
 
 		// properties :
 		
-		// determines animations playing in loop. You can add one in your state class : StarlingArt.pushLoopAnimation("run");
+		// determines animations playing in loop. You can add one in your state class : StarlingArt.setLoopAnimations(["walk", "climb"]);
 		private static var _loopAnimation:Dictionary = new Dictionary();
 		
 		private var _citrusObject:ISpriteView;
@@ -82,10 +82,13 @@ package com.citrusengine.view.starlingview {
 		
 		/**
 		 * Add a loop animation to the Dictionnary.
-		 * @param animName the loop animation name.
+		 * @param tab an array with all the loop animation names.
 		 */
-		static public function pushLoopAnimation(animName:String):void {
-			_loopAnimation[animName] = true;
+		static public function setLoopAnimations(tab:Array):void {
+			
+			for each (var animation:String in tab) {
+				_loopAnimation[animation] = true;
+			}
 		}
 		
 		static public function get loopAnimation():Dictionary {
@@ -146,7 +149,7 @@ package com.citrusengine.view.starlingview {
 					addChild(content);
 
 				} else if (_view is DisplayObject) {
-					// TODO : check performance
+					
 					addChild(_view);
 				} else {
 					throw new Error("SpriteArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
@@ -252,7 +255,7 @@ package com.citrusengine.view.starlingview {
 
 			if (evt.target.loader.content is flash.display.MovieClip) {
 
-				_textureAtlas = DynamicAtlas.fromMovieClipContainer(evt.target.loader.content);
+				_textureAtlas = DynamicAtlas.fromMovieClipContainer(evt.target.loader.content, 1, 0, true, true);
 				content = new MovieClip(_textureAtlas.getTextures(animation), _fpsMC);
 				Starling.juggler.add(content as MovieClip);
 			}

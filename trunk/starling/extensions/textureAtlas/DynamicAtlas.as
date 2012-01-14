@@ -1,11 +1,6 @@
 package starling.extensions.textureAtlas
 {
 
-	import starling.text.BitmapFont;
-	import starling.text.TextField;
-	import starling.textures.Texture;
-	import starling.textures.TextureAtlas;
-
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
@@ -17,7 +12,12 @@ package starling.extensions.textureAtlas
 	import flash.text.Font;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
-	import flash.utils.getQualifiedClassName;	
+    import flash.utils.getQualifiedClassName;
+
+    import starling.text.BitmapFont;
+	import starling.textures.Texture;
+	import starling.textures.TextureAtlas;
+	import starling.text.TextField;
 	
 	/**
 	 * DynamicAtlas.as
@@ -35,8 +35,9 @@ package starling.extensions.textureAtlas
 	 * Or you can select which font (specifying characters) you'd like to register as a Bitmap Font, using a string or passing a Regular TextField as a parameter.
 	 * This extension could save you a lot of time specially if you'll be coding mobile apps with the [starling framework](http://www.starling-framework.org/).
 	 *
-	 * # version 0.9.5 #
-	 * - Added the fromClassVector static function. Thank you Thomas Haselwanter
+	 * # version 1.0 #
+	 * - Added the checkBounds parameter to scan the clip prior the rasterization in order to get the bounds of the entire MovieClip (prevent scaling in some cases). Thank you Aymeric Lamboley.
+	 * - Added the fontCustomID parameter to the Bitmap font creation. Thank you Regan.
 	 *
 	 * ### Features ###
 	 *
@@ -77,9 +78,11 @@ package starling.extensions.textureAtlas
 	 *
 	 *  History:
 	 *  -------
+	 * # version 0.9.5 #
+	 * - Added the fromClassVector static function. Thank you Thomas Haselwanter
+	 * 
 	 * # version 0.9 #
 	 * - Added Bitmap Font creation support
-	 * - Added the 
 	 * - Scaling also applies to filters.
 	 * - Added Margin and PreserveColor Properties
 	 * 
@@ -172,16 +175,7 @@ package starling.extensions.textureAtlas
 		   
 		}
 		
-		/**
-		 * drawItem - This will actually rasterize the display object passed as a parameter
-		 * @param	clip
-		 * @param	name
-		 * @param	baseName
-		 * @param	clipColorTransform
-		 * @return TextureItem
-		 */
-		static protected function drawItem(clip:DisplayObject, name:String = "", baseName:String = "", clipColorTransform:ColorTransform = null):TextureItem
-		{
+		static protected function getRealBounds(clip:DisplayObject):Rectangle {
 			var bounds:Rectangle = clip.getBounds(clip.parent);
 			bounds.x = Math.floor(bounds.x);
 			bounds.y = Math.floor(bounds.y);
@@ -218,13 +212,28 @@ package starling.extensions.textureAtlas
 			realBounds.width = Math.max(realBounds.width, 1);
 			realBounds.height = Math.max(realBounds.height, 1);
 			
+			tmpBData = null;
+			return realBounds;
+		}
+		
+		/**
+		 * drawItem - This will actually rasterize the display object passed as a parameter
+		 * @param	clip
+		 * @param	name
+		 * @param	baseName
+		 * @param	clipColorTransform
+		 * @param	frameBounds
+		 * @return TextureItem
+		 */
+		static protected function drawItem(clip:DisplayObject, name:String = "", baseName:String = "", clipColorTransform:ColorTransform = null, frameBounds:Rectangle=null):TextureItem
+		{
+			var realBounds:Rectangle = getRealBounds(clip);
+			
 			_bData = new BitmapData(realBounds.width, realBounds.height, true, 0);
 			_mat = clip.transform.matrix;
 			_mat.translate(-realBounds.x + _margin, -realBounds.y + _margin);
 			
 			_bData.draw(clip, _mat, _preserveColor ? clipColorTransform : null);
-			
-			//realBounds.offset(-_x - _margin, -_y - _margin);
 			
 			var label:String = "";
 			if (clip is MovieClip) {
@@ -234,11 +243,20 @@ package starling.extensions.textureAtlas
 					label = _currentLab;
 				}
 			}
-			var item:TextureItem = new TextureItem(_bData, name, label);
+			
+			if (frameBounds) {
+				realBounds.x = frameBounds.x - realBounds.x;
+				realBounds.y = frameBounds.y - realBounds.y;
+				realBounds.width = frameBounds.width;
+				realBounds.height = frameBounds.height;
+			}
+			
+			var item:TextureItem = new TextureItem(_bData, name, label, realBounds.x, realBounds.y, realBounds.width, realBounds.height);
+			
 			_items.push(item);
 			_canvas.addChild(item);
 			
-			tmpBData = null;
+			
 			_bData = null;
 			
 			return item;
@@ -253,10 +271,10 @@ package starling.extensions.textureAtlas
          * @param	scaleFactor:Number - The scaling factor to apply to every object. Default value is 1 (no scaling).
          * @param	margin:uint - The amount of pixels that should be used as the resulting image margin (for each side of the image). Default value is 0 (no margin).
          * @param	preserveColor:Boolean - A Flag which indicates if the color transforms should be captured or not. Default value is true (capture color transform).
+		 * @param 	checkBounds:Boolean - A Flag used to scan the clip prior the rasterization in order to get the bounds of the entire MovieClip. By default is false because it adds overhead to the process.
          * @return  TextureAtlas - The dynamically generated Texture Atlas.
-         * @return
          */
-        static public function fromClassVector(assets:Vector.<Class>, scaleFactor:Number = 1, margin:uint=0, preserveColor:Boolean = true):TextureAtlas
+        static public function fromClassVector(assets:Vector.<Class>, scaleFactor:Number = 1, margin:uint=0, preserveColor:Boolean = true, checkBounds:Boolean=false):TextureAtlas
         {
             var container:MovieClip = new MovieClip();
             for each (var assetClass:Class in assets) {
@@ -264,7 +282,7 @@ package starling.extensions.textureAtlas
                 assetInstance.name = getQualifiedClassName(assetClass);
                 container.addChild(assetInstance);
             }
-            return fromMovieClipContainer(container, scaleFactor, margin, preserveColor);
+            return fromMovieClipContainer(container, scaleFactor, margin, preserveColor, checkBounds);
         }
 
         /** Retrieves all textures for a class. Returns <code>null</code> if it is not found.
@@ -281,14 +299,16 @@ package starling.extensions.textureAtlas
 		 * @param	scaleFactor:Number - The scaling factor to apply to every object. Default value is 1 (no scaling).
 		 * @param	margin:uint - The amount of pixels that should be used as the resulting image margin (for each side of the image). Default value is 0 (no margin).
 		 * @param	preserveColor:Boolean - A Flag which indicates if the color transforms should be captured or not. Default value is true (capture color transform).
+		 * @param 	checkBounds:Boolean - A Flag used to scan the clip prior the rasterization in order to get the bounds of the entire MovieClip. By default is false because it adds overhead to the process.
 		 * @return  TextureAtlas - The dynamically generated Texture Atlas.
 		 */
-		static public function fromMovieClipContainer(swf:MovieClip, scaleFactor:Number = 1, margin:uint=0, preserveColor:Boolean = true):TextureAtlas
+		static public function fromMovieClipContainer(swf:MovieClip, scaleFactor:Number = 1, margin:uint=0, preserveColor:Boolean = true, checkBounds:Boolean=false):TextureAtlas
 		{
 			var parseFrame:Boolean = false;
 			var selected:MovieClip;
 			var selectedTotalFrames:int;
 			var selectedColorTransform:ColorTransform;
+			var frameBounds:Rectangle = new Rectangle(0, 0, 0, 0);
 			
 			var children:uint = swf.numChildren;
 			
@@ -352,13 +372,26 @@ package starling.extensions.textureAtlas
 					}
 				}
 				
-				m = 0;
 				
+				
+				// Gets the frame bounds by performing a frame-by-frame check
+				if (selectedTotalFrames > 1 && checkBounds) {
+					selected.gotoAndStop(0);
+					frameBounds = getRealBounds(selected);
+					m = 1;
+					while (++m <= selectedTotalFrames)
+					{
+						selected.gotoAndStop(m);
+						frameBounds = frameBounds.union(getRealBounds(selected));
+					}
+				}
+				m = 0;
 				// Draw every frame
+				
 				while (++m <= selectedTotalFrames)
 				{
 					selected.gotoAndStop(m);
-					drawItem(selected, selected.name + "_" + appendIntToString(m - 1, 5), selected.name, selectedColorTransform);
+					drawItem(selected, selected.name + "_" + appendIntToString(m - 1, 5), selected.name, selectedColorTransform, frameBounds);
 				}
 			}
 			
@@ -382,18 +415,22 @@ package starling.extensions.textureAtlas
 				
 				// xml
 				subText = new XML(<SubTexture />); 
+				subText.@name = itm.textureName;
 				subText.@x = itm.x;
 				subText.@y = itm.y;
 				subText.@width = itm.width;
 				subText.@height = itm.height;
-				subText.@name = itm.textureName;
+				subText.@frameX = itm.frameX;
+				subText.@frameY = itm.frameY;
+				subText.@frameWidth = itm.frameWidth;
+				subText.@frameHeight = itm.frameHeight;
+				
 				if (itm.frameName != "")
 					subText.@frameLabel = itm.frameName;
 				xml.appendChild(subText);
 			}
 			texture = Texture.fromBitmapData(canvasData);
 			atlas = new TextureAtlas(texture, xml);
-			
 			
 			_items.length = 0;
 			_canvas.removeChildren();
@@ -416,8 +453,9 @@ package starling.extensions.textureAtlas
 		 * @param	bold:Boolean - A flag indicating if the font will be rasterized as bold.
 		 * @param	italic:Boolean - A flag indicating if the font will be rasterized as italic.
 		 * @param	charMarginX:int - The number of pixels that each character should have as horizontal margin (negative values are allowed). Default value is 0.
+		 * @param	fontCustomID:String - A custom font family name indicated by the user. Helpful when using differnt effects for the same font. [Optional]
 		 */
-		static public function bitmapFontFromString(chars:String, fontFamily:String, fontSize:Number = 12, bold:Boolean = false, italic:Boolean = false, charMarginX:int=0):void {
+		static public function bitmapFontFromString(chars:String, fontFamily:String, fontSize:Number = 12, bold:Boolean = false, italic:Boolean = false, charMarginX:int=0, fontCustomID:String=""):void {
 			var format:TextFormat = new TextFormat(fontFamily, fontSize, 0xFFFFFF, bold, italic);
 			var tf:flash.text.TextField = new flash.text.TextField();
 			
@@ -433,7 +471,8 @@ package starling.extensions.textureAtlas
 			tf.defaultTextFormat = format;
 			tf.text = chars;
 			
-			bitmapFontFromTextField(tf, charMarginX);
+			if (fontCustomID == "") fontCustomID = fontFamily;
+			bitmapFontFromTextField(tf, charMarginX, fontCustomID);
 		}
 		
 		/**
@@ -441,8 +480,9 @@ package starling.extensions.textureAtlas
 		 * 
 		 * @param	tf:flash.text.TextField - The textfield that will be used to rasterize every char of the text property
 		 * @param	charMarginX:int - The number of pixels that each character should have as horizontal margin (negative values are allowed). Default value is 0.
+		 * @param	fontCustomID:String - A custom font family name indicated by the user. Helpful when using differnt effects for the same font. [Optional]
 		 */
-		static public function bitmapFontFromTextField(tf:flash.text.TextField, charMarginX:int=0):void {
+		static public function bitmapFontFromTextField(tf:flash.text.TextField, charMarginX:int=0, fontCustomID:String=""):void {
 			var charCol:Vector.<String> = Vector.<String>(tf.text.split(""));
 			var format:TextFormat = tf.defaultTextFormat;
 			var fontFamily:String = format.font;
@@ -483,9 +523,10 @@ package starling.extensions.textureAtlas
 			
 			itemsLen = _items.length;
 			
+			
 			xml = new XML(<font></font>);
 			var infoNode:XML = new XML(<info />);
-			infoNode.@face = fontFamily;
+			infoNode.@face = (fontCustomID == "")? fontFamily : fontCustomID;
 			infoNode.@size = fontSize;
 			xml.appendChild(infoNode);
 			//var commonNode:XML = new XML(<common alphaChnl="1" redChnl="0" greenChnl="0" blueChnl="0" />);
