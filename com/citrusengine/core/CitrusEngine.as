@@ -2,6 +2,8 @@
 
 	import starling.core.Starling;
 
+	import com.citrusengine.utils.LevelManager;
+
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	
@@ -22,6 +24,7 @@
 		
 		protected var _starling:Starling;
 		
+		private var _levelManager:LevelManager;
 		private var _state:IState;
 		private var _newState:IState;
 		private var _stateDisplayIndex:uint = 0;
@@ -73,6 +76,20 @@
 			_starling = new Starling(RootClass, stage);
 			_starling.antiAliasing = antiAliasing;
 			_starling.start();
+		}
+		
+		/**
+		 * Return the level manager, take a look on its class for more information.
+		 */
+		public function get levelManager():LevelManager {
+			return _levelManager;
+		}
+		
+		/**
+		 * You may use the Citrus Engine's level manager if you have several levels. Take a look on its class for more information.
+		 */
+		public function set levelManager(value:LevelManager):void {
+			_levelManager = value;
 		}
 		
 		/**
@@ -261,10 +278,10 @@
 	}
 }
 
+import starling.display.Sprite;
 /**
  * RootClass is the root of Starling, it is never destroyed and only accessed through <code>_starling.stage</code>.
  */
-import starling.display.Sprite;
 
 internal class RootClass extends Sprite {
 }
