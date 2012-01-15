@@ -23,7 +23,12 @@ package com.citrusengine.view.starlingview {
 
 	/**
 	 * This is the class that all art objects use for the StarlingView state view. If you are using the StarlingView (as opposed to the blitting view, for instance),
-	 * then all your graphics will be an instance of this class. This class does the following things:
+	 * then all your graphics will be an instance of this class. There are 2 ways to manage MovieClip :
+	 * - specify a "object.swf" in the view property of your object's creation.
+	 * - add an AnimationSequence to your view property of your object's creation, see the AnimationSequence for more informations about it.
+	 * The AnimationSequence is more optimized than the .swf which creates textures "on the fly" thanks to the DynamicAtlas class.
+	 * 
+	 * This class does the following things:
 	 * 
 	 * 1) Creates the appropriate graphic depending on your CitrusObject's view property (loader, sprite, or bitmap), and loads it if it is a non-embedded graphic.
 	 * 2) Aligns the graphic with the appropriate registration (topLeft or center).
@@ -72,7 +77,12 @@ package com.citrusengine.view.starlingview {
 				Starling.juggler.remove(content as MovieClip);
 				_textureAtlas.dispose();
 				content.dispose();
-
+			
+			} else if (content is AnimationSequence) {
+				
+				(content as AnimationSequence).destroy();
+				content.dispose();
+				
 			} else if (content is Image) {
 				_texture.dispose();
 				content.dispose();
@@ -149,8 +159,9 @@ package com.citrusengine.view.starlingview {
 					addChild(content);
 
 				} else if (_view is DisplayObject) {
-					
-					addChild(_view);
+					// view property is a Display Object reference
+					content = _view;
+					addChild(content);
 				} else {
 					throw new Error("SpriteArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
 					return;
@@ -171,14 +182,16 @@ package com.citrusengine.view.starlingview {
 				return;
 
 			_animation = value;
-
-			if (content is MovieClip) {
-
-				if (_animation != null && _animation != "" && _textureAtlas.getTextures(_animation) != null) {
-
-					var animLoop:Boolean = _loopAnimation[_animation];
+			
+			if (_animation != null && _animation != "") {
+				
+				var animLoop:Boolean = _loopAnimation[_animation];
+				
+				if (content is MovieClip)
 					(content as MovieClip).changeTextures(_textureAtlas.getTextures(_animation), _fpsMC, animLoop);
-				}
+				
+				if (content is AnimationSequence)
+					(content as AnimationSequence).changeAnimation(_animation, _fpsMC, animLoop);
 			}
 		}
 
