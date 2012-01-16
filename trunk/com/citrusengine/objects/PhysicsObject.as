@@ -1,5 +1,6 @@
 package com.citrusengine.objects {
 
+	import Box2DAS.Collision.Shapes.b2CircleShape;
 	import Box2DAS.Collision.Shapes.b2PolygonShape;
 	import Box2DAS.Collision.Shapes.b2Shape;
 	import Box2DAS.Common.V2;
@@ -47,6 +48,7 @@ package com.citrusengine.objects {
 		protected var _rotation:Number = 0;
 		protected var _width:Number = 1;
 		protected var _height:Number = 1;
+		protected var _radius:Number;
 		
 		private var _group:Number = 0;
 		private var _offsetX:Number = 0;
@@ -303,6 +305,28 @@ package com.citrusengine.objects {
 		}
 		
 		/**
+		 * This can only be set in the constructor parameters. 
+		 */	
+		public function get radius():Number
+		{
+			return _radius * _box2D.scale;
+		}
+		
+		/**
+		 * The object has a radius or a width & height. It can't have both.
+		 */
+		[Property(value="")]
+		public function set radius(value:Number):void
+		{
+			_radius = value / _box2D.scale;
+			
+			if (_initialized)
+			{
+				trace("Warning: You cannot set " + this + " radius after it has been created. Please set it in the constructor.");
+			}
+		}
+		
+		/**
 		 * A direction reference to the Box2D body associated with this object.
 		 */
 		public function get body():b2Body
@@ -332,13 +356,18 @@ package com.citrusengine.objects {
 		
 		/**
 		 * This method will often need to be overriden to customize the Box2D shape object.
-		 * The PhysicsObject creates a rectangle by default, but you can replace this method's
+		 * The PhysicsObject creates a rectangle by default if the radius it not defined, but you can replace this method's
 		 * definition and instead create a custom shape, such as a line or circle.
 		 */	
 		protected function createShape():void
 		{
-			_shape = new b2PolygonShape();
-			b2PolygonShape(_shape).SetAsBox(_width / 2, _height / 2);
+			if (_radius) {
+				_shape = new b2CircleShape();
+				b2CircleShape(_shape).m_radius = _radius;
+			} else {
+				_shape = new b2PolygonShape();
+				b2PolygonShape(_shape).SetAsBox(_width / 2, _height / 2);
+			}
 		}
 		
 		/**
