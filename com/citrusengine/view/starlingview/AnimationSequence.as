@@ -32,8 +32,14 @@ package com.citrusengine.view.starlingview {
 
 			_mcSequences = new Dictionary();
 
-			for each (var animation:String in animations)				
+			for each (var animation:String in animations) {
+				
+				if (_textureAtlas.getTextures(animation).length == 0) {
+					throw new Error("One object doesn't have the " + animation + " animation in its TextureAtlas");
+				}
+				
 				_mcSequences[animation] = new MovieClip(_textureAtlas.getTextures(animation));
+			}
 			
 			_firstAnimation = firstAnimation;
 			
@@ -48,6 +54,11 @@ package com.citrusengine.view.starlingview {
 		 * @param animLoop : true if the MC is a loop
 		 */
 		public function changeAnimation(animation:String, fps:Number, animLoop:Boolean):void {
+			
+			if (!(_mcSequences[animation])) {
+				throw new Error("One object doesn't have the " + animation + " animation set up in its initial array");
+				return;
+			}
 			
 			removeChild(_mcSequences[_firstAnimation]);
 			Starling.juggler.remove(_mcSequences[_firstAnimation]);
