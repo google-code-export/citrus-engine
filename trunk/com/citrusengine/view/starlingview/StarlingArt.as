@@ -40,9 +40,18 @@ package com.citrusengine.view.starlingview {
 	 * such as add click listeners, change the alpha, etc.
 	 **/
 	public class StarlingArt extends Sprite {
-
+		
+		/**
+		 * The content property is the actual display object that your game object is using. For graphics that are loaded at runtime
+		 * (not embedded), the content property will not be available immediately. You can listen to the COMPLETE event on the loader
+		 * (or rather, the loader's contentLoaderInfo) if you need to know exactly when the graphic will be loaded.
+		 */
 		public var content:DisplayObject;
 
+		/**
+		 * For objects that are loaded at runtime, this is the object that loades them. Then, once they are loaded, the content
+		 * property is assigned to loader.content.
+		 */
 		public var loader:Loader;
 
 		// properties :
