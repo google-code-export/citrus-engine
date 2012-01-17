@@ -80,6 +80,8 @@ package com.citrusengine.view.starlingview {
 				_mcSequences[animation].dispose();
 			
 			_textureAtlas.dispose();
+			
+			_mcSequences = null;
 		}
 	}
 }
