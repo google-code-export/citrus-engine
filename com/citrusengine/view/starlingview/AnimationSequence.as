@@ -20,7 +20,7 @@ package com.citrusengine.view.starlingview {
 		private var _textureAtlas:TextureAtlas;
 		private var _animations:Array;
 		private var _mcSequences:Dictionary;
-		private var _firstAnimation:String;
+		private var _previousAnimation:String;
 
 		public function AnimationSequence(textureAtlas:TextureAtlas, animations:Array, firstAnimation:String) {
 
@@ -41,10 +41,10 @@ package com.citrusengine.view.starlingview {
 				_mcSequences[animation] = new MovieClip(_textureAtlas.getTextures(animation));
 			}
 			
-			_firstAnimation = firstAnimation;
+			_previousAnimation = firstAnimation;
 			
-			addChild(_mcSequences[_firstAnimation]);
-			Starling.juggler.add(_mcSequences[_firstAnimation]);			
+			addChild(_mcSequences[_previousAnimation]);
+			Starling.juggler.add(_mcSequences[_previousAnimation]);			
 		}
 		
 		/**
@@ -60,21 +60,21 @@ package com.citrusengine.view.starlingview {
 				return;
 			}
 			
-			removeChild(_mcSequences[_firstAnimation]);
-			Starling.juggler.remove(_mcSequences[_firstAnimation]);
+			removeChild(_mcSequences[_previousAnimation]);
+			Starling.juggler.remove(_mcSequences[_previousAnimation]);
 			
 			addChild(_mcSequences[animation]);
 			Starling.juggler.add(_mcSequences[animation]);
 			_mcSequences[animation].fps = fps;
 			_mcSequences[animation].loop = animLoop;
 			
-			_firstAnimation = animation;
+			_previousAnimation = animation;
 		}
 		
 		public function destroy():void {
 			
-			removeChild(_mcSequences[_firstAnimation]);
-			Starling.juggler.remove(_mcSequences[_firstAnimation]);
+			removeChild(_mcSequences[_previousAnimation]);
+			Starling.juggler.remove(_mcSequences[_previousAnimation]);
 			
 			for each (var animation : String in _animations)
 				_mcSequences[animation].dispose();
