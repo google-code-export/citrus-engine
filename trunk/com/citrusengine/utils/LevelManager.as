@@ -7,7 +7,7 @@ package com.citrusengine.utils {
 	import flash.net.URLRequest;
 
 	/**
-	 * The LevelManager is a complex but powerful class, you can use simple states for levels or/with SWC/SWF.
+	 * The LevelManager is a complex but powerful class, you can use simple states for levels with SWC/SWF/XML.
 	 * Before using it, be sure that you have good OOP knowledge. For using it, you must use an Abstract state class 
 	 * that you give as constructor parameter : Alevel. 
 	 * 
@@ -31,7 +31,8 @@ package com.citrusengine.utils {
 	 * state = _levelManager.currentLevel as IState;</code>
 	 * 
 	 * The ALevel class must implement public var lvlEnded & restartLevel Signals in its constructor.
-	 * If you have associated a SWF or SWC file to your level, you must add a flash MovieClip to its constructor.
+	 * If you have associated a SWF or SWC file to your level, you must add a flash MovieClip as a parameter into its constructor, 
+	 * or a XML if it is one!
 	 */
 	public class LevelManager {
 
@@ -116,7 +117,7 @@ package com.citrusengine.utils {
 				
 				onLevelChanged.dispatch(_currentLevel);
 				
-			// 	So it's a SWF
+			// So it's a SWF or XML
 			} else {
 
 				loader.load(new URLRequest(_levels[_currentIndex][1]));
