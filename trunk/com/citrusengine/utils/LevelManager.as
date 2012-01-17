@@ -117,22 +117,22 @@ package com.citrusengine.utils {
 				
 				onLevelChanged.dispatch(_currentLevel);
 				
-			// So it's a SWF or XML
+			// So it's a SWF or XML, we load it 
 			} else {
 
 				loader.load(new URLRequest(_levels[_currentIndex][1]));
-				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,_levelSWFLoaded);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,_levelLoaded);
 			}
 		}
 
-		private function _levelSWFLoaded(evt:Event):void {
+		private function _levelLoaded(evt:Event):void {
 
 			_currentLevel = _ALevel(new _levels[_currentIndex][0](evt.target.loader.content));
 			_currentLevel.lvlEnded.add(_onLevelEnded);
 
 			onLevelChanged.dispatch(_currentLevel);
 
-			evt.target.removeEventListener(Event.COMPLETE,_levelSWFLoaded);
+			evt.target.removeEventListener(Event.COMPLETE, _levelLoaded);
 			evt.target.loader.unloadAndStop();
 		}
 
