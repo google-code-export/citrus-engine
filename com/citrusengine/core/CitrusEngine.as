@@ -20,10 +20,11 @@
 	{
 		public static const VERSION:String = "3.00.00";
 		
+		public static var starlingDebugMode:Boolean;
+				
 		private static var _instance:CitrusEngine;
 		
 		protected var _starling:Starling;
-		
 		private var _levelManager:LevelManager;
 		private var _state:IState;
 		private var _newState:IState;
@@ -70,9 +71,13 @@
 		/**
 		 * You should call this function to create your Starling view. The RootClass is internal, it is never used elsewhere. 
 		 * StarlingState is added on the starling stage : <code>_starling.stage.addChildAt(_state as StarlingState, _stateDisplayIndex);</code>
+		 * @param debugMode : if true, display a Stats class instance.
 		 * @param antiAliasing : The antialiasing value allows you to set the anti-aliasing (0 - 16), generally a value of 1 is totally acceptable.
 		 */
-		public function setUpStarling(antiAliasing:uint = 1):void {
+		public function setUpStarling(debugMode:Boolean = false, antiAliasing:uint = 1):void {
+			
+			starlingDebugMode = debugMode;
+			
 			_starling = new Starling(RootClass, stage);
 			_starling.antiAliasing = antiAliasing;
 			_starling.start();
@@ -279,9 +284,19 @@
 }
 
 import starling.display.Sprite;
+import starling.extensions.utils.Stats;
+
+import com.citrusengine.core.CitrusEngine;
+
 /**
  * RootClass is the root of Starling, it is never destroyed and only accessed through <code>_starling.stage</code>.
+ * It may display a Stats class instance which contains Memory & FPS informations.
  */
-
 internal class RootClass extends Sprite {
+	
+	public function RootClass() {
+		
+		if (CitrusEngine.starlingDebugMode)
+			addChild(new Stats());
+	}
 }
