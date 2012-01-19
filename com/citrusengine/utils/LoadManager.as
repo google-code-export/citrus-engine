@@ -1,6 +1,5 @@
 package com.citrusengine.utils {
 
-
 	import starling.display.Sprite;
 
 	import org.osflash.signals.Signal;

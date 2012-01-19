@@ -157,7 +157,7 @@ package com.citrusengine.objects.platformer
 			onJump.removeAll();
 			onGiveDamage.removeAll();
 			onTakeDamage.removeAll();
-			onAnimationChange.removeAll()
+			onAnimationChange.removeAll();
 			super.destroy();
 		}
 		
