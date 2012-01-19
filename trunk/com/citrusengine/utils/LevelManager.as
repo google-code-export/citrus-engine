@@ -11,12 +11,14 @@ package com.citrusengine.utils {
 	 * Before using it, be sure that you have good OOP knowledge. For using it, you must use an Abstract state class 
 	 * that you give as constructor parameter : Alevel. 
 	 * 
-	 * The three ways to set up your level : 
+	 * The four ways to set up your level : 
 	 * <code>levelManager.levels = [Level1, Level2];
+	 * levelManager.levels = [[Level1, "level1.swf"], [level2, "level2.swf"]];
+	 * levelManager.levels = [[Level1, "level1.xml"], [level2, "level2.xml"]];
 	 * levelManager.levels = [[Level1, Level1_SWC], [level2, Level2_SWC]];
-	 * levelManager.levels = [[Level1, "level1.swf"], [level2, "level2.swf"]];</code>
+	 * </code>
 	 * 
-	 * An instanciation exemple in your Main class:
+	 * An instanciation exemple in your Main class (you may also use the AGameData to store your levels) :
 	 * <code>levelManager = new LevelManager(ALevel);
 	 * levelManager.onLevelChanged.add(_onLevelChanged);
 	 * levelManager.levels = [Level1, Level2];
@@ -26,7 +28,7 @@ package com.citrusengine.utils {
 	 * Then you can associate other function :
 	 * <code>lvl.lvlEnded.add(_nextLevel);
 	 * lvl.restartLevel.add(_restartLevel);</code>
-	 * And their result :
+	 * And their respective actions :
 	 * <code>_levelManager.nextLevel();
 	 * state = _levelManager.currentLevel as IState;</code>
 	 * 

@@ -25,6 +25,7 @@
 		private static var _instance:CitrusEngine;
 		
 		protected var _starling:Starling;
+		
 		private var _levelManager:LevelManager;
 		private var _state:IState;
 		private var _newState:IState;
@@ -32,6 +33,7 @@
 		private var _startTime:Number;
 		private var _gameTime:Number;
 		private var _playing:Boolean = true;
+		private var _gameData:AGameData;
 		private var _input:Input;
 		private var _sound:SoundManager;
 		private var _console:Console;
@@ -84,7 +86,7 @@
 		}
 		
 		/**
-		 * Return the level manager, take a look on its class for more information.
+		 * Return the level manager, use it if you want. Take a look on its class for more information.
 		 */
 		public function get levelManager():LevelManager {
 			return _levelManager;
@@ -134,6 +136,21 @@
 			_playing = value;
 			if (_playing)
 				_gameTime = new Date().time;
+		}
+		
+		/**
+		 * A reference to the Abstract GameData instance. Use it if you want.
+		 * It's a dynamic class, so you don't have problem to access informations in its extended class.
+		 */
+		public function get gameData():AGameData {
+			return _gameData;
+		}
+
+		/**
+		 * You may use a class to store your game's data, there is already an abstract class for that :
+		 */
+		public function set gameData(gameData:AGameData):void {
+			_gameData = gameData;
 		}
 		
 		/**
