@@ -2,6 +2,7 @@
 
 	import starling.core.Starling;
 
+	import com.citrusengine.utils.AGameData;
 	import com.citrusengine.utils.LevelManager;
 
 	import flash.display.MovieClip;

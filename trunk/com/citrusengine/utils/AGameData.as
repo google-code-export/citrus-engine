@@ -1,4 +1,4 @@
-package com.citrusengine.core {
+package com.citrusengine.utils {
 
 	import org.osflash.signals.Signal;
 	
