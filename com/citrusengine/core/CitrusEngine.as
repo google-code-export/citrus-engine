@@ -19,7 +19,7 @@
 	 */	
 	public class CitrusEngine extends MovieClip
 	{
-		public static const VERSION:String = "3.00.00";
+		public static const VERSION:String = "3.00.00 BETA 1";
 		
 		public static var starlingDebugMode:Boolean;
 				
