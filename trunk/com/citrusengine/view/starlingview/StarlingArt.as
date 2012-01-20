@@ -10,6 +10,7 @@ package com.citrusengine.view.starlingview {
 	import starling.extensions.textureAtlas.DynamicAtlas;
 	import starling.textures.Texture;
 	import starling.textures.TextureAtlas;
+	import starling.utils.deg2rad;
 
 	import com.citrusengine.view.ISpriteView;
 
@@ -264,7 +265,7 @@ package com.citrusengine.view.starlingview {
 				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
 				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 				visible = _citrusObject.visible;
-				rotation = _citrusObject.rotation;
+				rotation = deg2rad(_citrusObject.rotation);
 				scaleX = _citrusObject.inverted ? -1 : 1;
 				registration = _citrusObject.registration;
 				view = _citrusObject.view;

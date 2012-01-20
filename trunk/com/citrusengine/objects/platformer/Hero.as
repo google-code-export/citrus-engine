@@ -436,7 +436,11 @@ package com.citrusengine.objects.platformer
 				return;
 			
 			for each (var contact:b2Fixture in _groundContacts)
-				_combinedGroundAngle += contact.GetBody().GetAngle();
+				var angle:Number = contact.GetBody().GetAngle();
+				
+			var turn:Number = 45 * Math.PI / 180;
+			angle = angle % turn;
+			_combinedGroundAngle += angle;
 			_combinedGroundAngle /= _groundContacts.length;
 		}
 		
