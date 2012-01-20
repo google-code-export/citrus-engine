@@ -39,12 +39,13 @@ package com.citrusengine.view.starlingview {
 				}
 				
 				_mcSequences[animation] = new MovieClip(_textureAtlas.getTextures(animation));
+				
 			}
 			
-			_previousAnimation = firstAnimation;
+			addChild(_mcSequences[firstAnimation]);
+			Starling.juggler.add(_mcSequences[firstAnimation]);
 			
-			addChild(_mcSequences[_previousAnimation]);
-			Starling.juggler.add(_mcSequences[_previousAnimation]);			
+			_previousAnimation = firstAnimation;			
 		}
 		
 		/**
