@@ -1,6 +1,8 @@
 package com.citrusengine.view.spriteview 
 {
+
 	import com.citrusengine.view.ISpriteView;
+
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.FrameLabel;
@@ -118,6 +120,12 @@ package com.citrusengine.view.spriteview
 					content = new citrusObject.view();
 					addChild(content);
 				}
+				else if (_view is DisplayObject)
+				{
+					// view property is a Display Object reference
+					content = _view;
+					addChild(content);
+				} 
 				else
 				{
 					throw new Error("SpriteArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
