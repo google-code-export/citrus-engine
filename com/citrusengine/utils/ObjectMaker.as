@@ -1,9 +1,9 @@
-﻿package com.citrusengine.utils
-{
+﻿package com.citrusengine.utils {
+
 	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.core.CitrusObject;
-	import com.citrusengine.core.State;
-	
+	import com.citrusengine.core.IState;
+
 	import flash.display.MovieClip;
 	import flash.utils.getDefinitionByName;
 	
@@ -195,7 +195,7 @@
 		{
 			var array:Array = [];
 			
-			var state:State = CitrusEngine.getInstance().state as State;
+			var state:IState = CitrusEngine.getInstance().state;
 			for each (var objectXML:XML in levelData.CitrusObject)
 			{
 				var params:Object = { };

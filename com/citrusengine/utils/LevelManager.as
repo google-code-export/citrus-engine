@@ -4,6 +4,7 @@ package com.citrusengine.utils {
 
 	import flash.display.Loader;
 	import flash.events.Event;
+	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 
 	/**
@@ -121,21 +122,32 @@ package com.citrusengine.utils {
 				
 			// So it's a SWF or XML, we load it 
 			} else {
-
-				loader.load(new URLRequest(_levels[_currentIndex][1]));
-				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,_levelLoaded);
+				
+				var isXml:String = _levels[_currentIndex][1].substring(_levels[_currentIndex][1].length - 4).toLowerCase();
+				if (isXml == ".xml" || isXml == ".lev") {
+					
+					var urlLoader:URLLoader = new URLLoader();
+					urlLoader.load(new URLRequest(_levels[_currentIndex][1]));
+					urlLoader.addEventListener(Event.COMPLETE,_levelLoaded);
+					
+				} else {
+					
+					loader.load(new URLRequest(_levels[_currentIndex][1]));
+					loader.contentLoaderInfo.addEventListener(Event.COMPLETE,_levelLoaded);
+				}
 			}
 		}
 
 		private function _levelLoaded(evt:Event):void {
-
-			_currentLevel = _ALevel(new _levels[_currentIndex][0](evt.target.loader.content));
+			
+			_currentLevel = (evt.target is URLLoader) ? _ALevel(new _levels[_currentIndex][0](XML(evt.target.data))) : _currentLevel = _ALevel(new _levels[_currentIndex][0](evt.target.loader.content));
+			
 			_currentLevel.lvlEnded.add(_onLevelEnded);
-
 			onLevelChanged.dispatch(_currentLevel);
-
 			evt.target.removeEventListener(Event.COMPLETE, _levelLoaded);
-			evt.target.loader.unloadAndStop();
+			
+			if (evt.target is Loader)
+				evt.target.loader.unloadAndStop();
 		}
 
 		private function _onLevelEnded():void {
