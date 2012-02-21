@@ -84,6 +84,7 @@ package com.citrusengine.view.starlingview {
 		public function destroy():void {
 
 			if (content is MovieClip) {
+				
 				Starling.juggler.remove(content as MovieClip);
 				_textureAtlas.dispose();
 				content.dispose();
@@ -94,7 +95,10 @@ package com.citrusengine.view.starlingview {
 				content.dispose();
 				
 			} else if (content is Image) {
-				_texture.dispose();
+				
+				if (_texture)
+					_texture.dispose();
+					
 				content.dispose();
 			}
 
@@ -163,6 +167,7 @@ package com.citrusengine.view.starlingview {
 						content = new artClass();
 						addChild(content);
 					}
+					
 				} else if (_view is Class) {
 					// view property is a class reference
 					content = new citrusObject.view();
@@ -172,8 +177,9 @@ package com.citrusengine.view.starlingview {
 					// view property is a Display Object reference
 					content = _view;
 					addChild(content);
+					
 				} else {
-					throw new Error("SpriteArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
+					throw new Error("StarlingArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
 					return;
 				}
 
