@@ -112,15 +112,15 @@ package com.citrusengine.utils {
 
 				onLevelChanged.dispatch(_currentLevel);
 				
-			// It's a SWC ?
-			} else if (_levels[_currentIndex][1] is Class) {
+			// It's a SWC or a XML ?
+			} else if (_levels[_currentIndex][1] is Class || _levels[_currentIndex][1] is XML) {
 				
-				_currentLevel = _ALevel(new _levels[_currentIndex][0](new _levels[_currentIndex][1]()));
+				_currentLevel = (_levels[_currentIndex][1] is Class) ? _ALevel(new _levels[_currentIndex][0](new _levels[_currentIndex][1]())) : _ALevel(new _levels[_currentIndex][0](_levels[_currentIndex][1]));
 				_currentLevel.lvlEnded.add(_onLevelEnded);
 				
-				onLevelChanged.dispatch(_currentLevel);
+				onLevelChanged.dispatch(_currentLevel);				
 				
-			// So it's a SWF or XML, we load it 
+			// So it's an external SWF or XML, we load it 
 			} else {
 				
 				var isXml:String = _levels[_currentIndex][1].substring(_levels[_currentIndex][1].length - 4).toLowerCase();
