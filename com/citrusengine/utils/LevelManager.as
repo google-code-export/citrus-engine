@@ -12,10 +12,12 @@ package com.citrusengine.utils {
 	 * Before using it, be sure that you have good OOP knowledge. For using it, you must use an Abstract state class 
 	 * that you give as constructor parameter : Alevel. 
 	 * 
-	 * The four ways to set up your level : 
+	 * The six ways to set up your level : 
 	 * <code>levelManager.levels = [Level1, Level2];
 	 * levelManager.levels = [[Level1, "level1.swf"], [level2, "level2.swf"]];
 	 * levelManager.levels = [[Level1, "level1.xml"], [level2, "level2.xml"]];
+	 * levelManager.levels = [[Level1, level1XMLVar], [level2, level2XMLVar]];
+	 * levelManager.levels = [[Level1, XML(new level1XMLEmbed())], [level2, XML(new level2XMLEmbed())]];
 	 * levelManager.levels = [[Level1, Level1_SWC], [level2, Level2_SWC]];
 	 * </code>
 	 * 

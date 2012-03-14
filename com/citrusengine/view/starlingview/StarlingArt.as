@@ -242,25 +242,8 @@ package com.citrusengine.view.starlingview {
 
 				if (stateView.cameraTarget) {
 
-					var diffX:Number = (-stateView.cameraTarget.x + stateView.cameraOffset.x) - box2dDebugArt.x;
-					var diffY:Number = (-stateView.cameraTarget.y + stateView.cameraOffset.y) - box2dDebugArt.y;
-					var velocityX:Number = diffX * stateView.cameraEasing.x;
-					var velocityY:Number = diffY * stateView.cameraEasing.y;
-					box2dDebugArt.x += velocityX;
-					box2dDebugArt.y += velocityY;
-
-					// Constrain to camera bounds
-					if (stateView.cameraBounds) {
-						if (-box2dDebugArt.x <= stateView.cameraBounds.left || stateView.cameraBounds.width < stateView.cameraLensWidth)
-							box2dDebugArt.x = -stateView.cameraBounds.left;
-						else if (-box2dDebugArt.x + stateView.cameraLensWidth >= stateView.cameraBounds.right)
-							box2dDebugArt.x = -stateView.cameraBounds.right + stateView.cameraLensWidth;
-
-						if (-box2dDebugArt.y <= stateView.cameraBounds.top || stateView.cameraBounds.height < stateView.cameraLensHeight)
-							box2dDebugArt.y = -stateView.cameraBounds.top;
-						else if (-box2dDebugArt.y + stateView.cameraLensHeight >= stateView.cameraBounds.bottom)
-							box2dDebugArt.y = -stateView.cameraBounds.bottom + stateView.cameraLensHeight;
-					}
+					box2dDebugArt.x = stateView.viewRoot.x;
+					box2dDebugArt.y = stateView.viewRoot.y;
 				}
 
 				box2dDebugArt.visible = _citrusObject.visible;
