@@ -174,12 +174,12 @@ package com.citrusengine.view.spriteview
 		
 		public function update(stateView:SpriteView):void
 		{
+			scaleX = _citrusObject.inverted ? -1 : 1;
 			//position = object position + (camera position * inverse parallax)
-			x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
+			x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
 			y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 			rotation = _citrusObject.rotation;
 			visible = _citrusObject.visible;
-			scaleX = _citrusObject.inverted ? -1 : 1;
 			registration = _citrusObject.registration;
 			view = _citrusObject.view;
 			animation = _citrusObject.animation;

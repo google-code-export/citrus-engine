@@ -250,12 +250,12 @@ package com.citrusengine.view.starlingview {
 
 			} else {
 
+				scaleX = _citrusObject.inverted ? -1 : 1;
 				// The position = object position + (camera position * inverse parallax)
-				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
+				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
 				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 				visible = _citrusObject.visible;
 				rotation = deg2rad(_citrusObject.rotation);
-				scaleX = _citrusObject.inverted ? -1 : 1;
 				registration = _citrusObject.registration;
 				view = _citrusObject.view;
 				animation = _citrusObject.animation;
