@@ -68,6 +68,7 @@ package com.citrusengine.view.starlingview {
 			Starling.juggler.add(_mcSequences[animation]);
 			_mcSequences[animation].fps = fps;
 			_mcSequences[animation].loop = animLoop;
+			_mcSequences[animation].currentFrame = 0;
 			
 			_previousAnimation = animation;
 		}
