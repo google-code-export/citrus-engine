@@ -20,8 +20,6 @@
 	public class CitrusEngine extends MovieClip
 	{
 		public static const VERSION:String = "3.00.00 BETA 1";
-		
-		public static var starlingDebugMode:Boolean;
 				
 		private static var _instance:CitrusEngine;
 		
@@ -79,10 +77,9 @@
 		 */
 		public function setUpStarling(debugMode:Boolean = false, antiAliasing:uint = 1):void {
 			
-			starlingDebugMode = debugMode;
-			
 			_starling = new Starling(RootClass, stage);
 			_starling.antiAliasing = antiAliasing;
+			_starling.showStats = debugMode;
 			_starling.start();
 		}
 		
@@ -302,19 +299,12 @@
 }
 
 import starling.display.Sprite;
-import starling.extensions.utils.Stats;
-
-import com.citrusengine.core.CitrusEngine;
 
 /**
  * RootClass is the root of Starling, it is never destroyed and only accessed through <code>_starling.stage</code>.
- * It may display a Stats class instance which contains Memory & FPS informations.
  */
 internal class RootClass extends Sprite {
 	
 	public function RootClass() {
-		
-		if (CitrusEngine.starlingDebugMode)
-			addChild(new Stats());
 	}
 }

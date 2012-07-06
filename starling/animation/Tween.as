@@ -11,6 +11,9 @@
 
 package starling.animation
 {
+    import starling.events.Event;
+    import starling.events.EventDispatcher;
+
     /** A Tween animates numeric properties of objects. It uses different transition functions 
      *  to give the animations various styles.
      *  
@@ -29,15 +32,15 @@ package starling.animation
      *  tween.fadeTo(0);    // equivalent to 'animate("alpha", 0)'
      *  Starling.juggler.add(tween); 
      *  </pre> 
-     * 
-     *  Note that the object is added to a juggler at the end. A tween will only be executed if its
-     *  "advanceTime" method is executed regularly - the juggler will do that for you, and will 
-     *  release the tween when it is finished.
-     * 
+     *  
+     *  <p>Note that the object is added to a juggler at the end of this sample. That's because a 
+     *  tween will only be executed if its "advanceTime" method is executed regularly - the 
+     *  juggler will do that for you, and will remove the tween when it is finished.</p>
+     *  
      *  @see Juggler
      *  @see Transitions
      */ 
-    public class Tween implements IAnimatable
+    public class Tween extends EventDispatcher implements IAnimatable
     {
         private var mTarget:Object;
         private var mTransition:String;
@@ -56,22 +59,31 @@ package starling.animation
         private var mTotalTime:Number;
         private var mCurrentTime:Number;
         private var mDelay:Number;
-        private var mRoundToInt:Boolean;        
+        private var mRoundToInt:Boolean;
        
         /** Creates a tween with a target, duration (in seconds) and a transition function. */
         public function Tween(target:Object, time:Number, transition:String="linear")        
         {
-             mTarget = target;
-             mCurrentTime = 0;
-             mTotalTime = Math.max(0.0001, time);
-             mDelay = 0;
-             mTransition = transition;
-             mRoundToInt = false;
-             mProperties = new <String>[];
-             mStartValues = new <Number>[];
-             mEndValues = new <Number>[];
+             reset(target, time, transition);
         }
 
+        /** Resets the tween to its default values. Useful for pooling tweens. */
+        public function reset(target:Object, time:Number, transition:String="linear"):void
+        {
+            mTarget = target;
+            mCurrentTime = 0;
+            mTotalTime = Math.max(0.0001, time);
+            mDelay = 0;
+            mTransition = transition;
+            mRoundToInt = false;
+            mOnStart = mOnUpdate = mOnComplete = null;
+            mOnStartArgs = mOnUpdateArgs = mOnCompleteArgs = null; 
+            
+            if (mProperties)  mProperties.length  = 0; else mProperties  = new <String>[];
+            if (mStartValues) mStartValues.length = 0; else mStartValues = new <Number>[];
+            if (mEndValues)   mEndValues.length   = 0; else mEndValues   = new <Number>[];
+        }
+        
         /** Animates the property of an object to a target value. You can call this method multiple
          *  times on one tween. */
         public function animate(property:String, targetValue:Number):void
@@ -138,11 +150,14 @@ package starling.animation
             if (onUpdate != null) 
                 onUpdate.apply(null, mOnUpdateArgs);
             
-            if (onComplete != null && previousTime < mTotalTime && mCurrentTime >= mTotalTime)
-                onComplete.apply(null, mOnCompleteArgs);
+            if (previousTime < mTotalTime && mCurrentTime >= mTotalTime)
+            {
+                dispatchEvent(new Event(Event.REMOVE_FROM_JUGGLER));
+                if (onComplete != null) onComplete.apply(null, mOnCompleteArgs);
+            }
         }
         
-        /** @inheritDoc */
+        /** Indicates if the tween is finished. */
         public function get isComplete():Boolean { return mCurrentTime >= mTotalTime; }        
         
         /** The target object that is animated. */

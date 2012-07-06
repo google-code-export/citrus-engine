@@ -204,7 +204,7 @@ package com.citrusengine.view.starlingview {
 				var animLoop:Boolean = _loopAnimation[_animation];
 				
 				if (content is MovieClip)
-					(content as MovieClip).changeTextures(_textureAtlas.getTextures(_animation), _fpsMC, animLoop);
+					(content as DynamicMovieClip).changeTextures(_textureAtlas.getTextures(_animation), _fpsMC, animLoop);
 				
 				if (content is AnimationSequence)
 					(content as AnimationSequence).changeAnimation(_animation, _fpsMC, animLoop);
@@ -268,7 +268,7 @@ package com.citrusengine.view.starlingview {
 			if (evt.target.loader.content is flash.display.MovieClip) {
 
 				_textureAtlas = DynamicAtlas.fromMovieClipContainer(evt.target.loader.content, 1, 0, true, true);
-				content = new MovieClip(_textureAtlas.getTextures(animation), _fpsMC);
+				content = new DynamicMovieClip(_textureAtlas.getTextures(animation), _fpsMC);
 				Starling.juggler.add(content as MovieClip);
 			}
 
