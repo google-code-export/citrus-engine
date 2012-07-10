@@ -27,7 +27,7 @@ package com.citrusengine.physics {
 
 			super(name, params);
 
-			_space = new Space(new Vec2(0, 0));
+			_space = new Space();
 		}
 
 		override public function destroy():void {
