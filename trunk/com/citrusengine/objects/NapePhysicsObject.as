@@ -63,11 +63,11 @@ package com.citrusengine.objects {
 			}
 			
 			//Override these to customize your Nape initialization. Things must be done in this order.
+			defineBody();
 			createBody();
 			createMaterial();
 			createShape();
-			//defineJoint();
-			//createJoint();
+			createConstraint();
 		}
 		
 		override public function destroy():void {
@@ -93,30 +93,36 @@ package com.citrusengine.objects {
 			}
 		}
 		
-		protected function createBody():void {
+		protected function defineBody():void {
 			
 			_bodyType = BodyType.DYNAMIC;
-			_body = new Body(_bodyType);
-			_body.space = _nape.space;
+		}
+		
+		protected function createBody():void {
+			
+			_body = new Body(_bodyType, new Vec2(_x, _y));
 			_body.userData = this;
 		}
 		
 		protected function createMaterial():void {
 			
-			_material = new Material();
-			_material.density = 1;
-			_material.dynamicFriction = 0.6;
+			_material = new Material(0.2);
 		}
 		
 		protected function createShape():void {
 			
 			if (_radius) {
-				_body.shapes.add(new Circle(_radius, new Vec2(_x, _y), _material));
+				_body.shapes.add(new Circle(_radius, null, _material));
 			} else {
-				_body.shapes.add(new Polygon(Polygon.rect(_x, _y, _width, _height), _material));				
+				_body.shapes.add(new Polygon(Polygon.rect(0, 0, _width, _height), _material));				
 			}
 			
 			_body.rotate(new Vec2(_x + _width / 2, _y + _height / 2), _rotation);
+		}
+		
+		protected function createConstraint():void {
+			
+			_body.space = _nape.space;			
 		}
 		
 		public function get x():Number
@@ -259,7 +265,7 @@ package com.citrusengine.objects {
 			return _registration;
 		}
 		
-		[Property(value="center")]
+		[Property(value="topLeft")]
 		public function set registration(value:String):void
 		{
 			_registration = value;
@@ -326,7 +332,7 @@ package com.citrusengine.objects {
 		}
 		
 		/**
-		 * A direction reference to the Box2D body associated with this object.
+		 * A direction reference to the Nape body associated with this object.
 		 */
 		public function get body():Body
 		{

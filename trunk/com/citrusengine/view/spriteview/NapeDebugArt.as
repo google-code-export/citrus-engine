@@ -28,8 +28,7 @@ package com.citrusengine.view.spriteview {
 			
 			_nape = SpriteArt(parent).citrusObject as Nape;
 			
-			//_debugDrawer = new ShapeDebug(stage.stageWidth, stage.stageHeight);
-			_debugDrawer = new ShapeDebug(1000, 1000);
+			_debugDrawer = new ShapeDebug(0, 0);
 			addChild(_debugDrawer.display);
 		}
 		
