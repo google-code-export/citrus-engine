@@ -76,7 +76,7 @@ package com.citrusengine.objects {
 		
 		override public function destroy():void {
 			
-			_body.clear();
+			_nape.space.bodies.remove(_body);
 			
 			super.destroy();
 		}

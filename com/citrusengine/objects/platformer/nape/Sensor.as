@@ -10,7 +10,17 @@ package com.citrusengine.objects.platformer.nape {
 	import org.osflash.signals.Signal;
 
 	/**
-	 * @author Aymeric
+	 * Sensors simply listen for when an object begins and ends contact with them. They disaptch a signal
+	 * when contact is made or ended, and this signal can be used to perform custom game logic such as
+	 * triggering a scripted event, ending a level, popping up a dialog box, and virtually anything else.
+	 * 
+	 * Remember that signals dispatch events when ANY Nape object collides with them, so you will want
+	 * your collision handler to ignore collisions with objects that it is not interested in, or extend
+	 * the sensor and use maskBits to ignore collisions altogether.  
+	 * 
+	 * Events
+	 * onBeginContact - Dispatches on first contact with the sensor.
+	 * onEndContact - Dispatches when the object leaves the sensor.
 	 */
 	public class Sensor extends NapePhysicsObject {
 
@@ -64,12 +74,12 @@ package com.citrusengine.objects.platformer.nape {
 			_body.cbTypes.add(SENSOR);
 		}
 		
-		override public function handleBeginContact(callback:InteractionCallback):void {
-			onBeginContact.dispatch(callback);
+		override public function handleBeginContact(interactionCallback:InteractionCallback):void {
+			onBeginContact.dispatch(interactionCallback);
 		}
 		
-		override public function handleEndContact(callback:InteractionCallback):void {
-			onEndContact.dispatch(callback);
+		override public function handleEndContact(interactionCallback:InteractionCallback):void {
+			onEndContact.dispatch(interactionCallback);
 		}
 	}
 }
