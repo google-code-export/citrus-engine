@@ -29,12 +29,12 @@ package com.citrusengine.physics {
 			_space.listeners.clear();
 		}
 		
-		public function onSensorInteractionBegin(callback:InteractionCallback):void {
-			callback.int1.castBody.userData.handleBeginContact(callback);
+		public function onSensorInteractionBegin(interactionCallback:InteractionCallback):void {
+			interactionCallback.int1.castBody.userData.handleBeginContact(interactionCallback);
 		}
 		
-		public function onSensorInteractionEnd(callback:InteractionCallback):void {
-			callback.int1.castBody.userData.handleEndContact(callback);
+		public function onSensorInteractionEnd(interactionCallback:InteractionCallback):void {
+			interactionCallback.int1.castBody.userData.handleEndContact(interactionCallback);
 		}
 	}
 }
