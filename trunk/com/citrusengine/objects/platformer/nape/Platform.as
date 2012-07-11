@@ -2,9 +2,7 @@ package com.citrusengine.objects.platformer.nape {
 
 	import com.citrusengine.objects.NapePhysicsObject;
 	
-	import nape.phys.Body;
 	import nape.phys.BodyType;
-	import nape.shape.Polygon;
 
 	/**
 	 * @author Aymeric
