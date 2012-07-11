@@ -3,8 +3,11 @@ package com.citrusengine.objects.platformer.nape {
 	import com.citrusengine.objects.NapePhysicsObject;
 
 	import nape.callbacks.CbType;
+	import nape.callbacks.InteractionCallback;
 	import nape.dynamics.InteractionFilter;
 	import nape.phys.BodyType;
+	
+	import org.osflash.signals.Signal;
 
 	/**
 	 * @author Aymeric
@@ -12,13 +15,28 @@ package com.citrusengine.objects.platformer.nape {
 	public class Sensor extends NapePhysicsObject {
 
 		public static const SENSOR:CbType = new CbType();
+		
+		/**
+		 * Dispatches on first contact with the sensor.
+		 */
+		public var onBeginContact:Signal;
+		/**
+		 * Dispatches when the object leaves the sensor.
+		 */
+		public var onEndContact:Signal;
 
 		public function Sensor(name:String, params:Object = null) {
 
 			super(name, params);
+			
+			onBeginContact = new Signal(InteractionCallback);
+			onEndContact = new Signal(InteractionCallback);
 		}
 
 		override public function destroy():void {
+			
+			onBeginContact.removeAll();
+			onEndContact.removeAll();
 
 			super.destroy();
 		}
@@ -44,6 +62,14 @@ package com.citrusengine.objects.platformer.nape {
 			
 			_body.space = _nape.space;			
 			_body.cbTypes.add(SENSOR);
+		}
+		
+		override public function handleBeginContact(callback:InteractionCallback):void {
+			onBeginContact.dispatch(callback);
+		}
+		
+		override public function handleEndContact(callback:InteractionCallback):void {
+			onEndContact.dispatch(callback);
 		}
 	}
 }
