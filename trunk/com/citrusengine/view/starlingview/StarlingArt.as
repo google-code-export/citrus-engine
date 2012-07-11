@@ -21,6 +21,8 @@ package com.citrusengine.view.starlingview {
 	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
 	import flash.utils.getDefinitionByName;
+	
+	import nape.util.ShapeDebug;
 
 	/**
 	 * This is the class that all art objects use for the StarlingView state view. If you are using the StarlingView (as opposed to the blitting view, for instance),
@@ -247,6 +249,21 @@ package com.citrusengine.view.starlingview {
 				}
 
 				box2dDebugArt.visible = _citrusObject.visible;
+				
+			} else if (content is NapeDebugArt) {
+				
+				// Nape view is not on the Starling display list, but on the classical flash display list.
+				// So we need to move its view here, not in the StarlingView.
+				
+				var napeDebugArt:flash.display.DisplayObject = (Starling.current.nativeStage.getChildAt(1) as flash.display.DisplayObject);
+				
+				if (stateView.cameraTarget) {
+
+					napeDebugArt.x = stateView.viewRoot.x;
+					napeDebugArt.y = stateView.viewRoot.y;
+				}
+
+				napeDebugArt.visible = _citrusObject.visible;
 
 			} else {
 

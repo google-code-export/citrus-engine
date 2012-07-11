@@ -5,6 +5,7 @@ package com.citrusengine.view.starlingview {
 	import com.citrusengine.view.CitrusView;
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.spriteview.Box2DDebugArt;
+	import com.citrusengine.view.spriteview.NapeDebugArt;
 
 	import flash.display.MovieClip;
 
@@ -72,6 +73,10 @@ package com.citrusengine.view.starlingview {
 			//Changing to appropriate Box2DDebugArt
 			if (citrusObject.view == com.citrusengine.view.spriteview.Box2DDebugArt)
 				citrusObject.view = com.citrusengine.view.starlingview.Box2DDebugArt;
+			
+			//Changing to appropriate NapeDebugArt	
+			if (citrusObject.view == com.citrusengine.view.spriteview.NapeDebugArt)
+				citrusObject.view = com.citrusengine.view.starlingview.NapeDebugArt;
 				
 			if (citrusObject.view == flash.display.MovieClip)
 				citrusObject.view = starling.display.Sprite;
