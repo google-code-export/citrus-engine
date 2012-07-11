@@ -1,16 +1,9 @@
 package com.citrusengine.physics {
 
 	import com.citrusengine.core.CitrusObject;
-	import com.citrusengine.objects.NapePhysicsObject;
-	import com.citrusengine.objects.platformer.nape.Sensor;
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.spriteview.NapeDebugArt;
 
-	import nape.callbacks.CbEvent;
-	import nape.callbacks.CbType;
-	import nape.callbacks.InteractionCallback;
-	import nape.callbacks.InteractionListener;
-	import nape.callbacks.InteractionType;
 	import nape.space.Space;
 
 	/**
@@ -23,6 +16,7 @@ package com.citrusengine.physics {
 		private var _visible:Boolean = false;
 
 		private var _space:Space;
+		private var _contactListener:NapeContactListener;
 		private var _group:Number = 1;
 		private var _view:* = NapeDebugArt;
 
@@ -34,16 +28,13 @@ package com.citrusengine.physics {
 			super(name, params);
 
 			_space = new Space();
-			_space.listeners.add(new InteractionListener(CbEvent.BEGIN, InteractionType.SENSOR, Sensor.SENSOR, NapePhysicsObject.PHYSICS_OBJECT, onSensorInteractionBegin));
-		}
-		
-		public function onSensorInteractionBegin(callback:InteractionCallback):void {
-			trace(callback.int1.castBody.userData, callback.int2.castBody.userData);
+			_contactListener = new NapeContactListener(_space);
 		}
 
 		override public function destroy():void {
 			
-			space.clear();
+			_contactListener.destroy();
+			_space.clear();
 			
 			super.destroy();
 		}
