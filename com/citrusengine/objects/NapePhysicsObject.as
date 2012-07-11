@@ -7,6 +7,7 @@ package com.citrusengine.objects {
 	
 	import flash.display.MovieClip;
 	
+	import nape.callbacks.CbType;
 	import nape.geom.Vec2;
 	import nape.phys.Body;
 	import nape.phys.BodyType;
@@ -20,6 +21,8 @@ package com.citrusengine.objects {
 	 * learn about it via the <a href="http://deltaluca.me.uk/docnew/">Nape Documentation</a>.
 	 */	
 	public class NapePhysicsObject extends CitrusObject implements ISpriteView {
+		
+		public static const PHYSICS_OBJECT:CbType = new CbType();
 		
 		/**
 		 * The speed at which this object will be affected by gravity. 
@@ -106,7 +109,7 @@ package com.citrusengine.objects {
 		
 		protected function createMaterial():void {
 			
-			_material = new Material(0.2);
+			_material = new Material(0.2, 1, 1, 1, 0);
 		}
 		
 		protected function createShape():void {
@@ -123,6 +126,7 @@ package com.citrusengine.objects {
 		protected function createConstraint():void {
 			
 			_body.space = _nape.space;			
+			_body.cbTypes.add(PHYSICS_OBJECT);
 		}
 		
 		public function get x():Number
