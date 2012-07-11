@@ -8,6 +8,7 @@ package com.citrusengine.objects {
 	import flash.display.MovieClip;
 	
 	import nape.callbacks.CbType;
+	import nape.callbacks.InteractionCallback;
 	import nape.geom.Vec2;
 	import nape.phys.Body;
 	import nape.phys.BodyType;
@@ -94,6 +95,12 @@ package com.citrusengine.objects {
 				velocity.y += gravity;
 				_body.velocity = velocity;
 			}
+		}
+		
+		public function handleBeginContact(callback:InteractionCallback):void {
+		}
+		
+		public function handleEndContact(callback:InteractionCallback):void {
 		}
 		
 		protected function defineBody():void {
