@@ -4,6 +4,7 @@ package com.citrusengine.physics {
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.spriteview.NapeDebugArt;
 
+	import nape.geom.Vec2;
 	import nape.space.Space;
 
 	/**
@@ -14,8 +15,8 @@ package com.citrusengine.physics {
 	public class Nape extends CitrusObject implements ISpriteView {
 
 		private var _visible:Boolean = false;
-
 		private var _space:Space;
+		private var _gravity:Vec2 = new Vec2(0, 150);
 		private var _contactListener:NapeContactListener;
 		private var _group:Number = 1;
 		private var _view:* = NapeDebugArt;
@@ -27,7 +28,7 @@ package com.citrusengine.physics {
 
 			super(name, params);
 
-			_space = new Space();
+			_space = new Space(_gravity);
 			_contactListener = new NapeContactListener(_space);
 		}
 
@@ -44,6 +45,14 @@ package com.citrusengine.physics {
 		 */
 		public function get space():Space {
 			return _space;
+		}
+		
+		public function get gravity():Vec2 {
+			return _gravity;
+		}
+		
+		public function set gravity(value:Vec2):void {
+			_gravity = value;
 		}
 
 		override public function update(timeDelta:Number):void {

@@ -24,12 +24,6 @@ package com.citrusengine.objects {
 	 */	
 	public class PhysicsObject extends CitrusObject implements ISpriteView
 	{
-		/**
-		 * The speed at which this object will be affected by gravity. 
-		 */
-		[Property(value="1.6")]
-		public var gravity:Number = 1.6;
-		
 		protected var _ce:CitrusEngine;
 		protected var _box2D:Box2D;
 		protected var _bodyDef:b2BodyDef;
@@ -106,19 +100,10 @@ package com.citrusengine.objects {
 		
 		/**
 		 * You should override this method to extend the functionality of your physics object. This is where you will 
-		 * want to do any velocity/force logic. By default, this method also updates the gravitatonal effect on the object.
-		 * I have chosen to implement gravity in each individual object instead of globally via Box2D so that it is easy
-		 * to create objects that defy gravity (like birds or bullets). This is difficult to do naturally in Box2D. Instead,
-		 * you can simply set your PhysicsObject's gravity property to 0, and baddabing: no gravity. 
+		 * want to do any velocity/force logic. 
 		 */		
 		override public function update(timeDelta:Number):void
 		{
-			if (_bodyDef.type == b2Body.b2_dynamicBody)
-			{
-				var velocity:V2 = _body.GetLinearVelocity();
-				velocity.y += gravity;
-				_body.SetLinearVelocity(velocity);
-			}
 		}
 		
 		public function get x():Number
