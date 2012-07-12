@@ -45,14 +45,14 @@ package com.citrusengine.objects.platformer
 		/**
 		 * This is the initial velocity that the hero will move at when he jumps.
 		 */
-		[Property(value="14")]
-		public var jumpHeight:Number = 14;
+		[Property(value="11")]
+		public var jumpHeight:Number = 11;
 		
 		/**
 		 * This is the amount of "float" that the hero has when the player holds the jump button while jumping. 
 		 */
-		[Property(value="0.9")]
-		public var jumpAcceleration:Number = 0.9;
+		[Property(value="0.3")]
+		public var jumpAcceleration:Number = 0.3;
 		
 		/**
 		 * This is the y velocity that the hero must be travelling in order to kill a Baddy.
@@ -63,14 +63,14 @@ package com.citrusengine.objects.platformer
 		/**
 		 * The y velocity that the hero will spring when he kills an enemy. 
 		 */
-		[Property(value="10")]
-		public var enemySpringHeight:Number = 10;
+		[Property(value="8")]
+		public var enemySpringHeight:Number = 8;
 		
 		/**
 		 * The y velocity that the hero will spring when he kills an enemy while pressing the jump button. 
 		 */
-		[Property(value="12")]
-		public var enemySpringJumpHeight:Number = 12;
+		[Property(value="9")]
+		public var enemySpringJumpHeight:Number = 9;
 		
 		/**
 		 * How long the hero is in hurt mode for. 

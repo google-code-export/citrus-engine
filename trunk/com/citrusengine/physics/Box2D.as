@@ -8,7 +8,6 @@ package com.citrusengine.physics {
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.spriteview.Box2DDebugArt;
 	
-	
 	/**
 	 * This is a simple wrapper class that allows you to add a Box2D Alchemy world to your game's state.
 	 * Add an instance of this class to your State before you create any phyiscs bodies. It will need to 
@@ -19,6 +18,7 @@ package com.citrusengine.physics {
 		private var _visible:Boolean = false;
 		private var _scale:Number = 30;
 		private var _world:b2World;
+		private var _gravity:V2 = new V2(0, 15);
 		private var _group:Number = 1;
 		private var _view:* = Box2DDebugArt;
 		
@@ -33,7 +33,7 @@ package com.citrusengine.physics {
 		public function Box2D(name:String, params:Object = null)
 		{
 			super(name, params);
-			_world = new b2World(new V2(0, 0));
+			_world = new b2World(_gravity);
 			b2Base.initialize();
 			
 			//Set up collision categories
@@ -68,11 +68,20 @@ package com.citrusengine.physics {
 			return _scale;
 		}
 		
+		public function get gravity():V2 {
+			return _gravity;
+		}
+		
+		public function set gravity(value:V2):void {
+			_gravity = value;
+		}
+		
 		override public function update(timeDelta:Number):void
 		{
 			super.update(timeDelta);
 			
-			_world.Step(1 / 20, 8, 8);
+			// 0.05 = 1 / 20
+			_world.Step(0.05, 8, 8);
 		}
 		
 		public function get x():Number

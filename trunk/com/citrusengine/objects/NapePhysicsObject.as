@@ -25,12 +25,6 @@ package com.citrusengine.objects {
 		
 		public static const PHYSICS_OBJECT:CbType = new CbType();
 		
-		/**
-		 * The speed at which this object will be affected by gravity. 
-		 */
-		[Property(value="1.6")]
-		public var gravity:Number = 1.6;
-		
 		protected var _ce:CitrusEngine;
 		protected var _nape:Nape;
 		protected var _body:Body;
@@ -83,18 +77,9 @@ package com.citrusengine.objects {
 		
 		/**
 		 * You should override this method to extend the functionality of your physics object. This is where you will 
-		 * want to do any velocity/force logic. By default, this method also updates the gravitatonal effect on the object.
-		 * I have chosen to implement gravity in each individual object instead of globally via Nape so that it is easy
-		 * to create objects that defy gravity (like birds or bullets). This is difficult to do naturally in Nape. Instead,
-		 * you can simply set your PhysicsObject's gravity property to 0, and baddabing: no gravity. 
+		 * want to do any velocity/force logic. 
 		 */		
 		override public function update(timeDelta:Number):void {
-			
-			if (_bodyType == BodyType.DYNAMIC) {
-				var velocity:Vec2 = _body.velocity;
-				velocity.y += gravity;
-				_body.velocity = velocity;
-			}
 		}
 		
 		public function handleBeginContact(callback:InteractionCallback):void {
