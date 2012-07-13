@@ -1,6 +1,7 @@
 package com.citrusengine.view.spriteview 
 {
 
+	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.view.ISpriteView;
 
 	import flash.display.Bitmap;
@@ -53,6 +54,20 @@ package com.citrusengine.view.spriteview
 		public function SpriteArt(object:ISpriteView) 
 		{
 			_citrusObject = object;
+			
+			this.name = (_citrusObject as CitrusObject).name;
+		}
+		
+		public function moveRegistrationPoint(registrationPoint:String):void {
+			
+			if (registrationPoint == "topLeft") {
+				content.x = 0;
+				content.y = 0;
+			} else if (registrationPoint == "center") {
+				content.x = -content.width / 2;
+				content.y = -content.height / 2;
+			}
+			
 		}
 		
 		public function get registration():String
@@ -67,16 +82,7 @@ package com.citrusengine.view.spriteview
 				
 			_registration = value;
 			
-			if (_registration == "topLeft")
-			{
-				content.x = 0;
-				content.y = 0;
-			}
-			else if (_registration == "center")
-			{
-				content.x = -content.width / 2;
-				content.y = -content.height / 2;
-			}
+			moveRegistrationPoint(_registration);
 		}
 		
 		public function get view():*
@@ -111,6 +117,7 @@ package com.citrusengine.view.spriteview
 					{
 						var artClass:Class = getDefinitionByName(classString) as Class;
 						content = new artClass();
+						moveRegistrationPoint(_citrusObject.registration);
 						addChild(content);
 					}
 				}
@@ -118,12 +125,14 @@ package com.citrusengine.view.spriteview
 				{
 					//view property is a class reference
 					content = new citrusObject.view();
+					moveRegistrationPoint(_citrusObject.registration);
 					addChild(content);
 				}
 				else if (_view is DisplayObject)
 				{
 					// view property is a Display Object reference
 					content = _view;
+					moveRegistrationPoint(_citrusObject.registration);
 					addChild(content);
 				} 
 				else
@@ -134,6 +143,7 @@ package com.citrusengine.view.spriteview
 				
 				if (content && content.hasOwnProperty("initialize"))
 					content["initialize"](_citrusObject);
+					
 			}
 		}
 		
@@ -203,6 +213,8 @@ package com.citrusengine.view.spriteview
 			
 			if (content is Bitmap)
 				Bitmap(content).smoothing = true;
+				
+			moveRegistrationPoint(_citrusObject.registration);
 		}
 		
 		private function handleContentIOError(e:IOErrorEvent):void 
