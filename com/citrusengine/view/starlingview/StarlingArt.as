@@ -12,6 +12,7 @@ package com.citrusengine.view.starlingview {
 	import starling.textures.TextureAtlas;
 	import starling.utils.deg2rad;
 
+	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.view.ISpriteView;
 
 	import flash.display.Bitmap;
@@ -21,8 +22,6 @@ package com.citrusengine.view.starlingview {
 	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
 	import flash.utils.getDefinitionByName;
-	
-	import nape.util.ShapeDebug;
 
 	/**
 	 * This is the class that all art objects use for the StarlingView state view. If you are using the StarlingView (as opposed to the blitting view, for instance),
@@ -78,6 +77,8 @@ package com.citrusengine.view.starlingview {
 
 			_citrusObject = object;
 			
+			this.name = (_citrusObject as CitrusObject).name;
+			
 			if (_loopAnimation["walk"] != true) {
 				_loopAnimation["walk"] = true;
 			}
@@ -120,6 +121,18 @@ package com.citrusengine.view.starlingview {
 		static public function get loopAnimation():Dictionary {
 			return _loopAnimation;
 		}
+		
+		public function moveRegistrationPoint(registrationPoint:String):void {
+			
+			if (registrationPoint == "topLeft") {
+				content.x = 0;
+				content.y = 0;
+			} else if (registrationPoint == "center") {
+				content.x = -content.width / 2;
+				content.y = -content.height / 2;
+			}
+			
+		}
 
 		public function get registration():String {
 			return _registration;
@@ -131,14 +144,8 @@ package com.citrusengine.view.starlingview {
 				return;
 
 			_registration = value;
-
-			if (_registration == "topLeft") {
-				content.x = 0;
-				content.y = 0;
-			} else if (_registration == "center") {
-				content.x = -content.width / 2;
-				content.y = -content.height / 2;
-			}
+			
+			moveRegistrationPoint(_registration);
 		}
 
 		public function get view():* {
@@ -167,17 +174,20 @@ package com.citrusengine.view.starlingview {
 					else {
 						var artClass:Class = getDefinitionByName(classString) as Class;
 						content = new artClass();
+						moveRegistrationPoint(_citrusObject.registration);
 						addChild(content);
 					}
 					
 				} else if (_view is Class) {
 					// view property is a class reference
 					content = new citrusObject.view();
+					moveRegistrationPoint(_citrusObject.registration);
 					addChild(content);
 
 				} else if (_view is DisplayObject) {
 					// view property is a Display Object reference
 					content = _view;
+					moveRegistrationPoint(_citrusObject.registration);
 					addChild(content);
 					
 				} else {
@@ -187,6 +197,7 @@ package com.citrusengine.view.starlingview {
 
 				if (content && content.hasOwnProperty("initialize"))
 					content["initialize"](_citrusObject);
+					
 			}
 		}
 
@@ -294,7 +305,9 @@ package com.citrusengine.view.starlingview {
 				_texture = Texture.fromBitmap(evt.target.loader.content);
 				content = new Image(_texture);
 			}
-
+			
+			moveRegistrationPoint(_citrusObject.registration);
+			
 			addChild(content);
 		}
 

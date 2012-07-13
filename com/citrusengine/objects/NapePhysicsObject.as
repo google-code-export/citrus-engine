@@ -46,7 +46,7 @@ package com.citrusengine.objects {
 		private var _group:Number = 0;
 		private var _offsetX:Number = 0;
 		private var _offsetY:Number = 0;
-		private var _registration:String = "topLeft";
+		private var _registration:String = "center";
 
 		public function NapePhysicsObject(name:String, params:Object = null) {
 			
@@ -95,7 +95,7 @@ package com.citrusengine.objects {
 		
 		protected function createBody():void {
 			
-			_body = new Body(_bodyType, new Vec2(_x, _y));
+			_body = new Body(_bodyType, new Vec2(_x + _width / 2, _y + _height / 2));
 			_body.userData = this;
 		}
 		
@@ -109,7 +109,7 @@ package com.citrusengine.objects {
 			if (_radius) {
 				_body.shapes.add(new Circle(_radius, null, _material));
 			} else {
-				_body.shapes.add(new Polygon(Polygon.rect(0, 0, _width, _height), _material));				
+				_body.shapes.add(new Polygon(Polygon.box(_width, _height), _material));				
 			}
 			
 			_body.rotate(new Vec2(_x + _width / 2, _y + _height / 2), _rotation);
