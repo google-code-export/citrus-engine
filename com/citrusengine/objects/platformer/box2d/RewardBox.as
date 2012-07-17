@@ -1,11 +1,11 @@
-package com.citrusengine.objects.platformer 
+package com.citrusengine.objects.platformer.box2d 
 {
 
 	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Body;
 
 	import com.citrusengine.math.MathVector;
-	import com.citrusengine.objects.PhysicsObject;
+	import com.citrusengine.objects.Box2DPhysicsObject;
 
 	import org.osflash.signals.Signal;
 
@@ -41,7 +41,7 @@ package com.citrusengine.objects.platformer
 	 * If you don't want the reward box to generate a reward, (or you want the reward to be granted immediately, like points),
 	 * you can set the rewardClass to null and just listen for the "onUse" event to grant the player the reward.
 	 */
-	public class RewardBox extends PhysicsObject 
+	public class RewardBox extends Box2DPhysicsObject 
 	{
 		/**
 		 * This is the vector normal that the reward box must be collided with in order for the reward to be created.

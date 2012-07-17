@@ -12,7 +12,7 @@ package com.citrusengine.objects {
 	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.physics.Box2D;
-	import com.citrusengine.physics.CollisionCategories;
+	import com.citrusengine.physics.Box2DCollisionCategories;
 	import com.citrusengine.view.ISpriteView;
 
 	import flash.display.MovieClip;
@@ -22,7 +22,7 @@ package com.citrusengine.objects {
 	 * and creating Box2D bodies, fixtures, shapes, and joints. If you are not familiar with Box2D, you should first
 	 * learn about it via the <a href="http://www.box2d.org/manual.html">Box2D Manual</a>.
 	 */	
-	public class PhysicsObject extends CitrusObject implements ISpriteView
+	public class Box2DPhysicsObject extends CitrusObject implements ISpriteView
 	{
 		protected var _ce:CitrusEngine;
 		protected var _box2D:Box2D;
@@ -49,11 +49,11 @@ package com.citrusengine.objects {
 		private var _offsetY:Number = 0;
 		private var _registration:String = "center";
 		
-		public static function Make(name:String, x:Number, y:Number, width:Number, height:Number, view:*):PhysicsObject
+		public static function Make(name:String, x:Number, y:Number, width:Number, height:Number, view:*):Box2DPhysicsObject
 		{
 			if (!view)
 				view = MovieClip;
-			return new PhysicsObject(name, { x: x, y: y, width: width, height: height, view: view } );
+			return new Box2DPhysicsObject(name, { x: x, y: y, width: width, height: height, view: view } );
 		}
 		
 		/**
@@ -65,7 +65,7 @@ package com.citrusengine.objects {
 		 * if you need additional Box2D functionality. Please see provided examples of classes that have overridden
 		 * the PhysicsObject.</p>
 		 */		
-		public function PhysicsObject(name:String, params:Object=null)
+		public function Box2DPhysicsObject(name:String, params:Object=null)
 		{
 			_ce = CitrusEngine.getInstance();
 			_box2D = _ce.state.getFirstObjectByType(Box2D) as Box2D;
@@ -365,8 +365,8 @@ package com.citrusengine.objects {
 			_fixtureDef.density = 1;
 			_fixtureDef.friction = 0.6;
 			_fixtureDef.restitution = 0.3;
-			_fixtureDef.filter.categoryBits = CollisionCategories.Get("Level");
-			_fixtureDef.filter.maskBits = CollisionCategories.GetAll();
+			_fixtureDef.filter.categoryBits = Box2DCollisionCategories.Get("Level");
+			_fixtureDef.filter.maskBits = Box2DCollisionCategories.GetAll();
 		}
 		
 		/**
