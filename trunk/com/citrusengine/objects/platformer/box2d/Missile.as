@@ -1,11 +1,11 @@
-package com.citrusengine.objects.platformer 
+package com.citrusengine.objects.platformer.box2d 
 {
 	
 	import Box2DAS.Common.V2;
 	import Box2DAS.Dynamics.ContactEvent;
 
-	import com.citrusengine.objects.PhysicsObject;
-	import com.citrusengine.physics.CollisionCategories;
+	import com.citrusengine.objects.Box2DPhysicsObject;
+	import com.citrusengine.physics.Box2DCollisionCategories;
 
 	import org.osflash.signals.Signal;
 
@@ -30,7 +30,7 @@ package com.citrusengine.objects.platformer
 	 * 		1. The Missile (Missile)
 	 * 		2. The Object it exploded on (PhysicsObject)
 	 */
-	public class Missile extends PhysicsObject 
+	public class Missile extends Box2DPhysicsObject 
 	{
 		/**
 		 * In degrees, the angle that the missile will fire at. Right is zero degrees, going clockwise.
@@ -59,7 +59,7 @@ package com.citrusengine.objects.platformer
 		private var _exploded:Boolean = false;
 		private var _explodeTimeoutID:Number = 0;
 		private var _fuseDurationTimeoutID:Number = 0;
-		private var _contact:PhysicsObject;
+		private var _contact:Box2DPhysicsObject;
 		
 		public static function Make(name:String, x:Number, y:Number, width:Number, height:Number, angle:Number, view:* = null, speed:Number = 2, fuseDuration:Number = 10000, explodeDuration:Number = 1000):Missile
 		{
@@ -70,7 +70,7 @@ package com.citrusengine.objects.platformer
 		public function Missile(name:String, params:Object = null) 
 		{
 			super(name, params);
-			onExplode = new Signal(Missile, PhysicsObject);
+			onExplode = new Signal(Missile, Box2DPhysicsObject);
 			
 			_velocity = new V2(speed, 0);
 			_velocity.rotate(angle * Math.PI / 180);
@@ -124,7 +124,7 @@ package com.citrusengine.objects.platformer
 			_exploded = true;
 			
 			//Not collideable with anything anymore.
-			_fixture.SetFilterData({ maskBits: CollisionCategories.GetNone() });
+			_fixture.SetFilterData({ maskBits: Box2DCollisionCategories.GetNone() });
 			
 			onExplode.dispatch(this, _contact);
 			
@@ -156,7 +156,7 @@ package com.citrusengine.objects.platformer
 		
 		protected function handleBeginContact(e:ContactEvent):void
 		{
-			_contact = e.other.GetBody().GetUserData() as PhysicsObject;
+			_contact = e.other.GetBody().GetUserData() as Box2DPhysicsObject;
 			if (!e.other.IsSensor())
 				explode();
 		}

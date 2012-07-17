@@ -1,9 +1,9 @@
-package com.citrusengine.objects.platformer
+package com.citrusengine.objects.platformer.box2d
 {
 	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Body;
 	
-	import com.citrusengine.objects.PhysicsObject;
+	import com.citrusengine.objects.Box2DPhysicsObject;
 	
 	/**
 	 * A Platform is a rectangular object that is meant to be stood on. It can be given any position, width, height, or rotation to suit your level's needs.
@@ -15,7 +15,7 @@ package com.citrusengine.objects.platformer
 	 * Properties:
 	 * oneWay - Makes the platform only collidable when falling from above it.
 	 */
-	public class Platform extends PhysicsObject
+	public class Platform extends Box2DPhysicsObject
 	{
 		private var _oneWay:Boolean = false;
 		

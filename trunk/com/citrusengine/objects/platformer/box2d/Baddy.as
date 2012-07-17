@@ -1,4 +1,4 @@
-package com.citrusengine.objects.platformer {
+package com.citrusengine.objects.platformer.box2d {
 
 	import Box2DAS.Collision.Shapes.b2PolygonShape;
 	import Box2DAS.Common.V2;
@@ -6,8 +6,8 @@ package com.citrusengine.objects.platformer {
 	import Box2DAS.Dynamics.b2Fixture;
 	import Box2DAS.Dynamics.b2FixtureDef;
 
-	import com.citrusengine.objects.PhysicsObject;
-	import com.citrusengine.physics.CollisionCategories;
+	import com.citrusengine.objects.Box2DPhysicsObject;
+	import com.citrusengine.physics.Box2DCollisionCategories;
 	import com.citrusengine.utils.Box2DShapeMaker;
 
 	import flash.display.MovieClip;
@@ -24,7 +24,7 @@ package com.citrusengine.objects.platformer {
 	 * For example, the Hero doesn't contain the logic for killing the Baddy, and the Baddy doesn't contain the
 	 * logic for making the hero "Spring" when he kills him. 
 	 */	
-	public class Baddy extends PhysicsObject
+	public class Baddy extends Box2DPhysicsObject
 	{
 		[Property(value="1.3")]
 		public var speed:Number = 1.3;
@@ -99,7 +99,7 @@ package com.citrusengine.objects.platformer {
 			return _enemyClass;
 		}
 		
-		[Property(value="com.citrusengine.objects.platformer.Hero")]
+		[Property(value="com.citrusengine.objects.platformer.box2d.Hero")]
 		public function set enemyClass(value:*):void
 		{
 			if (value is String)
@@ -170,14 +170,14 @@ package com.citrusengine.objects.platformer {
 		{
 			super.defineFixture();
 			_fixtureDef.friction = 0;
-			_fixtureDef.filter.categoryBits = CollisionCategories.Get("BadGuys");
-			_fixtureDef.filter.maskBits = CollisionCategories.GetAllExcept("Items");
+			_fixtureDef.filter.categoryBits = Box2DCollisionCategories.Get("BadGuys");
+			_fixtureDef.filter.maskBits = Box2DCollisionCategories.GetAllExcept("Items");
 			
 			_sensorFixtureDef = new b2FixtureDef();
 			_sensorFixtureDef.shape = _leftSensorShape;
 			_sensorFixtureDef.isSensor = true;
-			_sensorFixtureDef.filter.categoryBits = CollisionCategories.Get("BadGuys");
-			_sensorFixtureDef.filter.maskBits = CollisionCategories.GetAllExcept("Items");
+			_sensorFixtureDef.filter.categoryBits = Box2DCollisionCategories.Get("BadGuys");
+			_sensorFixtureDef.filter.maskBits = Box2DCollisionCategories.GetAllExcept("Items");
 		}
 		
 		override protected function createFixture():void
@@ -198,7 +198,7 @@ package com.citrusengine.objects.platformer {
 		
 		protected function handleBeginContact(e:ContactEvent):void
 		{
-			var collider:PhysicsObject = e.other.GetBody().GetUserData();
+			var collider:Box2DPhysicsObject = e.other.GetBody().GetUserData();
 			
 			if (collider is _enemyClass && collider.body.GetLinearVelocity().y > enemyKillVelocity)
 				hurt();
@@ -213,7 +213,7 @@ package com.citrusengine.objects.platformer {
 			if (_body.GetLinearVelocity().x > 0 && e.fixture == _leftSensorFixture)
 				return;
 				
-			var collider:PhysicsObject = e.other.GetBody().GetUserData();
+			var collider:Box2DPhysicsObject = e.other.GetBody().GetUserData();
 			if (collider is Platform || collider is Baddy)
 			{
 				turnAround();

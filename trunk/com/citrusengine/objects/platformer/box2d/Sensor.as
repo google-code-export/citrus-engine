@@ -1,10 +1,10 @@
-package com.citrusengine.objects.platformer
+package com.citrusengine.objects.platformer.box2d
 {
 
 	import Box2DAS.Dynamics.ContactEvent;
 	import Box2DAS.Dynamics.b2Body;
 
-	import com.citrusengine.objects.PhysicsObject;
+	import com.citrusengine.objects.Box2DPhysicsObject;
 
 	import org.osflash.signals.Signal;
 
@@ -23,7 +23,7 @@ package com.citrusengine.objects.platformer
 	 * onBeginContact - Dispatches on first contact with the sensor.
 	 * onEndContact - Dispatches when the object leaves the sensor.
 	 */	
-	public class Sensor extends PhysicsObject
+	public class Sensor extends Box2DPhysicsObject
 	{
 		/**
 		 * Dispatches on first contact with the sensor.

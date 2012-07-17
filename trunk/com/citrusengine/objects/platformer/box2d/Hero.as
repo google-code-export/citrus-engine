@@ -1,4 +1,4 @@
-package com.citrusengine.objects.platformer
+package com.citrusengine.objects.platformer.box2d
 {
 
 	import Box2DAS.Common.V2;
@@ -6,8 +6,8 @@ package com.citrusengine.objects.platformer
 	import Box2DAS.Dynamics.b2Fixture;
 
 	import com.citrusengine.math.MathVector;
-	import com.citrusengine.objects.PhysicsObject;
-	import com.citrusengine.physics.CollisionCategories;
+	import com.citrusengine.objects.Box2DPhysicsObject;
+	import com.citrusengine.physics.Box2DCollisionCategories;
 	import com.citrusengine.utils.Box2DShapeMaker;
 
 	import org.osflash.signals.Signal;
@@ -27,7 +27,7 @@ package com.citrusengine.objects.platformer
 	 * Don't store data on the hero object that you will need between two or more levels (such
 	 * as current coin count). The hero should be re-created each time a state is created or reset.
 	 */	
-	public class Hero extends PhysicsObject
+	public class Hero extends Box2DPhysicsObject
 	{
 		//properties
 		/**
@@ -193,7 +193,7 @@ package com.citrusengine.objects.platformer
 		 * "com.citrusengine.objects.platformer.Baddy", or Baddy (with no quotes). Only String
 		 * form will work when creating objects via a level editor.
 		 */
-		[Property(value="com.citrusengine.objects.platformer.Baddy")]
+		[Property(value="com.citrusengine.objects.platformer.box2d.Baddy")]
 		public function set enemyClass(value:*):void
 		{
 			if (value is String)
@@ -342,8 +342,8 @@ package com.citrusengine.objects.platformer
 			super.defineFixture();
 			_fixtureDef.friction = _friction;
 			_fixtureDef.restitution = 0;
-			_fixtureDef.filter.categoryBits = CollisionCategories.Get("GoodGuys");
-			_fixtureDef.filter.maskBits = CollisionCategories.GetAll();
+			_fixtureDef.filter.categoryBits = Box2DCollisionCategories.Get("GoodGuys");
+			_fixtureDef.filter.maskBits = Box2DCollisionCategories.GetAll();
 		}
 		
 		override protected function createFixture():void
@@ -362,7 +362,7 @@ package com.citrusengine.objects.platformer
 			if (!_ducking)
 				return;
 				
-			var other:PhysicsObject = e.other.GetBody().GetUserData() as PhysicsObject;
+			var other:Box2DPhysicsObject = e.other.GetBody().GetUserData() as Box2DPhysicsObject;
 			
 			var heroTop:Number = y;
 			var objectBottom:Number = other.y + (other.height / 2);
@@ -373,7 +373,7 @@ package com.citrusengine.objects.platformer
 		
 		protected function handleBeginContact(e:ContactEvent):void
 		{
-			var collider:PhysicsObject = e.other.GetBody().GetUserData();
+			var collider:Box2DPhysicsObject = e.other.GetBody().GetUserData();
 			
 			if (_enemyClass && collider is _enemyClass)
 			{

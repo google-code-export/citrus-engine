@@ -15,7 +15,7 @@ package com.citrusengine.physics
 	 * it just for the sake of adding fun category names. The categories created by the Box2D class are used by the
 	 * platformer kit that comes with Citrus Engine.
 	 */
-	public class CollisionCategories 
+	public class Box2DCollisionCategories 
 	{
 		private static var _allCategories:uint = 0;
 		private static var _numCategories:uint = 0;

@@ -1,4 +1,4 @@
-package com.citrusengine.objects.platformer 
+package com.citrusengine.objects.platformer.box2d 
 {
 
 	import Box2DAS.Common.V2;
@@ -7,8 +7,8 @@ package com.citrusengine.objects.platformer
 	import Box2DAS.Dynamics.b2FixtureDef;
 
 	import com.citrusengine.math.MathVector;
-	import com.citrusengine.objects.PhysicsObject;
-	import com.citrusengine.physics.CollisionCategories;
+	import com.citrusengine.objects.Box2DPhysicsObject;
+	import com.citrusengine.physics.Box2DCollisionCategories;
 
 	import org.osflash.signals.Signal;
 
@@ -40,7 +40,7 @@ package com.citrusengine.objects.platformer
 	 * The reward object only has a default animation.
 	 * 
 	 */
-	public class Reward extends PhysicsObject 
+	public class Reward extends Box2DPhysicsObject 
 	{
 		/**
 		 * The speed at which the reward moves. It will turn around when it hits a wall.
@@ -141,14 +141,14 @@ package com.citrusengine.objects.platformer
 			super.defineFixture();
 			_fixtureDef.friction = 0;
 			_fixtureDef.restitution = 0;
-			_fixtureDef.filter.categoryBits = CollisionCategories.Get("Items");
-			_fixtureDef.filter.maskBits = CollisionCategories.GetAllExcept("GoodGuys", "BadGuys");
+			_fixtureDef.filter.categoryBits = Box2DCollisionCategories.Get("Items");
+			_fixtureDef.filter.maskBits = Box2DCollisionCategories.GetAllExcept("GoodGuys", "BadGuys");
 			
 			_collectFixtureDef = new b2FixtureDef();
 			_collectFixtureDef.shape = _shape;
 			_collectFixtureDef.isSensor = true;
-			_collectFixtureDef.filter.categoryBits = CollisionCategories.Get("Items");
-			_collectFixtureDef.filter.maskBits = CollisionCategories.GetAllExcept("BadGuys");
+			_collectFixtureDef.filter.categoryBits = Box2DCollisionCategories.Get("Items");
+			_collectFixtureDef.filter.maskBits = Box2DCollisionCategories.GetAllExcept("BadGuys");
 		}
 		
 		override protected function createFixture():void
@@ -165,7 +165,7 @@ package com.citrusengine.objects.platformer
 		
 		protected function handleCollectContact(e:ContactEvent):void
 		{
-			var collider:PhysicsObject = e.other.GetBody().GetUserData() as PhysicsObject;
+			var collider:Box2DPhysicsObject = e.other.GetBody().GetUserData() as Box2DPhysicsObject;
 			
 			if (collider is _collectorClass)
 			{

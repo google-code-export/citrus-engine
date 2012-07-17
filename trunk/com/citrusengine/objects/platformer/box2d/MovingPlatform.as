@@ -1,4 +1,4 @@
-package com.citrusengine.objects.platformer
+package com.citrusengine.objects.platformer.box2d
 {
 
 	import Box2DAS.Common.V2;
