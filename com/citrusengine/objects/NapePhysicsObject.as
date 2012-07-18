@@ -96,7 +96,7 @@ package com.citrusengine.objects {
 		protected function createBody():void {
 			
 			_body = new Body(_bodyType, new Vec2(_x + _width / 2, _y + _height / 2));
-			_body.userData = this;
+			_body.userData.myData = this;
 		}
 		
 		protected function createMaterial():void {

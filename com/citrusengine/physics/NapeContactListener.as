@@ -30,11 +30,11 @@ package com.citrusengine.physics {
 		}
 		
 		public function onSensorInteractionBegin(interactionCallback:InteractionCallback):void {
-			interactionCallback.int1.castBody.userData.handleBeginContact(interactionCallback);
+			interactionCallback.int1.castBody.userData.myData.handleBeginContact(interactionCallback);
 		}
 		
 		public function onSensorInteractionEnd(interactionCallback:InteractionCallback):void {
-			interactionCallback.int1.castBody.userData.handleEndContact(interactionCallback);
+			interactionCallback.int1.castBody.userData.myData.handleEndContact(interactionCallback);
 		}
 	}
 }
