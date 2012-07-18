@@ -1,6 +1,6 @@
 package com.citrusengine.objects.platformer.box2d 
 {
-	
+
 	import Box2DAS.Common.V2;
 	import Box2DAS.Dynamics.ContactEvent;
 
@@ -12,7 +12,7 @@ package com.citrusengine.objects.platformer.box2d
 	import flash.display.MovieClip;
 	import flash.utils.clearTimeout;
 	import flash.utils.setTimeout;
-	
+		
 	/**
 	 * A missile is an object that moves at a particular trajectory and speed, and explodes when it comes into contact with something.
 	 * Often you will want the object that it exploded on to also die (or at least get hurt), such as a hero or an enemy.
@@ -74,7 +74,6 @@ package com.citrusengine.objects.platformer.box2d
 			
 			_velocity = new V2(speed, 0);
 			_velocity.rotate(angle * Math.PI / 180);
-			gravity = 0;
 			_inverted = speed < 0;
 			
 			_fuseDurationTimeoutID = setTimeout(explode, fuseDuration);
@@ -99,6 +98,12 @@ package com.citrusengine.objects.platformer.box2d
 		override public function update(timeDelta:Number):void
 		{
 			super.update(timeDelta);
+			
+			var removeGravity:V2 = new V2();
+			removeGravity.subtract(_box2D.world.GetGravity());
+			removeGravity.multiplyN(body.GetMass());
+			
+			_body.ApplyForce(removeGravity, _body.GetWorldCenter());
 			
 			if (!_exploded)
 			{

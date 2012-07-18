@@ -89,7 +89,7 @@ package com.citrusengine.objects.platformer.box2d
 			}
 		}
 		
-		private function handlePreSolve(e:ContactEvent):void
+		protected function handlePreSolve(e:ContactEvent):void
 		{
 			//Get the y position of the top of the platform
 			var platformTop:Number = _body.GetPosition().y - _height / 2;
