@@ -83,6 +83,10 @@
 			_starling.start();
 		}
 		
+		public function get starling():Starling {
+			return _starling;
+		}
+		
 		/**
 		 * Return the level manager, use it if you want. Take a look on its class for more information.
 		 */

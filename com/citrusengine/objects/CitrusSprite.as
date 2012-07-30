@@ -1,10 +1,12 @@
 package com.citrusengine.objects
 {
 
+	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.SpriteDebugArt;
+	import com.citrusengine.view.StarlingSpriteDebugArt;
 
 	import org.osflash.signals.Signal;
 
@@ -16,7 +18,7 @@ package com.citrusengine.objects
 	 * of the Flash Sprite. It has common properties that are required for properly displaying and
 	 * positioning objects. You can also add your logic to this sprite.
 	 * 
-	 * <p>With a CitrusSprite, there is only simple collision and velocity logic. If you'd like to take advantage of Box2D physics,
+	 * <p>With a CitrusSprite, there is only simple collision and velocity logic. If you'd like to take advantage of Box2D or Nape physics,
 	 * you should extend the PhysicsObject class instead.</p>
 	 */	
 	public class CitrusSprite extends CitrusObject implements ISpriteView
@@ -28,6 +30,7 @@ package com.citrusengine.objects
 		public var onPersist:Signal = new Signal(CitrusSprite, CitrusSprite, MathVector);
 		public var onSeparate:Signal = new Signal(CitrusSprite, CitrusSprite);
 		
+		protected var _ce:CitrusEngine;
 		protected var _x:Number = 0;
 		protected var _y:Number = 0;
 		protected var _width:Number = 30;
@@ -36,7 +39,7 @@ package com.citrusengine.objects
 		protected var _rotation:Number = 0;
 		protected var _group:Number = 0;
 		protected var _visible:Boolean = true;
-		protected var _view:* = SpriteDebugArt;
+		protected var _view:*;
 		protected var _inverted:Boolean = false;
 		protected var _animation:String = "";
 		protected var _offsetX:Number = 0;
@@ -51,6 +54,10 @@ package com.citrusengine.objects
 		public function CitrusSprite(name:String, params:Object=null)
 		{
 			super(name, params);
+			
+			_ce = CitrusEngine.getInstance();
+			
+			_view = _ce.starling ? StarlingSpriteDebugArt : SpriteDebugArt;
 		}
 		
 		override public function destroy():void
