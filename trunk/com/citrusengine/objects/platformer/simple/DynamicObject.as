@@ -6,14 +6,10 @@ package com.citrusengine.objects.platformer.simple {
 	 * An object that will be moved away from overlapping during a collision (probably your hero or something else that moves).
 	 */
 	public class DynamicObject extends CitrusSprite {
-		
-		public var gravity:Number = 20;
 
 		public function DynamicObject(name:String, params:Object = null) {
 			
 			super(name, params);
-			
-			velocity.y = gravity;
 		}
 	}
 }
