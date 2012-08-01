@@ -14,8 +14,6 @@ package com.citrusengine.system.components.box2d {
 	import com.citrusengine.physics.Box2DCollisionCategories;
 	import com.citrusengine.system.Component;
 
-	import flash.display.MovieClip;
-
 	/**
 	 * @author Aymeric
 	 */
@@ -28,22 +26,12 @@ package com.citrusengine.system.components.box2d {
 		protected var _fixtureDef:b2FixtureDef;
 		protected var _fixture:b2Fixture;
 		
-		protected var _inverted:Boolean = false;
-		protected var _parallax:Number = 1;
-		protected var _animation:String = "";
-		protected var _visible:Boolean = true;
 		protected var _x:Number = 0;
 		protected var _y:Number = 0;
-		protected var _view:* = MovieClip;
 		protected var _rotation:Number = 0;
 		protected var _width:Number = 1;
 		protected var _height:Number = 1;
 		protected var _radius:Number;
-		
-		private var _group:Number = 0;
-		private var _offsetX:Number = 0;
-		private var _offsetY:Number = 0;
-		private var _registration:String = "center";
 
 		public function Box2DComponent(name:String, params:Object = null) {
 			
@@ -111,17 +99,6 @@ package com.citrusengine.system.components.box2d {
 				_body.SetTransform(pos, _body.GetAngle());
 			}
 		}
-			
-		public function get parallax():Number
-		{
-			return _parallax;
-		}
-		
-		[Property(value="1")]
-		public function set parallax(value:Number):void
-		{
-			_parallax = value;
-		}
 		
 		public function get rotation():Number
 		{
@@ -138,81 +115,6 @@ package com.citrusengine.system.components.box2d {
 			
 			if (_body)
 				_body.SetTransform(_body.GetPosition(), _rotation); 
-		}
-			
-		public function get group():Number
-		{
-			return _group;
-		}
-		
-		[Property(value="0")]
-		public function set group(value:Number):void
-		{
-			_group = value;
-		}
-		
-		public function get visible():Boolean
-		{
-			return _visible;
-		}
-		
-		public function set visible(value:Boolean):void
-		{
-			_visible = value;
-		}
-		
-		public function get view():*
-		{
-			return _view;
-		}
-		
-		[Property(value="", browse="true")]
-		public function set view(value:*):void
-		{
-			_view = value;
-		}
-		
-		public function get animation():String
-		{
-			return _animation;
-		}
-		
-		public function get inverted():Boolean
-		{
-			return _inverted;
-		}
-		
-		public function get offsetX():Number
-		{
-			return _offsetX;
-		}
-		
-		[Property(value="0")]
-		public function set offsetX(value:Number):void
-		{
-			_offsetX = value;
-		}
-		
-		public function get offsetY():Number
-		{
-			return _offsetY;
-		}
-		
-		[Property(value="0")]
-		public function set offsetY(value:Number):void
-		{
-			_offsetY = value;
-		}
-		
-		public function get registration():String
-		{
-			return _registration;
-		}
-		
-		[Property(value="center")]
-		public function set registration(value:String):void
-		{
-			_registration = value;
 		}
 		
 		/**

@@ -1,5 +1,7 @@
 package com.citrusengine.core {
 
+	import com.citrusengine.system.Entity;
+	import com.citrusengine.system.components.ViewComponent;
 	import com.citrusengine.view.CitrusView;
 	
 	/**
@@ -16,6 +18,8 @@ package com.citrusengine.core {
 		function update(timeDelta:Number):void;
 		
 		function add(object:CitrusObject):CitrusObject;
+		
+		function addEntity(entity:Entity, view:ViewComponent):Entity;
 		
 		function remove(object:CitrusObject):void;
 		
