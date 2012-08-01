@@ -25,6 +25,14 @@ package com.citrusengine.system {
 			return this;
 		}
 		
+		public function remove(component:Component):void {
+			
+			if (components[component.name]) {
+				component.destroy();
+				delete components[component.name];
+			}
+		}
+		
 		public function initialize():void {
 			
 			for each (var component:Component in components) {
