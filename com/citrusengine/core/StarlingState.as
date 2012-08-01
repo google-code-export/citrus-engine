@@ -82,8 +82,13 @@ package com.citrusengine.core {
 			for (i = 0; i < n; i++) {
 				var garbageObject:CitrusObject = garbage[i];
 				_objects.splice(_objects.indexOf(garbageObject), 1);
+				
+				if (garbageObject is Entity)
+					_view.removeArt((garbageObject as Entity).components["view"]);				
+				else
+					_view.removeArt(garbageObject);
+				
 				garbageObject.destroy();
-				_view.removeArt(garbageObject);
 			}
 
 			// Update the input object
