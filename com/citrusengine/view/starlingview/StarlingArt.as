@@ -1,5 +1,5 @@
 package com.citrusengine.view.starlingview {
-
+	
 	import Box2DAS.Dynamics.b2DebugDraw;
 
 	import starling.core.Starling;
@@ -12,7 +12,12 @@ package com.citrusengine.view.starlingview {
 	import starling.textures.TextureAtlas;
 	import starling.utils.deg2rad;
 
+	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.core.CitrusObject;
+	import com.citrusengine.core.IState;
+	import com.citrusengine.physics.Box2D;
+	import com.citrusengine.physics.Nape;
+	import com.citrusengine.system.components.ViewComponent;
 	import com.citrusengine.view.ISpriteView;
 
 	import flash.display.Bitmap;
@@ -62,6 +67,7 @@ package com.citrusengine.view.starlingview {
 		private static var _loopAnimation:Dictionary = new Dictionary();
 		
 		private var _citrusObject:ISpriteView;
+		private var _physicsComponent:*;
 		private var _registration:String;
 		private var _view:*;
 		private var _animation:String;
@@ -76,6 +82,11 @@ package com.citrusengine.view.starlingview {
 		public function StarlingArt(object:ISpriteView) {
 
 			_citrusObject = object;
+			
+			var ceState:IState = CitrusEngine.getInstance().state;
+			
+			if (_citrusObject is ViewComponent && (ceState.getFirstObjectByType(Box2D) as Box2D || ceState.getFirstObjectByType(Nape) as Nape))
+				_physicsComponent = (_citrusObject as ViewComponent).entity.components["physics"];
 			
 			this.name = (_citrusObject as CitrusObject).name;
 			
@@ -245,6 +256,9 @@ package com.citrusengine.view.starlingview {
 		}
 
 		public function update(stateView:StarlingView):void {
+			
+			scaleX = _citrusObject.inverted ? -1 : 1;
+			// The position = object position + (camera position * inverse parallax)
 
 			if (content is Box2DDebugArt) {
 
@@ -275,20 +289,25 @@ package com.citrusengine.view.starlingview {
 				}
 
 				napeDebugArt.visible = _citrusObject.visible;
+				
+			} else if (_physicsComponent) {
+				
+				x = _physicsComponent.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
+				y = _physicsComponent.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				rotation = deg2rad(_physicsComponent.rotation);
 
 			} else {
 
-				scaleX = _citrusObject.inverted ? -1 : 1;
-				// The position = object position + (camera position * inverse parallax)
 				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
 				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
-				visible = _citrusObject.visible;
 				rotation = deg2rad(_citrusObject.rotation);
-				registration = _citrusObject.registration;
-				view = _citrusObject.view;
-				animation = _citrusObject.animation;
-				group = _citrusObject.group;
 			}
+			
+			visible = _citrusObject.visible;
+			registration = _citrusObject.registration;
+			view = _citrusObject.view;
+			animation = _citrusObject.animation;
+			group = _citrusObject.group;
 		}
 
 		private function handleContentLoaded(evt:Event):void {

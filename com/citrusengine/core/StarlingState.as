@@ -2,6 +2,8 @@ package com.citrusengine.core {
 
 	import starling.display.Sprite;
 
+	import com.citrusengine.system.Entity;
+	import com.citrusengine.system.components.ViewComponent;
 	import com.citrusengine.view.CitrusView;
 	import com.citrusengine.view.starlingview.StarlingView;
 
@@ -102,6 +104,14 @@ package com.citrusengine.core {
 			_view.addArt(object);
 			
 			return object;
+		}
+		
+		public function addEntity(entity:Entity, view:ViewComponent):Entity {
+			
+			_objects.push(entity);
+			_view.addArt(view);
+			
+			return entity;
 		}
 
 		/**
