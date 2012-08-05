@@ -4,6 +4,8 @@ package com.citrusengine.objects {
 	import com.citrusengine.core.CitrusObject;
 	import com.citrusengine.physics.Nape;
 	import com.citrusengine.view.ISpriteView;
+	import nape.callbacks.PreCallback;
+	import nape.callbacks.PreFlag;
 	
 	import flash.display.MovieClip;
 	
@@ -80,6 +82,10 @@ package com.citrusengine.objects {
 		 * want to do any velocity/force logic. 
 		 */		
 		override public function update(timeDelta:Number):void {
+		}
+		
+		public function handlePreContact(callback:PreCallback):PreFlag {
+			return PreFlag.ACCEPT;
 		}
 		
 		public function handleBeginContact(callback:InteractionCallback):void {
