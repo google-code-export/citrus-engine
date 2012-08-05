@@ -31,13 +31,10 @@ package com.citrusengine.objects.platformer.nape {
 			if (_body.cbTypes.length > 0) {
 				_body.cbTypes.clear();
 			}
-			if (_oneWay) {
-				if (_preListener) {
-					_preListener.space = null;
-				}
-				_body.cbTypes.remove(ONEWAY_PLATFORM);
+			if (_preListener) {
+				_preListener.space = null;
+				_preListener = null;
 			}
-			_preListener = null;
 			
 			super.destroy();
 		}
@@ -65,8 +62,9 @@ package com.citrusengine.objects.platformer.nape {
 			{
 				if (_preListener) {
 					_preListener.space = null;
+					_preListener = null;
 				}
-				_body.cbTypes.remove(ONEWAY_PLATFORM);
+				_body.cbTypes.clear();
 			}
 		}
 		
@@ -89,6 +87,7 @@ package com.citrusengine.objects.platformer.nape {
 			if (_oneWay) {
 				_body.cbTypes.add(ONEWAY_PLATFORM);
 			}
+
 		}
 		
 		override protected function createConstraint():void {
