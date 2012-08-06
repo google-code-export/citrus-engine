@@ -1,7 +1,9 @@
 package com.citrusengine.system.components {
 
-	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.system.Component;
+	import com.citrusengine.view.ISpriteView;
+
+	import org.osflash.signals.Signal;
 
 	import flash.display.MovieClip;
 
@@ -9,6 +11,8 @@ package com.citrusengine.system.components {
 	 * @author Aymeric
 	 */
 	public class ViewComponent extends Component implements ISpriteView {
+		
+		public var onAnimationChange:Signal;
 
 		protected var _x:Number = 0;
 		protected var _y:Number = 0;
@@ -26,6 +30,20 @@ package com.citrusengine.system.components {
 
 		public function ViewComponent(name:String, params:Object = null) {
 			super(name, params);
+			
+			onAnimationChange = new Signal();
+		}
+			
+		override public function update(timeDelta:Number):void {
+			
+			super.update(timeDelta);
+		}
+			
+		override public function destroy():void {
+			
+			onAnimationChange.removeAll();
+			
+			super.destroy();
 		}
 		
 		public function get x():Number {
