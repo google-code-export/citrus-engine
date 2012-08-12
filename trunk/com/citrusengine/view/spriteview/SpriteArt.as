@@ -72,8 +72,12 @@ package com.citrusengine.view.spriteview
 			if (_citrusObject is ViewComponent && (ceState.getFirstObjectByType(Box2D) as Box2D || ceState.getFirstObjectByType(Nape) as Nape))
 				_physicsComponent = (_citrusObject as ViewComponent).entity.components["physics"];
 			
-			//this.name = (_citrusObject as CitrusObject).name;
+			this.name = (_citrusObject as CitrusObject).name;
+		}
+		
+		public function destroy():void {
 			
+			_view = null;
 		}
 		
 		public function moveRegistrationPoint(registrationPoint:String):void {
