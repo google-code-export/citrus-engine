@@ -57,8 +57,14 @@ package com.citrusengine.view.spriteview
 		private var _animation:String;
 		private var _group:int;
 		
-		public function SpriteArt(object:ISpriteView) 
+		public function SpriteArt(object:ISpriteView = null) 
 		{
+			if (object)
+				initialize(object);
+		}
+		
+		public function initialize(object:ISpriteView):void {
+			
 			_citrusObject = object;
 			
 			var ceState:IState = CitrusEngine.getInstance().state;
@@ -66,7 +72,8 @@ package com.citrusengine.view.spriteview
 			if (_citrusObject is ViewComponent && (ceState.getFirstObjectByType(Box2D) as Box2D || ceState.getFirstObjectByType(Nape) as Nape))
 				_physicsComponent = (_citrusObject as ViewComponent).entity.components["physics"];
 			
-			this.name = (_citrusObject as CitrusObject).name;
+			//this.name = (_citrusObject as CitrusObject).name;
+			
 		}
 		
 		public function moveRegistrationPoint(registrationPoint:String):void {
