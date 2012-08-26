@@ -37,6 +37,9 @@ package com.citrusengine.view.starlingview {
 		private var _ltl:uint;
 		
 		
+		private var _parallax:Number;
+		
+		
 		// timer to call updates, every second should be fine
 		private var _timer:Timer = new Timer(1000);
 		
@@ -47,9 +50,10 @@ package com.citrusengine.view.starlingview {
 		
 		
 		
-		public function StarlingTileSystem(bodyToFollow:ISpriteView, images:Array) {
+		public function StarlingTileSystem(bodyToFollow:ISpriteView, images:Array, parallax:Number = 1) {
 			_followMe = bodyToFollow;
 			_images = images;
+			_parallax = parallax;
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
@@ -103,7 +107,7 @@ package com.citrusengine.view.starlingview {
 				// check distance between tile and hero
 				d = DistanceTwoPoints(currentTile.x + (TW >> 1), _followMe.x, currentTile.y + (TH >> 1), _followMe.y);
 				// check if it is close enough to load in
-				if (d < TW * 1.5) {
+				if (d < TW * (1.5 / _parallax)) {
 					if (!currentTile.isInRAM) {
 						//trace("adding it");
 						currentTile.isInRAM = true;
@@ -118,7 +122,7 @@ package com.citrusengine.view.starlingview {
 					
 					
 				// otherwise, check if it is far enough to dispose
-				} else if (d > TW * 1.7) {
+				} else if (d > TW * (1.7 / _parallax)) {
 					if (currentTile.isInRAM) {
 						//trace("removing it");
 						currentTile.isInRAM = false;
@@ -138,7 +142,7 @@ package com.citrusengine.view.starlingview {
 				if (numInRam > maxInRam) {
 					maxInRam = numInRam;
 					// shows the maximum number of tiles used
-					//trace("maximum tiles in ram:", numInRam, "memory in use:", (numInRam * 4), "MB");
+					//trace(this.name, "maximum tiles in ram:", numInRam, "memory in use:", (numInRam * 4), "MB");
 				}
 			}
 		}
