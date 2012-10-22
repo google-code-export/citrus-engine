@@ -1,12 +1,11 @@
 package com.citrusengine.view.blittingview 
 {
-
 	import com.citrusengine.core.CitrusEngine;
 	import com.citrusengine.math.MathVector;
 	import com.citrusengine.physics.APhysicsEngine;
-	import com.citrusengine.physics.SimpleCitrusSolver;
+	import com.citrusengine.physics.IDebugView;
+	import com.citrusengine.physics.simple.SimpleCitrusSolver;
 	import com.citrusengine.view.CitrusView;
-	import com.citrusengine.view.IDebugView;
 	import com.citrusengine.view.ISpriteView;
 	import com.citrusengine.view.SpriteDebugArt;
 
@@ -16,6 +15,7 @@ package com.citrusengine.view.blittingview
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getDefinitionByName;
+
 	
 	public class BlittingView extends CitrusView
 	{
