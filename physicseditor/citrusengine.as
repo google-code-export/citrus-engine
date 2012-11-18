@@ -1,18 +1,18 @@
 package {
 
-    import Box2DAS.Collision.Shapes.b2PolygonShape;
-	import Box2DAS.Common.V2;
+    import Box2D.Collision.Shapes.b2PolygonShape;
+	import Box2D.Common.Math.b2Vec2;
 
-	import com.citrusengine.objects.PhysicsObject;
+	import com.citrusengine.objects.Box2DPhysicsObject;
 
 	/**
 	 * @author Aymeric
-	 * <p>This is a class created by the software http://www.physicseditor.de/</p>
-	 * <p>Just select the CitrusEngine template, upload your png picture, set polygons and export.</p>
+	 * <p>This is a class created by the software <a href="http://www.physicseditor.de/">PhysicsEditor</a></p>
+	 * <p>Launch PhysicsEditor, select the CitrusEngine template, upload your png picture, set polygons and export.</p>
 	 * <p>Be careful, the registration point is topLeft !</p>
-	 * @param peObject : the name of the png file
+	 * @param peObject the name of the png file
 	 */
-    public class PhysicsEditorObjects extends PhysicsObject {
+    public class PhysicsEditorObjects extends Box2DPhysicsObject {
 		
 		[Inspectable(defaultValue="")]
 		public var peObject:String = "";
@@ -20,6 +20,11 @@ package {
 		private var _tab:Array;
 
 		public function PhysicsEditorObjects(name:String, params:Object = null) {
+
+			if (params && params.registration == undefined)
+				params.registration = "topLeft";
+			else if (params == null)
+				params = {registration:"topLeft"};
 
 			super(name, params);
 		}
@@ -46,7 +51,7 @@ package {
 			
 			for (var i:uint = 0; i < _tab.length; ++i) {
 				var polygonShape:b2PolygonShape = new b2PolygonShape();
-				polygonShape.Set(_tab[i]);
+				polygonShape.SetAsArray(_tab[i]);
 				_fixtureDef.shape = polygonShape;
 
 				body.CreateFixture(_fixtureDef);
@@ -56,16 +61,16 @@ package {
         protected function _createVertices():void {
 			
 			_tab = [];
-			var vertices:Vector.<V2> = new Vector.<V2>();
+			var vertices:Array = [];
 
 			switch (peObject) {
 				{% for body in bodies %}
 				case "{{body.name}}":
 					{% for fixture in body.fixtures %}{% for polygon in fixture.polygons %}						
-			        {% for point in polygon %}vertices.push(new V2({{point.x}}/_box2D.scale, {{point.y}}/_box2D.scale));
+			        {% for point in polygon %}vertices.push(new b2Vec2({{point.x}}/_box2D.scale, {{point.y}}/_box2D.scale));
 					{% endfor %}
 					_tab.push(vertices);{% if not forloop.last %}
-					vertices = new Vector.<V2>();{% endif %}
+					vertices = [];{% endif %}
 					{% endfor %}{% endfor %}
 					break;
 			{% endfor %}
@@ -78,7 +83,6 @@ package {
 				{% for body in bodies %}
 				case "{{body.name}}":
 					{% for fixture in body.fixtures %}return {{fixture.density}};{% endfor %}
-					break;
 			{% endfor %}
 			}
 
@@ -91,7 +95,6 @@ package {
 				{% for body in bodies %}
 				case "{{body.name}}":
 					{% for fixture in body.fixtures %}return {{fixture.friction}};{% endfor %}
-					break;
 			{% endfor %}
 			}
 
@@ -104,7 +107,6 @@ package {
 				{% for body in bodies %}
 				case "{{body.name}}":
 					{% for fixture in body.fixtures %}return {{fixture.restitution}};{% endfor %}
-					break;
 			{% endfor %}
 			}
 
