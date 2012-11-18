@@ -1,7 +1,7 @@
 <exporter>
     
     <!-- identifier of the exporter -->
-	<name>box2d-alchemy</name>
+	<name>citrus-as</name>
 	
 	<!-- name for the dropbox -->
     <displayName>CitrusEngine ActionScript (FLASH)</displayName>
@@ -10,7 +10,7 @@
     <description>CitrusEngine ActionScript for Flash</description>
 	
 	<!-- exporter version -->
-	<version>1.0</version>
+	<version>1.2</version>
 	
 	<!-- direction of the y axis: up / down -->
     <yAxisDirection>down</yAxisDirection>
