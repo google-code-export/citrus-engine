@@ -5,7 +5,7 @@ package com.citrusengine.objects.platformer.box2d {
 	import Box2D.Dynamics.b2Body;
 
 	import com.citrusengine.math.MathVector;
-	import com.citrusengine.objects.Box2DPhysicsObject;
+	import com.citrusengine.physics.box2d.Box2DUtils;
 	
 	/**
 	 * A platform that moves between two points. The MovingPlatform has several properties that can customize it.
@@ -192,13 +192,13 @@ package com.citrusengine.objects.platformer.box2d {
 		
 		override public function handleBeginContact(contact:b2Contact):void {
 			
-			_passengers.push(Box2DPhysicsObject.CollisionGetOther(this, contact).body);
+			_passengers.push(Box2DUtils.CollisionGetOther(this, contact).body);
 		}
 		
 		
 		override public function handleEndContact(contact:b2Contact):void {
 			
-			_passengers.splice(_passengers.indexOf(Box2DPhysicsObject.CollisionGetOther(this, contact).body), 1); 
+			_passengers.splice(_passengers.indexOf(Box2DUtils.CollisionGetOther(this, contact).body), 1); 
 		}
 	}
 }
