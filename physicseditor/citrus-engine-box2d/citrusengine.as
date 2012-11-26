@@ -1,6 +1,6 @@
 package {
 
-    import Box2D.Collision.Shapes.b2PolygonShape;
+	import Box2D.Collision.Shapes.b2PolygonShape;
 	import Box2D.Common.Math.b2Vec2;
 
 	import com.citrusengine.objects.Box2DPhysicsObject;
@@ -9,7 +9,7 @@ package {
 	 * @author Aymeric
 	 * <p>This is a class created by the software <a href="http://www.physicseditor.de/">PhysicsEditor</a></p>
 	 * <p>Launch PhysicsEditor, select the CitrusEngine template, upload your png picture, set polygons and export.</p>
-	 * <p>Be careful, the registration point is topLeft !</p>
+	 * <p>Be careful, the registration point is topLeft!</p>
 	 * @param peObject the name of the png file
 	 */
     public class PhysicsEditorObjects extends Box2DPhysicsObject {

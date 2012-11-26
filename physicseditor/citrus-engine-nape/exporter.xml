@@ -1,22 +1,22 @@
 <exporter>
     
     <!-- identifier of the exporter -->
-	<name>citrus-as</name>
+	<name>citrus-nape</name>
 	
 	<!-- name for the dropbox -->
-    <displayName>CitrusEngine ActionScript (FLASH)</displayName>
+    <displayName>Citrus Engine Nape (FLASH)</displayName>
 	
 	<!-- description of the exporter -->
-    <description>CitrusEngine ActionScript for Flash</description>
+    <description>Citrus Engine Nape (FLASH)</description>
 	
 	<!-- exporter version -->
-	<version>1.2</version>
+	<version>1.0</version>
 	
 	<!-- direction of the y axis: up / down -->
     <yAxisDirection>down</yAxisDirection>
 	
 	<!-- physics engine to use: box2d, chipmunk -->
-	<physicsEngine>box2d</physicsEngine>
+	<physicsEngine><!--nape-->generic</physicsEngine>
 	
 	<!-- name of the template file -->
     <template>citrusengine.as</template>
@@ -60,28 +60,34 @@
 	<!-- custom fixture parameters -->
 	<fixture>
 		<parameter>
-			<name>density</name>
-			<displayName>Density</displayName>
-			<description>Density of the shape. Used for calculating the mass.</description>
-			<shortDescription>Density of the shape. Used for calculating the mass.</shortDescription>
+			<name>elasticity</name>
+			<displayName>elasticity</displayName>
+			<type>float</type>
+			<default>0.2</default>
+		</parameter>
+		<parameter>
+			<name>dynamicFriction</name>
+			<displayName>dynamicFriction</displayName>
 			<type>float</type>
 			<default>1</default>
 		</parameter>
 		<parameter>
-			<name>friction</name>
-			<description>Fricion.</description>
-			<shortDescription>Friction.</shortDescription>
-			<displayName>Friction</displayName>
+			<name>staticFriction</name>
+			<displayName>staticFriction</displayName>
 			<type>float</type>
-			<default>0.6</default>
+			<default>1</default>
 		</parameter>
 		<parameter>
-			<name>restitution</name>
-			<displayName>Restitution</displayName>
-			<description>Restitution defines how much a shape bounces.</description>
-			<shortDescription>Density of the shape. Used for calculating the mass.</shortDescription>
+			<name>density</name>
+			<displayName>density</displayName>
 			<type>float</type>
-			<default>0.3</default>
+			<default>1</default>
+		</parameter>
+		<parameter>
+			<name>rollingFriction</name>
+			<displayName>rollingFriction</displayName>
+			<type>float</type>
+			<default>0</default>
 		</parameter>
     </fixture>
 </exporter>
