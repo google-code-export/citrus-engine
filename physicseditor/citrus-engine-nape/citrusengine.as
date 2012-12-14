@@ -1,6 +1,6 @@
 package {
 
-	import com.citrusengine.objects.NapePhysicsObject;
+	import citrus.objects.NapePhysicsObject;
 
 	import nape.geom.Vec2;
 	import nape.phys.Material;
