@@ -1,10 +1,11 @@
-package citrus.core {
+package citrus.core.starling {
+
+	import citrus.core.CitrusEngine;
 
 	import starling.core.Starling;
 	import starling.events.Event;
 
 	import flash.display.DisplayObject;
-	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 
