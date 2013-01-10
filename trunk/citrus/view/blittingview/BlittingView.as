@@ -6,7 +6,7 @@ package citrus.view.blittingview
 	import citrus.physics.APhysicsEngine;
 	import citrus.physics.IDebugView;
 	import citrus.physics.simple.SimpleCitrusSolver;
-	import citrus.view.CitrusView;
+	import citrus.view.ACitrusView;
 	import citrus.view.ISpriteView;
 	import citrus.view.SpriteDebugArt;
 
@@ -30,7 +30,7 @@ package citrus.view.blittingview
 	 * new BlittingView(this)</code>. Also don't forget to call <code>BlittingView(view).updateCanvas();</code> to set up the blitting canvas. 
 	 * Check the demo for an example.</p>
 	 */	
-	public class BlittingView extends CitrusView
+	public class BlittingView extends ACitrusView
 	{
 		public var backgroundColor:Number = 0xffffffff;
 		
@@ -50,12 +50,16 @@ package citrus.view.blittingview
 		{
 			super(root, ISpriteView);
 			
-			_canvas = new BitmapData(cameraLensWidth, cameraLensHeight, true, backgroundColor);
+			var ce:CitrusEngine = CitrusEngine.getInstance();
+			
+			_canvas = new BitmapData(ce.stage.stageWidth, ce.stage.stageHeight, true, backgroundColor);
 			_canvasBitmap = new Bitmap(_canvas);
 			root.addChild(_canvasBitmap);
 			
 			_debugView = new Sprite();
 			root.addChild(_debugView);
+			
+			camera = new BlittingCamera(_cameraPosition);
 		}
 		
 		public function get cameraPosition():MathVector
@@ -67,31 +71,7 @@ package citrus.view.blittingview
 		{
 			super.update();
 			
-			//Update Camera
-			if (cameraTarget)
-			{
-				//Update camera position
-				var diffX:Number = (cameraTarget.x - cameraOffset.x) - _cameraPosition.x;
-				var diffY:Number = (cameraTarget.y - cameraOffset.y) - _cameraPosition.y;
-				var velocityX:Number = diffX * cameraEasing.x;
-				var velocityY:Number = diffY * cameraEasing.y;
-				_cameraPosition.x += velocityX;
-				_cameraPosition.y += velocityY;
-				
-				//Constrain to camera bounds
-				if (cameraBounds)
-				{
-					if (_cameraPosition.x <= cameraBounds.left || cameraBounds.width < cameraLensWidth)
-						_cameraPosition.x = cameraBounds.left;
-					else if (_cameraPosition.x + cameraLensWidth >= cameraBounds.right)
-						_cameraPosition.x = cameraBounds.right - cameraLensWidth;
-					
-					if (_cameraPosition.y <= cameraBounds.top || cameraBounds.height < cameraLensHeight)
-						_cameraPosition.y = cameraBounds.top;
-					else if (_cameraPosition.y + cameraLensHeight >= cameraBounds.bottom)
-						_cameraPosition.y = cameraBounds.bottom - cameraLensHeight;
-				}
-			}
+			camera.update();			
 			
 			if (_debuggerPhysicsObject) {
 				_debugView.visible = _debuggerPhysicsObject.visible;
@@ -109,7 +89,7 @@ package citrus.view.blittingview
 			}
 			
 			_canvas.lock();
-			_canvas.fillRect(new Rectangle(0, 0, cameraLensWidth, cameraLensHeight), backgroundColor);
+			_canvas.fillRect(new Rectangle(0, 0, camera.cameraLensWidth, camera.cameraLensHeight), backgroundColor);
 			var n:Number = _spriteOrder.length;
 			for (var j:uint = 0; j < n; ++j)
 			{
@@ -120,7 +100,7 @@ package citrus.view.blittingview
 		
 		public function updateCanvas():void
 		{
-			_canvas = new BitmapData(cameraLensWidth, cameraLensHeight, true, backgroundColor);
+			_canvas = new BitmapData(camera.cameraLensWidth, camera.cameraLensHeight, true, backgroundColor);
 			_canvasBitmap.bitmapData = _canvas;
 		}
 		

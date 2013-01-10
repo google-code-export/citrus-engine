@@ -1,6 +1,6 @@
 package citrus.view.spriteview {
 
-	import citrus.view.CitrusView;
+	import citrus.view.ACitrusView;
 	import citrus.view.ISpriteView;
 
 	import flash.display.Sprite;
@@ -13,7 +13,7 @@ package citrus.view.spriteview {
 	 * prefer to use other rendering methods. The most common alternative is called "blitting", which is what Flixel uses. There are
 	 * also Stage3D to render graphics 2D graphics via <a href="http://gamua.com/starling/">Starling</a> or 3D graphics thanks to <a href="http://away3d.com/">Away3D</a>.</p>
 	 */	
-	public class SpriteView extends CitrusView
+	public class SpriteView extends ACitrusView
 	{
 		private var _viewRoot:Sprite;
 		
@@ -23,6 +23,8 @@ package citrus.view.spriteview {
 			
 			_viewRoot = new Sprite();
 			root.addChild(_viewRoot);
+			
+			camera = new SpriteCamera(_viewRoot);
 		}
 		
 		public function get viewRoot():Sprite
@@ -34,30 +36,7 @@ package citrus.view.spriteview {
 		{
 			super.update();
 			
-			//Update Camera
-			if (cameraTarget)
-			{
-				var diffX:Number = (-cameraTarget.x + cameraOffset.x) - _viewRoot.x;
-				var diffY:Number = (-cameraTarget.y + cameraOffset.y) - _viewRoot.y;
-				var velocityX:Number = diffX * cameraEasing.x;
-				var velocityY:Number = diffY * cameraEasing.y;
-				_viewRoot.x += velocityX;
-				_viewRoot.y += velocityY;
-				
-				//Constrain to camera bounds
-				if (cameraBounds)
-				{
-					if (-_viewRoot.x <= cameraBounds.left || cameraBounds.width < cameraLensWidth)
-						_viewRoot.x = -cameraBounds.left;
-					else if (-_viewRoot.x + cameraLensWidth >= cameraBounds.right)
-						_viewRoot.x = -cameraBounds.right + cameraLensWidth;
-					
-					if (-_viewRoot.y <= cameraBounds.top || cameraBounds.height < cameraLensHeight)
-						_viewRoot.y = -cameraBounds.top;
-					else if (-_viewRoot.y + cameraLensHeight >= cameraBounds.bottom)
-						_viewRoot.y = -cameraBounds.bottom + cameraLensHeight;
-				}
-			}
+			camera.update();
 			
 			//Update art positions
 			for each (var sprite:SpriteArt in _viewObjects)

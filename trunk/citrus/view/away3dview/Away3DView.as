@@ -3,7 +3,7 @@ package citrus.view.away3dview {
 	import away3d.containers.ObjectContainer3D;
 
 	import citrus.physics.APhysicsEngine;
-	import citrus.view.CitrusView;
+	import citrus.view.ACitrusView;
 	import citrus.view.ISpriteView;
 
 	import flash.display.MovieClip;
@@ -13,7 +13,7 @@ package citrus.view.away3dview {
 	 * You must use this view to create a 3D game. Note that you can create a 3D game with a 2D logic/physics.
 	 * It is automatically set up when you extend Away3DState.
 	 */
-	public class Away3DView extends CitrusView {
+	public class Away3DView extends ACitrusView {
 
 		private var _viewRoot:ObjectContainer3D;
 
@@ -31,6 +31,9 @@ package citrus.view.away3dview {
 			
 			_viewRoot = new ObjectContainer3D();
 			root.addChild(_viewRoot);
+			
+			// TODO: change camera depending the mode.
+			camera = new Away3DCamera2D(_viewRoot);
 		}
 
 		override public function destroy():void {
@@ -51,31 +54,8 @@ package citrus.view.away3dview {
 		override public function update():void {
 
 			super.update();
-
-			// Update Camera
-			if (cameraTarget) {
-				var diffX:Number = (-cameraTarget.x + cameraOffset.x) - _viewRoot.position.x;
-				var diffY:Number = (-cameraTarget.y + cameraOffset.y) - _viewRoot.position.y;
-				var velocityX:Number = diffX * cameraEasing.x;
-				var velocityY:Number = diffY * cameraEasing.y;
-
-				_viewRoot.x += velocityX;
-				_viewRoot.y -= velocityY;
-
-				// Constrain to camera bounds
-				if (cameraBounds) {
-
-					if (-_viewRoot.x <= cameraBounds.left || cameraBounds.width < cameraLensWidth)
-						_viewRoot.x = -cameraBounds.left;
-					else if (-_viewRoot.x + cameraLensWidth >= cameraBounds.right)
-						_viewRoot.x = -cameraBounds.right + cameraLensWidth;
-
-					if (-_viewRoot.y <= cameraBounds.top || cameraBounds.height < cameraLensHeight)
-						_viewRoot.y = -cameraBounds.top;
-					else if (-_viewRoot.y + cameraLensHeight >= cameraBounds.bottom)
-						_viewRoot.y = -cameraBounds.bottom + cameraLensHeight;
-				}
-			}
+			
+			camera.update();
 
 			// Update art positions
 			for each (var sprite:Away3DArt in _viewObjects) {
