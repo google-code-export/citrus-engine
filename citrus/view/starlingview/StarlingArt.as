@@ -317,10 +317,13 @@ package citrus.view.starlingview {
 				// So we need to move their views here, not in the StarlingView.
 				physicsDebugArt = (Starling.current.nativeStage.getChildByName("debug view") as flash.display.DisplayObject);
 				
-				if (stateView.cameraTarget) {
+				if (stateView.camera.target) {
 
-					physicsDebugArt.x = stateView.viewRoot.x;
-					physicsDebugArt.y = stateView.viewRoot.y;
+					//temporarily using the StarlingCamera cameraLens property.
+					physicsDebugArt.x = -(stateView.camera as StarlingCamera).cameraLens.rect.x;
+					physicsDebugArt.y = -(stateView.camera as StarlingCamera).cameraLens.rect.y;
+					physicsDebugArt.scaleX = physicsDebugArt.scaleY = (stateView.camera as StarlingCamera).cameraLens.zoom;
+					physicsDebugArt.rotation = (stateView.camera as StarlingCamera).cameraLens.rotation * 180/Math.PI;
 				}
 
 				physicsDebugArt.visible = _citrusObject.visible;
