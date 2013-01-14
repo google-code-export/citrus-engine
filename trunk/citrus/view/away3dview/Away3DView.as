@@ -96,11 +96,13 @@ package citrus.view.away3dview {
 		private function updateGroupForSprite(sprite:Away3DArt):void {
 
 			// Create the container sprite (group) if it has not been created yet.
-			while (sprite.group >= _viewRoot.numChildren)
+			while (sprite.citrusObject.group >= _viewRoot.numChildren)
 				_viewRoot.addChild(new ObjectContainer3D());
 
 			// Add the sprite to the appropriate group
-			ObjectContainer3D(_viewRoot.getChildAt(sprite.group)).addChild(sprite);
+			ObjectContainer3D(_viewRoot.getChildAt(sprite.citrusObject.group)).addChild(sprite);
+			
+			// The sprite.group will be updated in the update method like all its other values. This function is called after the updateGroupForSprite method.
 		}
 	}
 }
