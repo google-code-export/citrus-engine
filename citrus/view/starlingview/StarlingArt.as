@@ -6,6 +6,7 @@ package citrus.view.starlingview {
 	import citrus.physics.APhysicsEngine;
 	import citrus.system.components.ViewComponent;
 	import citrus.view.ISpriteView;
+	import flash.geom.Point;
 
 	import dragonBones.Armature;
 
@@ -65,7 +66,6 @@ package citrus.view.starlingview {
 
 		// properties :
 		
-		// determines animations playing in loop. You can add one in your state class : StarlingArt.setLoopAnimations(["walk", "climb"]);
 		private static var _loopAnimation:Dictionary = new Dictionary();
 		
 		private var _citrusObject:ISpriteView;
@@ -73,7 +73,7 @@ package citrus.view.starlingview {
 		private var _registration:String;
 		private var _view:*;
 		private var _animation:String;
-		private var _group:int;
+		public var group:uint;
 
 		private var _texture:Texture;
 		private var _textureAtlas:TextureAtlas;
@@ -159,6 +159,9 @@ package citrus.view.starlingview {
 			}
 		}
 		
+		/**
+		 * Determines animations playing in loop. You can add one in your state class: <code>StarlingArt.setLoopAnimations(["walk", "climb"])</code>;
+		 */
 		static public function get loopAnimation():Dictionary {
 			return _loopAnimation;
 		}
@@ -290,14 +293,6 @@ package citrus.view.starlingview {
 			}
 		}
 
-		public function get group():int {
-			return _group;
-		}
-
-		public function set group(value:int):void {
-			_group = value;
-		}
-
 		public function get citrusObject():ISpriteView {
 			return _citrusObject;
 		}
@@ -309,6 +304,9 @@ package citrus.view.starlingview {
 			
 			var physicsDebugArt:flash.display.DisplayObject;
 			
+			var cam:StarlingCamera = (stateView.camera as StarlingCamera);
+			var camPosition:Point = cam.pointFromLocal(new Point(cam.offset.x/cam.getZoom(), cam.offset.y/cam.getZoom()));
+			
 			if (content is StarlingPhysicsDebugView) {
 				
 				(content as StarlingPhysicsDebugView).update();
@@ -317,27 +315,27 @@ package citrus.view.starlingview {
 				// So we need to move their views here, not in the StarlingView.
 				physicsDebugArt = (Starling.current.nativeStage.getChildByName("debug view") as flash.display.DisplayObject);
 				
-				if (stateView.camera.target) {
+				if (stateView.camera.target || stateView.camera.manualPosition) {
 
 					//temporarily using the StarlingCamera cameraLens property.
-					physicsDebugArt.x = -(stateView.camera as StarlingCamera).cameraLens.rect.x;
-					physicsDebugArt.y = -(stateView.camera as StarlingCamera).cameraLens.rect.y;
-					physicsDebugArt.scaleX = physicsDebugArt.scaleY = (stateView.camera as StarlingCamera).cameraLens.zoom;
-					physicsDebugArt.rotation = (stateView.camera as StarlingCamera).cameraLens.rotation * 180/Math.PI;
+					physicsDebugArt.x = cam.camProxy.x;
+					physicsDebugArt.y = cam.camProxy.y;
+					physicsDebugArt.scaleX = physicsDebugArt.scaleY = (stateView.camera as StarlingCamera).camProxy.scale;
+					physicsDebugArt.rotation = (stateView.camera as StarlingCamera).camProxy.rotation * 180/Math.PI;
 				}
 
 				physicsDebugArt.visible = _citrusObject.visible;
 				
 			} else if (_physicsComponent) {
 				
-				x = _physicsComponent.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
-				y = _physicsComponent.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				x = _physicsComponent.x + (camPosition.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
+				y = _physicsComponent.y + (camPosition.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 				rotation = deg2rad(_physicsComponent.rotation);
 
 			} else {
 
-				x = _citrusObject.x + (-stateView.viewRoot.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
-				y = _citrusObject.y + (-stateView.viewRoot.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				x = _citrusObject.x + (camPosition.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX;
+				y = _citrusObject.y + (camPosition.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
 				rotation = deg2rad(_citrusObject.rotation);
 			}
 			
