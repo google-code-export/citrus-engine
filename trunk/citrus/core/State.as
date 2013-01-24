@@ -89,10 +89,10 @@ package citrus.core
 		/**
 		 * This method calls update on all the CitrusObjects that are attached to this state.
 		 * The update method also checks for CitrusObjects that are ready to be destroyed and kills them.
-		 * Finally, this method updates the Input and View managers. 
+		 * Finally, this method updates the View manager. 
 		 */		
 		public function update(timeDelta:Number):void {
-
+			
 			// Search objects to destroy
 			var garbage:Array = [];
 			var n:uint = _objects.length;
@@ -148,9 +148,6 @@ package citrus.core
 			
 			for each (var poolObject:PoolObject in _poolObjects)
 				poolObject.updatePhysics(timeDelta);
-
-			// Update the input object
-			_input.update();
 
 			// Update the state's view
 			_view.update();
