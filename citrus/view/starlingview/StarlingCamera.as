@@ -1,12 +1,13 @@
 package citrus.view.starlingview {
-	
-	import citrus.view.ACitrusCamera;
-	import flash.geom.Rectangle;
-	
-	import starling.display.Sprite;
-	
-	import flash.geom.Point;
+
 	import citrus.math.MathUtils;
+	import citrus.view.ACitrusCamera;
+
+	import starling.display.Sprite;
+
+	import flash.display.Sprite;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	
 	/**
 	 * The Camera for the StarlingView.
@@ -20,72 +21,14 @@ package citrus.view.starlingview {
 	 */
 	public class StarlingCamera extends ACitrusCamera
 	{
-		/**
-		 * should we restrict zoom to bounds?
-		 */
-		public var restrictZoom:Boolean = false;
 		
-		/**
-		 * Is the camera allowed to Zoom?
-		 */
-		protected var _allowZoom:Boolean = false;
-		
-		/**
-		 * Is the camera allowed to Rotate?
-		 */
-		protected var _allowRotation:Boolean = false;
-		
-		/**
-		 * the ease factor for zoom
-		 */
-		public var zoomEasing:Number = 0.05;
-		
-		/**
-		 * the ease factor for rotation
-		 */
-		public var rotationEasing:Number = 0.05;
-		
-		/**
-		 * _aabb holds the axis aligned bounding box of the camera in rect
-		 * and its relative position to it (with offsetX and offsetY)
-		 */
-		protected var _aabbData:Object = { };
-		
-		/**
-		 * the targeted rotation value.
-		 */
-		protected var _rotation:Number = 0;
-		
-		/**
-		 * the targeted zoom value.
-		 */
-		protected var _zoom:Number = 1;
-		
-		/**
-		 * ghostTarget is the eased position of target.
-		 */
-		protected var _ghostTarget:Point = new Point();
-		
-		/**
-		 * targetPos is used for calculating ghostTarget.
-		 * (not sure if really necessary)
-		 */
-		protected var _targetPos:Point = new Point();
-		
-		/**
-		 * the _camProxy object is used as a container to hold the data to be applied to the _viewroot.
-		 * it can be accessible publicly so that debugView can be correctly displaced, rotated and scaled as _viewroot will be.
-		 */
-		protected var _camProxy:Object = { x: 0, y: 0, offsetX: 0, offsetY: 0, scale: 1, rotation: 0 };
-		
-		/**
-		 * projected camera position + offset. (used internally)
-		 */
-		internal var camPos:Point = new Point();
-		
-		public function StarlingCamera(viewRoot:Sprite)
+		public function StarlingCamera(viewRoot:starling.display.Sprite)
 		{
 			super(viewRoot);
+		}
+		
+		override public function init():void {
+			super.init();// setup camera lens normally
 			
 			/*fix for different starling content scale factors. but super has already calculated cameraLensWidth and Height
 			so might need to be applied in a different way.
@@ -100,9 +43,9 @@ package citrus.view.starlingview {
 		 * multiplies the targeted zoom value by factor.
 		 * @param	factor
 		 */
-		public function zoom(factor:Number):void
+		override public function zoom(factor:Number):void
 		{
-			if(_allowZoom)
+			if (_allowZoom)
 				_zoom *= factor;
 			else
 				throw(new Error(this+"is not allowed to zoom. please set allowZoom to true."));
@@ -113,9 +56,9 @@ package citrus.view.starlingview {
 		 * adds angle to targeted rotation value.
 		 * @param	angle in radians.
 		 */
-		public function rotate(angle:Number):void
+		override public function rotate(angle:Number):void
 		{
-			if(_allowRotation)
+			if (_allowRotation)
 				_rotation += angle;
 			else
 				throw(new Error(this+"is not allowed to rotate. please set allowRotation to true."));
@@ -125,9 +68,9 @@ package citrus.view.starlingview {
 		 * sets the targeted rotation value to angle.
 		 * @param	angle in radians.
 		 */
-		public function setRotation(angle:Number):void
+		override public function setRotation(angle:Number):void
 		{
-			if(_allowRotation)
+			if (_allowRotation)
 				_rotation = angle;
 			else
 				throw(new Error(this+"is not allowed to rotate. please set allowRotation to true."));
@@ -137,20 +80,20 @@ package citrus.view.starlingview {
 		 * sets the targeted zoom value to factor.
 		 * @param	factor
 		 */
-		public function setZoom(factor:Number):void
+		override public function setZoom(factor:Number):void
 		{
-			if(_allowZoom)
+			if (_allowZoom)
 				_zoom = factor;
 			else
 				throw(new Error(this+"is not allowed to zoom. please set allowZoom to true."));
 		}
 		
-		public function getZoom():Number
+		override public function getZoom():Number
 		{
 			return _zoom;
 		}
 		
-		public function getRotation():Number
+		override public function getRotation():Number
 		{
 			return _rotation;
 		}
@@ -239,7 +182,7 @@ package citrus.view.starlingview {
 			
 			resetAABBData();
 			
-			if (bounds && restrictZoom)
+			if (bounds && _restrictZoom)
 			{
 				var lwratio:Number = _aabbData.rect.width*_camProxy.scale / bounds.width;
 				var lhratio:Number = _aabbData.rect.height*_camProxy.scale / bounds.height;
@@ -261,7 +204,7 @@ package citrus.view.starlingview {
 			_aabbData.rect.x -= rotScaledOffset.x;
 			_aabbData.rect.y -= rotScaledOffset.y;
 			
-			boundscheck: if ( bounds && !bounds.containsRect(_aabbData.rect) )
+			if ( bounds && !bounds.containsRect(_aabbData.rect) )
 			{
 				
 				var newAABBPos:Point = new Point(_aabbData.rect.x,_aabbData.rect.y);
@@ -300,7 +243,7 @@ package citrus.view.starlingview {
 			_viewRoot.y = _camProxy.y;
 			
 			
-			camPos = pointFromLocal(new Point(offset.x, offset.y));
+			_camPos = pointFromLocal(new Point(offset.x, offset.y));
 			
 		}
 		
@@ -310,7 +253,7 @@ package citrus.view.starlingview {
 		 * in that same Sprite. you have to position it and scale it yourself!
 		 * @param	sprite a flash display sprite to render to.
 		 */
-		public function renderDebug(sprite:*):void
+		public function renderDebug(sprite:flash.display.Sprite):void
 		{
 			
 			var xo:Number, yo:Number, w:Number, h:Number;
@@ -337,7 +280,7 @@ package citrus.view.starlingview {
 			
 			//draw targets
 			sprite.graphics.lineStyle(20, 0xFF0000);
-			if(_target)
+			if (_target)
 				sprite.graphics.drawCircle(_target.x, _target.y, 10);
 			sprite.graphics.drawCircle(_ghostTarget.x, _ghostTarget.y, 10);
 			
@@ -469,8 +412,8 @@ package citrus.view.starlingview {
 			
 			return MathUtils.rotatePoint(
 			new Point(
-			(p.x - _camProxy.x - _camProxy.offsetX) /_camProxy.scale, 
-			(p.y - _camProxy.y - _camProxy.offsetY) /_camProxy.scale)
+			(p.x - _camProxy.x) /_camProxy.scale, 
+			(p.y - _camProxy.y) /_camProxy.scale)
 			, _camProxy.rotation);
 			
 			//return (_viewRoot as Sprite).globalToLocal(p);
@@ -481,50 +424,20 @@ package citrus.view.starlingview {
 		 */
 		public function pointToLocal(p:Point):Point
 		{
-			return (_viewRoot as Sprite).localToGlobal(p);
+			return (_viewRoot as starling.display.Sprite).localToGlobal(p);
 		}
 		
-		/**
-		 * camProxy is read only.
-		 * contains the data to be applied to container layers (_viewRoot and debug views).
-		 */
-		public function get camProxy():Object
-		{
-			return _camProxy;
-		}
-		
-		/**
-		 * read-only to get the eased position of the target, which is the actual point the camera
-		 * is looking at ( - the offset )
-		 */
-		public function get ghostTarget():Point
-		{
-			return _ghostTarget;
-		}
-		
-		public function get allowZoom():Boolean
+		override public function get allowZoom():Boolean
 		{
 			return _allowZoom;
 		}
 		
-		public function get allowRotation():Boolean
+		override public function get allowRotation():Boolean
 		{
 			return _allowRotation;
 		}
 		
-		override public function set manualPosition(p:Point):void
-		{
-			_target = null;
-			_manualPosition = p;
-		}
-		
-		override public function set target(o:Object):void
-		{
-			_manualPosition = null;
-			_target = o;
-		}
-		
-		public function set allowZoom(value:Boolean):void
+		override public function set allowZoom(value:Boolean):void
 		{
 			if (!value)
 			{
@@ -534,7 +447,7 @@ package citrus.view.starlingview {
 			_allowZoom = value;
 		}
 		
-		public function set allowRotation(value:Boolean):void
+		override public function set allowRotation(value:Boolean):void
 		{
 			if (!value)
 			{
@@ -542,6 +455,16 @@ package citrus.view.starlingview {
 				_camProxy.rotation = 0;
 			}
 			_allowRotation = value;
+		}
+		
+		override public function set restrictZoom(value:Boolean):void
+		{
+			_restrictZoom = value;
+		}
+		
+		override public function get restrictZoom():Boolean
+		{
+			return _restrictZoom;
 		}
 	
 	}
