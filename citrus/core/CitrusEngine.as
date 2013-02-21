@@ -20,7 +20,7 @@ package citrus.core {
 	 */	
 	public class CitrusEngine extends MovieClip
 	{
-		public static const VERSION:String = "3.1.3";
+		public static const VERSION:String = "3.1.4";
 				
 		private static var _instance:CitrusEngine;
 		
@@ -29,16 +29,26 @@ package citrus.core {
 		 */
 		public var onPlayingChange:Signal;
 		
+		/**
+		 * You may use a class to store your game's data, this is already an abstract class made for that. 
+		 * It's also a dynamic class, so you won't have problem to access information in its extended class.
+		 */
+		public var gameData:AGameData;
+		
+		/**
+		 * You may use the Citrus Engine's level manager if you have several levels to handle. Take a look on its class for more information.
+		 */
+		public var levelManager:LevelManager;
+		
 		protected var _state:IState;
 		protected var _newState:IState;
 		protected var _stateDisplayIndex:uint = 0;
 		protected var _playing:Boolean = true;
 		protected var _input:Input;
 		
-		private var _levelManager:LevelManager;
 		private var _startTime:Number;
 		private var _gameTime:Number;
-		private var _gameData:AGameData;
+		
 		private var _sound:SoundManager;
 		private var _console:Console;
 		
@@ -60,6 +70,7 @@ package citrus.core {
 			_console = new Console(9); //Opens with tab key by default
 			_console.onShowConsole.add(handleShowConsole);
 			_console.addCommand("set", handleConsoleSetCommand);
+			_console.addCommand("get", handleConsoleGetCommand);
 			addChild(_console);
 			
 			//timekeeping
@@ -101,20 +112,6 @@ package citrus.core {
 			
 			_input.destroy();
 			_sound.destroy();
-		}
-		
-		/**
-		 * Return the level manager, use it if you want. Take a look on its class for more information.
-		 */
-		public function get levelManager():LevelManager {
-			return _levelManager;
-		}
-		
-		/**
-		 * You may use the Citrus Engine's level manager if you have several levels. Take a look on its class for more information.
-		 */
-		public function set levelManager(value:LevelManager):void {
-			_levelManager = value;
 		}
 		
 		/**
@@ -160,21 +157,6 @@ package citrus.core {
 				_gameTime = new Date().time;
 			
 			onPlayingChange.dispatch(_playing);
-		}
-		
-		/**
-		 * A reference to the Abstract GameData instance. Use it if you want.
-		 * It's a dynamic class, so you don't have problem to access information in its extended class.
-		 */
-		public function get gameData():AGameData {
-			return _gameData;
-		}
-
-		/**
-		 * You may use a class to store your game's data, there is already an abstract class for that :
-		 */
-		public function set gameData(gameData:AGameData):void {
-			_gameData = gameData;
 		}
 		
 		/**
@@ -232,8 +214,8 @@ package citrus.core {
 			{
 				if (_newState is State) {
 					
-					if (_state) {
-							
+					if (_state && _state is State) {
+						
 						_state.destroy();
 						removeChild(_state as State);
 					}
@@ -307,6 +289,22 @@ package citrus.core {
 			
 			if (object.hasOwnProperty(paramName))
 				object[paramName] = value;
+			else
+				trace("Warning: " + objectName + " has no parameter named " + paramName + ".");
+		}
+		
+		private function handleConsoleGetCommand(objectName:String, paramName:String):void
+		{
+			var object:CitrusObject = _state.getObjectByName(objectName);
+			
+			if (!object)
+			{
+				trace("Warning: There is no object named " + objectName);
+				return;
+			}
+			
+			if (object.hasOwnProperty(paramName))
+				trace(objectName + " property:" + paramName + "=" + object[paramName]);	
 			else
 				trace("Warning: " + objectName + " has no parameter named " + paramName + ".");
 		}

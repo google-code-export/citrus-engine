@@ -70,7 +70,7 @@ package citrus.core {
 			return Boolean(sounds[id]);
 		}
 
-		public function playSound(id:String, volume:Number = 1.0, timesToRepeat:int = 999):void {
+		public function playSound(id:String, volume:Number = 1.0, timesToRepeat:int = 999, panning:Number = 0):void {
 			
 			// Check for an existing sound, and play it.
 			var t:SoundTransform;
@@ -78,7 +78,7 @@ package citrus.core {
 				if (currID == id) {
 					var c:SoundChannel = currPlayingSounds[id].channel as SoundChannel;
 					var s:Sound = currPlayingSounds[id].sound as Sound;
-					t = new SoundTransform(volume);
+					t = new SoundTransform(volume,panning);
 					c = s.play(0, timesToRepeat);
 					c.soundTransform = t;
 					currPlayingSounds[id] = {channel:c, sound:s, volume:volume};
@@ -100,7 +100,7 @@ package citrus.core {
 			var channel:SoundChannel = new SoundChannel();
 			channel = soundFactory.play(0, timesToRepeat);
 
-			t = new SoundTransform(volume);
+			t = new SoundTransform(volume,panning);
 			channel.soundTransform = t;
 
 			currPlayingSounds[id] = {channel:channel, sound:soundFactory, volume:volume};
@@ -124,15 +124,12 @@ package citrus.core {
 		}
 
 		public function muteAll(mute:Boolean = true):void {
-			
-			if (mute) {
-				setGlobalVolume(0);
-			} else {
-				for (var currID:String in currPlayingSounds) {
-					var s:SoundTransform = new SoundTransform(currPlayingSounds[currID].volume);
+			var s:SoundTransform;
+			var currID:String;
+				for (currID in currPlayingSounds) {
+					s = new SoundTransform(mute ? 0 : currPlayingSounds[currID].volume);
 					SoundChannel(currPlayingSounds[currID].channel).soundTransform = s;
 				}
-			}
 		}
 
 		public function setVolume(id:String, volume:Number):void {
