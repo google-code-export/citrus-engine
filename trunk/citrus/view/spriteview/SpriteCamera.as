@@ -16,8 +16,8 @@ package citrus.view.spriteview {
 			super(viewRoot);
 		}
 		
-		override public function init():void {
-			super.init();
+		override protected function initialize():void {
+			super.initialize();
 			
 			_aabbData = MathUtils.createAABBData(0, 0, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale, _camProxy.rotation);
 		}
@@ -32,6 +32,18 @@ package citrus.view.spriteview {
 				_zoom *= factor;
 			else
 				throw(new Error(this+"is not allowed to zoom. please set allowZoom to true."));
+		}
+		
+		override public function zoomFit(width:Number,height:Number):void
+		{
+			if (_allowZoom)
+			{
+				var ratioX:Number =  width/cameraLensWidth;
+				var ratioY:Number = height/cameraLensHeight;
+				_zoom = 1/( (ratioX >= ratioY) ? ratioY : ratioX );
+			}
+			else
+				throw(new Error(this+" is not allowed to zoom. please set allowZoom to true."));
 		}
 		
 		/**

@@ -52,6 +52,30 @@ package citrus.math {
 		}
 		
 		/**
+		 * Get the linear equation from two points.
+		 * @return an object, m is the slope and b a constant term.
+		 */
+		public static function lineEquation(p0:Point, p1:Point):Object{
+			
+			var a:Number = (p1.y - p0.y) / (p1.x - p0.x);
+			var b:Number = p0.y - a * p0.x;
+			
+			return {m:a, b:b}; 
+		}
+		
+		/**
+		 * Linear interpolation function
+		 * @param	a start value
+		 * @param	b end value
+		 * @param	ratio interpolation amount
+		 * @return
+		 */
+		public static function lerp(a:Number,b:Number,ratio:Number):Number
+		{
+			return a + (b - a) * ratio;
+		}
+		
+		/**
 		 * Creates the axis aligned bounding box for a rotated rectangle.
 		 * @param w width of the rotated rectangle
 		 * @param h height of the rotated rectangle
