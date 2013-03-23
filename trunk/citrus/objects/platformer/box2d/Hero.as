@@ -142,6 +142,8 @@ package citrus.objects.platformer.box2d
 		 */		
 		public function Hero(name:String, params:Object = null)
 		{
+			updateCallEnabled = true;
+			
 			super(name, params);
 			
 			onJump = new Signal();
@@ -226,6 +228,7 @@ package citrus.objects.platformer.box2d
 		{
 			super.update(timeDelta);
 			
+			// we get a reference to the actual velocity vector
 			var velocity:b2Vec2 = _body.GetLinearVelocity();
 			
 			if (controlsEnabled)
@@ -284,9 +287,6 @@ package citrus.objects.platformer.box2d
 					velocity.x = maxVelocity;
 				else if (velocity.x < (-maxVelocity))
 					velocity.x = -maxVelocity;
-				
-				//update physics with new velocity
-				_body.SetLinearVelocity(velocity);
 			}
 			
 			updateAnimation();

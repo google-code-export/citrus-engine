@@ -1,5 +1,6 @@
 package citrus.datastructures {
 
+	import citrus.objects.APhysicsObject;
 	import citrus.view.ACitrusView;
 
 	/**
@@ -109,6 +110,9 @@ package citrus.datastructures {
 				head = tail = node;
 			
 			(node.data as _poolType).initialize(params);
+			
+			if (node.data is APhysicsObject)
+				node.data.addPhysics();
 
 			++_count;
 			
@@ -119,7 +123,7 @@ package citrus.datastructures {
 
 			var tmpHead:DoublyLinkedListNode = head;
 
-			while (tmpHead != null) {
+			while (tmpHead != null && (tmpHead.data as _poolType).updateCallEnabled) {
 				(tmpHead.data as _poolType).update(timeDelta);
 				tmpHead = tmpHead.next;
 			}

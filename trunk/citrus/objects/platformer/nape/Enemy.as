@@ -50,12 +50,9 @@ package citrus.objects.platformer.nape {
 		
 		public function Enemy(name:String, params:Object=null) {
 			
+			updateCallEnabled = true;
+			
 			super(name, params);
-		}
-			
-		override public function initialize(poolObjectParams:Object = null):void {
-			
-			super.initialize(poolObjectParams);
 			
 			if (startingDirection == "left")
 				_inverted = true;
@@ -96,8 +93,6 @@ package citrus.objects.platformer.nape {
 				velocity.x = _inverted ? -speed : speed;
 			else
 				velocity.x = 0;
-			
-			_body.velocity = velocity;
 			
 			updateAnimation();
 		}

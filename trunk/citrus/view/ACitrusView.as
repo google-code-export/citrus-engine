@@ -1,9 +1,7 @@
 package citrus.view {
 
-	import citrus.math.MathVector;
 	import citrus.utils.LoadManager;
 
-	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	
 	/**
@@ -59,7 +57,7 @@ package citrus.view {
 		 * and update their graphical counterparts on every frame. See the SpriteView's implementation of the update() method for
 		 * specifics. 
 		 */		
-		public function update():void
+		public function update(timeDelta:Number):void
 		{
 		}
 		

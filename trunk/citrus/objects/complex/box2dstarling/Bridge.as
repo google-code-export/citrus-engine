@@ -27,7 +27,6 @@ package citrus.objects.complex.box2dstarling {
 	 * <li>useTexture : Oset false for debugging</li>
 	 * <li>segmentBitmapData : BitmapData for creating the texture for Bridgeelements. It get's scaled with keeping 
 	 * proportion between width and height</li></ul>
-	 * 
 	 */
 	public class Bridge extends Box2DPhysicsObject {
 
@@ -56,6 +55,19 @@ package citrus.objects.complex.box2dstarling {
 
 		public function Bridge(name:String, params:Object = null) {
 			super(name, params);
+			updateCallEnabled = true;
+		}
+		
+		
+		override public function destroy():void
+		{
+			var i:uint = 0;
+			for each (var bodyChain:b2Body in _vecBodyBridge) {
+				_box2D.world.DestroyBody(bodyChain);
+				_ce.state.remove(_vecSprites[i]);
+				++i;
+			}
+			super.destroy();
 		}
 
 		override public function update(timeDelta:Number):void {
