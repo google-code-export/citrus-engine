@@ -47,6 +47,11 @@ package citrus.view.spriteview
 		 */
 		public var loader:Loader;
 		
+		/**
+		 * Set it to false if you want to prevent the art to be updated. Be careful its properties (x, y, ...) won't be able to change!
+		 */
+		public var updateArtEnabled:Boolean = true;
+		
 		private var _citrusObject:ISpriteView;
 		private var _physicsComponent:*;
 		private var _registration:String;
@@ -69,7 +74,7 @@ package citrus.view.spriteview
 			var ceState:IState = CitrusEngine.getInstance().state;
 			
 			if (_citrusObject is ViewComponent && ceState.getFirstObjectByType(APhysicsEngine) as APhysicsEngine)
-				_physicsComponent = (_citrusObject as ViewComponent).entity.components["physics"];
+				_physicsComponent = (_citrusObject as ViewComponent).entity.lookupComponentByName("physics");
 			
 			this.name = (_citrusObject as CitrusObject).name;
 		}
@@ -186,6 +191,7 @@ package citrus.view.spriteview
 				// Call the initialize function if it exists on the custom art class.
 				if (_content && _content.hasOwnProperty("initialize"))
 					_content["initialize"](_citrusObject);
+					
 			}
 		}
 		
@@ -216,7 +222,16 @@ package citrus.view.spriteview
 		
 		public function update(stateView:SpriteView):void
 		{
-			scaleX = _citrusObject.inverted ? -1 : 1;
+			if (_citrusObject.inverted) {
+
+				if (scaleX > 0)
+					scaleX = -scaleX;
+
+			} else {
+
+				if (scaleX < 0)
+					scaleX = -scaleX;
+			}
 			
 			var cam:SpriteCamera = (stateView.camera as SpriteCamera);
 			var camPosition:Point = cam.camPos;
@@ -227,18 +242,19 @@ package citrus.view.spriteview
 				
 			} else if (_physicsComponent) {
 				
-				x = _physicsComponent.x + (camPosition.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
-				y = _physicsComponent.y + (camPosition.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				x = _physicsComponent.x + (camPosition.x * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+				y = _physicsComponent.y + (camPosition.y * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
 				rotation = _physicsComponent.rotation;
 				
 			} else {
 				
-				x = _citrusObject.x + (camPosition.x * (1 - _citrusObject.parallax)) + _citrusObject.offsetX * scaleX;
-				y = _citrusObject.y + (camPosition.y * (1 - _citrusObject.parallax)) + _citrusObject.offsetY;
+				x = _citrusObject.x + (camPosition.x * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+				y = _citrusObject.y + (camPosition.y * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
 				rotation = _citrusObject.rotation;
 			}
 			
 			visible = _citrusObject.visible;
+			mouseChildren = mouseEnabled = _citrusObject.touchable;
 			registration = _citrusObject.registration;
 			view = _citrusObject.view;
 			animation = _citrusObject.animation;

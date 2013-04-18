@@ -40,6 +40,11 @@ package citrus.system.components.box2d {
 		protected var _width:Number = 1;
 		protected var _height:Number = 1;
 		protected var _radius:Number = 0;
+		
+		protected var _beginContactCallEnabled:Boolean = false;
+		protected var _endContactCallEnabled:Boolean = false;
+		protected var _preContactCallEnabled:Boolean = false;
+		protected var _postContactCallEnabled:Boolean = false;
 
 		public function Box2DComponent(name:String, params:Object = null) {
 			
@@ -76,6 +81,14 @@ package citrus.system.components.box2d {
 			_collisionComponent.handlePostSolve(contact, impulse);
 		}
 		
+		/**
+		 * This method doesn't depend of your application enter frame. Ideally, the time between two calls never change. 
+		 * In this method you will apply any velocity/force logic. 
+		 */
+		public function fixedUpdate():void {
+			
+		}
+		
 		override public function initialize(poolObjectParams:Object = null):void {
 			
 			super.initialize();
@@ -83,7 +96,7 @@ package citrus.system.components.box2d {
 			if (!_box2D)
 				throw new Error("Cannot create a Box2DPhysicsObject when a Box2D object has not been added to the state.");
 			
-			_collisionComponent = entity.components['collision'];
+			_collisionComponent = entity.lookupComponentByName('collision') as CollisionComponent;
 			
 			//Override these to customize your Box2D initialization. Things must be done in this order.
 			defineBody();
@@ -317,6 +330,62 @@ package citrus.system.components.box2d {
 		public function getBody():*
 		{
 			return _body;
+		}
+		
+		/**
+		 * This flag determines if the <code>handleBeginContact</code> method is called or not. Default is false, it saves some performances.
+		 */
+		public function get beginContactCallEnabled():Boolean {
+			return _beginContactCallEnabled;
+		}
+		
+		/**
+		 * Enable or disable the <code>handleBeginContact</code> method to be called. It doesn't change physics behavior.
+		 */
+		public function set beginContactCallEnabled(beginContactCallEnabled:Boolean):void {
+			_beginContactCallEnabled = beginContactCallEnabled;
+		}
+		
+		/**
+		 * This flag determines if the <code>handleEndContact</code> method is called or not. Default is false, it saves some performances.
+		 */
+		public function get endContactCallEnabled():Boolean {
+			return _endContactCallEnabled;
+		}
+		
+		/**
+		 * Enable or disable the <code>handleEndContact</code> method to be called. It doesn't change physics behavior.
+		 */
+		public function set endContactCallEnabled(value:Boolean):void {
+			_endContactCallEnabled = value;
+		}
+		
+		/**
+		 * This flag determines if the <code>handlePreSolve</code> method is called or not. Default is false, it saves some performances.
+		 */
+		public function get preContactCallEnabled():Boolean {
+			return _preContactCallEnabled;
+		}
+		
+		/**
+		 * Enable or disable the <code>handlePreSolve</code> method to be called. It doesn't change physics behavior.
+		 */
+		public function set preContactCallEnabled(value:Boolean):void {
+			_preContactCallEnabled = value;
+		}
+		
+		/**
+		 * This flag determines if the <code>handlePostSolve</code> method is called or not. Default is false, it saves some performances.
+		 */
+		public function get postContactCallEnabled():Boolean {
+			return _postContactCallEnabled;
+		}
+		
+		/**
+		 * Enable or disable the <code>handlePostSolve</code> method to be called. It doesn't change physics behavior.
+		 */
+		public function set postContactCallEnabled(value:Boolean):void {
+			_postContactCallEnabled = value;
 		}
 	}
 }

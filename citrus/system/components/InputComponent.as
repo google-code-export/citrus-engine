@@ -2,18 +2,16 @@ package citrus.system.components {
 
 	import citrus.system.Component;
 
-	import flash.ui.Keyboard;
-
 	/**
 	 * An input component, it will inform if the key is down, just pressed or just released.
 	 */
 	public class InputComponent extends Component {
 		
-		public var rightKeyIsDown:Boolean = false;
-		public var leftKeyIsDown:Boolean = false;
-		public var downKeyIsDown:Boolean = false;
-		public var spaceKeyIsDown:Boolean = false;
-		public var spaceKeyJustPressed:Boolean = false;
+		public var isDoingRight:Boolean = false;
+		public var isDoingLeft:Boolean = false;
+		public var isDoingDuck:Boolean = false;
+		public var isDoingJump:Boolean = false;
+		public var justDidJump:Boolean = false;
 
 		public function InputComponent(name:String, params:Object = null) {
 			super(name, params);
@@ -23,11 +21,11 @@ package citrus.system.components {
 			
 			super.update(timeDelta);
 			
-			rightKeyIsDown = _ce.input.isDown(Keyboard.RIGHT);
-			leftKeyIsDown = _ce.input.isDown(Keyboard.LEFT);
-			downKeyIsDown = _ce.input.isDown(Keyboard.DOWN);
-			spaceKeyIsDown = _ce.input.isDown(Keyboard.SPACE);
-			spaceKeyJustPressed = _ce.input.justPressed(Keyboard.SPACE);
+			isDoingRight = _ce.input.isDoing("right");
+			isDoingRight = _ce.input.isDoing("left");
+			isDoingDuck = _ce.input.isDoing("duck");
+			isDoingJump = _ce.input.isDoing("jump");
+			justDidJump = _ce.input.justDid("jump");
 		}
 	}
 }

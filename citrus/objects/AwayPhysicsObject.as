@@ -5,7 +5,6 @@ package citrus.objects {
 	import awayphysics.collision.shapes.AWPSphereShape;
 	import awayphysics.dynamics.AWPRigidBody;
 
-	import citrus.core.CitrusEngine;
 	import citrus.physics.PhysicsCollisionCategories;
 	import citrus.physics.awayphysics.AwayPhysics;
 	import citrus.view.ISpriteView;
@@ -37,9 +36,6 @@ package citrus.objects {
 		 */	
 		public function AwayPhysicsObject(name:String, params:Object = null) {
 
-			_ce = CitrusEngine.getInstance();
-			_awayPhysics = _ce.state.getFirstObjectByType(AwayPhysics) as AwayPhysics;
-
 			super(name, params);
 		}
 		
@@ -51,6 +47,8 @@ package citrus.objects {
 		 * the AwayPhysicsObject.</p>
 		 */
 		override public function addPhysics():void {
+			
+			_awayPhysics = _ce.state.getFirstObjectByType(AwayPhysics) as AwayPhysics;
 			
 			if (!_awayPhysics)
 				throw new Error("Cannot create a AwayPhysicsObject when a AwayPhysics object has not been added to the state.");

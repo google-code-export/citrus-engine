@@ -1,7 +1,7 @@
 package citrus.objects {
 
-	import citrus.core.CitrusEngine;
 	import citrus.physics.PhysicsCollisionCategories;
+	import citrus.physics.nape.INapePhysicsObject;
 	import citrus.physics.nape.Nape;
 	import citrus.view.ISpriteView;
 
@@ -27,7 +27,7 @@ package citrus.objects {
 	 * and creating Nape bodies, fixtures, shapes, and joints. If you are not familiar with Nape, you should first
 	 * learn about it via the <a href="http://napephys.com/help/manual.html">Nape Manual</a>.
 	 */	
-	public class NapePhysicsObject extends APhysicsObject implements ISpriteView {
+	public class NapePhysicsObject extends APhysicsObject implements ISpriteView, INapePhysicsObject {
 		
 		public static const PHYSICS_OBJECT:CbType = new CbType();
 		
@@ -40,6 +40,9 @@ package citrus.objects {
 		protected var _width:Number = 30;
 		protected var _height:Number = 30;
 		
+		protected var _beginContactCallEnabled:Boolean = false;
+		protected var _endContactCallEnabled:Boolean = false;
+		
 		/**
 		 * Used to define vertices' x and y points.
 		 */
@@ -50,9 +53,6 @@ package citrus.objects {
 		 * so you will need to set the "view" property in the params parameter.
 		 */	
 		public function NapePhysicsObject(name:String, params:Object = null) {
-			
-			_ce = CitrusEngine.getInstance();
-			_nape = _ce.state.getFirstObjectByType(Nape) as Nape;
 			
 			super(name, params);
 		}
@@ -65,6 +65,8 @@ package citrus.objects {
 		 * the NapePhysicsObject.</p>
 		 */	
 		override public function addPhysics():void {
+			
+			_nape = _ce.state.getFirstObjectByType(Nape) as Nape;
 			
 			if (!_nape)
 				throw new Error("Cannot create a NapePhysicsObject when a Nape object has not been added to the state.");
@@ -332,6 +334,34 @@ package citrus.objects {
 		
 		public function set velocity(value:Array):void {
 			_body.velocity.setxy(value[0], value[1]);
+		}
+		
+		/**
+		 * This flag determines if the <code>handleBeginContact</code> method is called or not. Default is false, it saves some performances.
+		 */
+		public function get beginContactCallEnabled():Boolean {
+			return _beginContactCallEnabled;
+		}
+		
+		/**
+		 * Enable or disable the <code>handleBeginContact</code> method to be called. It doesn't change physics behavior.
+		 */
+		public function set beginContactCallEnabled(beginContactCallEnabled:Boolean):void {
+			_beginContactCallEnabled = beginContactCallEnabled;
+		}
+		
+		/**
+		 * This flag determines if the <code>handleEndContact</code> method is called or not. Default is false, it saves some performances.
+		 */
+		public function get endContactCallEnabled():Boolean {
+			return _endContactCallEnabled;
+		}
+		
+		/**
+		 * Enable or disable the <code>handleEndContact</code> method to be called. It doesn't change physics behavior.
+		 */
+		public function set endContactCallEnabled(endContactCallEnabled:Boolean):void {
+			_endContactCallEnabled = endContactCallEnabled;
 		}
 	}
 }

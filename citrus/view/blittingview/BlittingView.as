@@ -93,7 +93,8 @@ package citrus.view.blittingview
 			var n:Number = _spriteOrder.length;
 			for (var j:uint = 0; j < n; ++j)
 			{
-				updateArt(_spriteOrder[j].citrusObject, _spriteOrder[j]);
+				if (_spriteOrder[j].updateArtEnabled)
+					updateArt(_spriteOrder[j].citrusObject, _spriteOrder[j]);
 			}
 			_canvas.unlock();
 		}
@@ -189,8 +190,8 @@ package citrus.view.blittingview
 			bart.play(object.animation);
 			
 			var position:Point = new Point();
-			position.x = (object.x - _cameraPosition.x) * object.parallax;
-			position.y = (object.y - _cameraPosition.y) * object.parallax;
+			position.x = (object.x - _cameraPosition.x) * object.parallaxX;
+			position.y = (object.y - _cameraPosition.y) * object.parallaxY;
 			
 			//handle registration
 			if (bart.registration == "center")
