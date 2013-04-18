@@ -55,9 +55,12 @@ package citrus.view.starlingview {
 		{
 			if (_allowZoom)
 			{
-				var ratioX:Number =  width/cameraLensWidth;
-				var ratioY:Number = height/cameraLensHeight;
-				_zoom = 1/( (ratioX >= ratioY) ? ratioY : ratioX );
+				var ratio:Number;
+				if (cameraLensHeight / cameraLensWidth > height / width)
+					ratio = cameraLensWidth / width;
+				else
+					ratio = cameraLensHeight / height;
+				_zoom = ratio;
 			}
 			else
 				throw(new Error(this+" is not allowed to zoom. please set allowZoom to true."));
@@ -159,8 +162,6 @@ package citrus.view.starlingview {
 				_camProxy.scale += velocityZoom;
 			}
 			
-			var invRotTarget:Point;
-			
 			if (_target)
 			{
 				_targetPos.x = _target.x;
@@ -181,7 +182,7 @@ package citrus.view.starlingview {
 				_ghostTarget.y = _manualPosition.y;
 			}
 			
-			(_allowRotation) ? MathUtils.rotatePoint(_ghostTarget.x, _ghostTarget.y, -_camProxy.rotation) : invRotTarget = _ghostTarget as Point;
+			var invRotTarget:Point = (_allowRotation) ? MathUtils.rotatePoint(_ghostTarget.x, _ghostTarget.y, -_camProxy.rotation) : _ghostTarget as Point;
 				
 			_camProxy.x = -invRotTarget.x * _camProxy.scale;
 			_camProxy.y = -invRotTarget.y * _camProxy.scale;

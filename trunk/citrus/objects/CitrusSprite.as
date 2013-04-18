@@ -1,6 +1,5 @@
-package citrus.objects
-{
-	import citrus.core.CitrusEngine;
+package citrus.objects {
+
 	import citrus.core.CitrusObject;
 	import citrus.math.MathVector;
 	import citrus.view.ISpriteView;
@@ -32,10 +31,12 @@ package citrus.objects
 		protected var _width:Number = 30;
 		protected var _height:Number = 30;
 		protected var _velocity:MathVector = new MathVector();
-		protected var _parallax:Number = 1;
+		protected var _parallaxX:Number = 1;
+		protected var _parallaxY:Number = 1;
 		protected var _rotation:Number = 0;
 		protected var _group:uint = 0;
 		protected var _visible:Boolean = true;
+		protected var _touchable:Boolean = false;
 		protected var _view:* = SpriteDebugArt;
 		protected var _inverted:Boolean = false;
 		protected var _animation:String = "";
@@ -45,7 +46,6 @@ package citrus.objects
 			
 		public function CitrusSprite(name:String, params:Object = null)
 		{
-			_ce = CitrusEngine.getInstance();
 			
 			super(name, params);
 		}
@@ -125,15 +125,26 @@ package citrus.objects
 			_velocity.y = value[1];
 		}
 		
-		public function get parallax():Number
+		public function get parallaxX():Number
 		{
-			return _parallax;
+			return _parallaxX;
 		}
 		
 		[Inspectable(defaultValue="1")]
-		public function set parallax(value:Number):void
+		public function set parallaxX(value:Number):void
 		{
-			_parallax = value;
+			_parallaxX = value;
+		}
+		
+		public function get parallaxY():Number
+		{
+			return _parallaxY;
+		}
+		
+		[Inspectable(defaultValue="1")]
+		public function set parallaxY(value:Number):void
+		{
+			_parallaxY = value;
 		}
 		
 		public function get rotation():Number
@@ -168,6 +179,16 @@ package citrus.objects
 		public function set visible(value:Boolean):void
 		{
 			_visible = value;
+		}
+		
+		public function get touchable():Boolean
+		{
+			return _touchable;
+		}
+		
+		public function set touchable(value:Boolean):void
+		{
+			_touchable = value;
 		}
 		
 		/**
