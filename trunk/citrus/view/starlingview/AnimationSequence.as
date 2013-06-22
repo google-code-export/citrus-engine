@@ -21,7 +21,7 @@ package citrus.view.starlingview {
 		 */
 		public var onAnimationComplete:Signal;
 
-		private var _textureAtlas:TextureAtlas;
+		private var _textureAtlas:*;
 		private var _animations:Array;
 		private var _firstAnimation:String;
 		private var _animFps:Number;
@@ -32,14 +32,14 @@ package citrus.view.starlingview {
 		private var _previousAnimation:String;
 
 		/**
-		 * @param textureAtlas a TextureAtlas object with your object's animations you would lkie to use.
+		 * @param textureAtlas a TextureAtlas or an AssetManager object with your object's animations you would like to use.
 		 * @param animations an array with the object's animations as a String you would like to pick up.
 		 * @param firstAnimation a string of your default animation at its creation.
 		 * @param animFps a number which determines the animation MC's fps.
 		 * @param firstAnimLoop a boolean, set it to true if you want your first animation to loop.
 		 * @param smoothing a string indicating the smoothing algorithms used for the AnimationSequence, default is bilinear.
 		 */
-		public function AnimationSequence(textureAtlas:TextureAtlas, animations:Array, firstAnimation:String, animFps:Number = 30, firstAnimLoop:Boolean = false, smoothing:String = "bilinear") {
+		public function AnimationSequence(textureAtlas:*, animations:Array, firstAnimation:String, animFps:Number = 30, firstAnimLoop:Boolean = false, smoothing:String = "bilinear") {
 
 			super();
 
@@ -72,7 +72,25 @@ package citrus.view.starlingview {
 
 			_previousAnimation = _firstAnimation;
 		}
-		
+
+		/**
+		 * It may be useful to add directly a MovieClip instead of a Texture Atlas to enable its manipulation like an animation's reversion for example.
+		 * Be careful, if you <code>clone</code> the AnimationSequence it's not taken into consideration.
+		 * @param mc a MovieClip you would like to use.
+		 * @param animation the object's animation name as a String you would like to pick up.
+		 */
+		public function addMovieClip(mc:MovieClip, animation:String):void {
+
+			if ((_mcSequences[animation]))
+				throw new Error(this + " already have the " + animation + " animation set up in its animations' array");
+
+			_mcSequences[animation] = mc;
+			_mcSequences[animation].name = animation;
+			_mcSequences[animation].addEventListener(Event.COMPLETE, _animationComplete);
+			_mcSequences[animation].smoothing = _smoothing;
+			_mcSequences[animation].fps = _animFps;
+		}
+
 		/**
 		 * If you need more than one TextureAtlas for your character's animations, use this function. 
 		 * Be careful, if you <code>clone</code> the AnimationSequence it's not taken into consideration.
@@ -93,22 +111,22 @@ package citrus.view.starlingview {
 				_mcSequences[animation].smoothing = _smoothing;
 			}
 		}
-		
+
 		/**
 		 * You may want to remove animations from the AnimationSequence, use this function.
 		 * Be careful, if you <code>clone</code> the AnimationSequence it's not taken into consideration.
 		 * @param animations an array with the object's animations as a String you would like to remove.
 		 */
 		public function removeAnimations(animations:Array):void {
-			
+
 			for each (var animation:String in animations) {
-				
+
 				if (!(_mcSequences[animation]))
-				throw new Error(this.parent.name + " doesn't have the " + animation + " animation set up in its animations' array");
-				
+					throw new Error(this.parent.name + " doesn't have the " + animation + " animation set up in its animations' array");
+
 				_mcSequences[animation].removeEventListener(Event.COMPLETE, _animationComplete);
 				_mcSequences[animation].dispose();
-				
+
 				delete _mcSequences[animation];
 			}
 		}
@@ -165,7 +183,7 @@ package citrus.view.starlingview {
 		}
 
 		/**
-		 * Return a clone of the current AnimationSequence.
+		 * Return a clone of the current AnimationSequence. Animations added via <code>addMovieClip</code> or <code>addTextureAtlasWithAnimations</code> aren't included.
 		 */
 		public function clone():AnimationSequence {
 			return new AnimationSequence(_textureAtlas, _animations, _firstAnimation, _animFps, _firstAnimLoop, _smoothing);

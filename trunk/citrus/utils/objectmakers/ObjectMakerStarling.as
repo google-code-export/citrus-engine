@@ -13,7 +13,6 @@ package citrus.utils.objectmakers {
 	import starling.display.QuadBatch;
 	import starling.textures.Texture;
 	import starling.textures.TextureAtlas;
-	import starling.utils.AssetManager;
 	import starling.utils.Color;
 
 	import flash.display.MovieClip;
@@ -61,10 +60,9 @@ package citrus.utils.objectmakers {
 		 * 
 		 * <p>This Starling version enables you to use a String for the view which is a texture name coming from your texture atlas.</p>
 		 * 
-		 * @param textureAtlas A TextureAtlas containing textures which are used in your level maker.
-		 * @param assetManager A reference to an AssetManager object. Easier to manage if you use several TextureAtlas.
+		 * @param textureAtlas A TextureAtlas or an AssetManager object containing textures which are used in your level maker.
 		 */
-		public static function FromMovieClip(mc:MovieClip, textureAtlas:TextureAtlas = null, assetManager:AssetManager = null, addToCurrentState:Boolean = true):Array {
+		public static function FromMovieClip(mc:MovieClip, textureAtlas:*, addToCurrentState:Boolean = true):Array {
 			var a:Array = [];
 			var n:Number = mc.numChildren;
 			var child:MovieClip;
@@ -105,8 +103,6 @@ package citrus.utils.objectmakers {
 						if (!(suffix == ".swf" || suffix == ".png" || suffix == ".gif" || suffix == ".jpg")) {
 							if (textureAtlas)
 								params.view = new Image(textureAtlas.getTexture(params.view));
-							else if (assetManager)
-								params.view = new Image(assetManager.getTexture(params.view));
 							else
 								throw new Error("ObjectMakerStarling FromMovieClip function needs a TextureAtlas or a reference to an AssetManager!");
 						}
@@ -134,9 +130,9 @@ package citrus.utils.objectmakers {
 		 * <p>For the objects, you can add their name and don't forget their types : package name + class name. 
 		 * It also supports properties.</p>
 		 * @param levelXML the TMX provided by the Tiled Map Editor software, convert it into an xml before.
-		 * @param atlas an atlas which represent the different tiles, you must name each tile with the corresponding texture name.
+		 * @param atlas an atlas or a reference to an AssetManager which represent the different tiles, you must name each tile with the corresponding texture name.
 		 */
-		public static function FromTiledMap(levelXML:XML, atlas:TextureAtlas, addToCurrentState:Boolean = true):Array {
+		public static function FromTiledMap(levelXML:XML, atlas:*, addToCurrentState:Boolean = true):Array {
 
 			var ce:CitrusEngine = CitrusEngine.getInstance();
 			var params:Object;

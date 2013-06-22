@@ -7,8 +7,11 @@ package citrus.view.spriteview
 	import citrus.physics.APhysicsEngine;
 	import citrus.physics.IDebugView;
 	import citrus.system.components.ViewComponent;
+	import citrus.view.ACitrusCamera;
 	import citrus.view.ISpriteView;
-	import flash.geom.Point;
+
+	import dragonBones.Armature;
+	import dragonBones.animation.WorldClock;
 
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
@@ -18,6 +21,7 @@ package citrus.view.spriteview
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.geom.Point;
 	import flash.net.URLRequest;
 	import flash.utils.getDefinitionByName;
 
@@ -94,12 +98,19 @@ package citrus.view.spriteview
 				
 				if (_view is String)
 					removeChild(_content.loaderInfo.loader);
-				else if (_content && _content.parent)
+				 else if (_content && _content.parent)
 					removeChild(_content.parent);
-				
+					
 			} else {
 				
 				CitrusEngine.getInstance().onPlayingChange.remove(_pauseAnimation);
+				
+				if (_view is Armature) {
+					
+					WorldClock.clock.remove(_view);
+					(_view as Armature).dispose();					
+				}
+				
 				_view = null;
 			}
 		}
@@ -184,7 +195,14 @@ package citrus.view.spriteview
 					_content = _view;
 					moveRegistrationPoint(_citrusObject.registration);
 					addChild(_content);
-				} 
+					
+				} else if (_view is Armature) {
+					
+					_content = (_view as Armature).display as Sprite;
+					moveRegistrationPoint(_citrusObject.registration);
+					addChild(_content);
+					WorldClock.clock.add(_view);
+				}
 				else
 					throw new Error("SpriteArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
 				
@@ -212,7 +230,9 @@ package citrus.view.spriteview
 				var mc:MovieClip = _content as MovieClip;
 				if (_animation != null && _animation != "" && hasAnimation(_animation))
 					mc.gotoAndStop(_animation);
-			}
+					
+			} else if (_view is Armature)
+					(_view as Armature).animation.gotoAndPlay(value);
 		}
 		
 		public function get citrusObject():ISpriteView
@@ -233,23 +253,27 @@ package citrus.view.spriteview
 					scaleX = -scaleX;
 			}
 			
-			var cam:SpriteCamera = (stateView.camera as SpriteCamera);
-			var camPosition:Point = cam.camPos;
-			
 			if (_content is IDebugView) {
 				
 				(_content as IDebugView).update();
 				
 			} else if (_physicsComponent) {
 				
-				x = _physicsComponent.x + (camPosition.x * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
-				y = _physicsComponent.y + (camPosition.y * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				x = _physicsComponent.x + ( (stateView.camera.camProxy.x - _physicsComponent.x) * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+				y = _physicsComponent.y + ( (stateView.camera.camProxy.y - _physicsComponent.y) * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
 				rotation = _physicsComponent.rotation;
 				
 			} else {
-				
-				x = _citrusObject.x + (camPosition.x * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
-				y = _citrusObject.y + (camPosition.y * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				if (stateView.camera.parallaxMode == ACitrusCamera.PARALLAX_MODE_DEPTH)
+				{
+					x = _citrusObject.x + ( (stateView.camera.camProxy.x - _citrusObject.x) * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+					y = _citrusObject.y + ( (stateView.camera.camProxy.y - _citrusObject.y) * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				}
+				else
+				{
+					x = _citrusObject.x + ( (stateView.camera.camProxy.x + stateView.camera.camProxy.offset.x) * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+					y = _citrusObject.y + ( (stateView.camera.camProxy.y + stateView.camera.camProxy.offset.y) * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				}
 				rotation = _citrusObject.rotation;
 			}
 			

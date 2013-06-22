@@ -2,6 +2,7 @@ package citrus.input.controllers
 {
 
 	import citrus.input.InputController;
+	import flash.geom.Vector3D;
 	import flash.utils.Dictionary;
 
 	import flash.events.AccelerometerEvent;
@@ -9,20 +10,20 @@ package citrus.input.controllers
 	
 	public class Accelerometer extends InputController
 	{
-		private var _accel: flash.sensors.Accelerometer;
+		protected var _accel: flash.sensors.Accelerometer;
 		
 		//current accel
-		private var _a:Object = { x:0, y:0, z:0 };
+		protected var _a:Vector3D = new Vector3D();
 		//target accel
-		private var _t:Object = { x:0, y:0, z:0 };
+		protected var _t:Vector3D = new Vector3D();
 		
 		//rotation
-		private var _rot:Object = { x:0 , y:0 , z:0 };
+		protected var _rot:Vector3D = new Vector3D();
 		//previous rotation
-		private var _prevRot:Object = { x:0 , y:0 , z:0 };
+		protected var _prevRot:Vector3D = new Vector3D();
 		
 		//only start calculating when received first events from device.
-		private var receivedFirstAccelUpdate:Boolean = false;
+		protected var receivedFirstAccelUpdate:Boolean = false;
 		
 		/**
 		 * Angle inside which no action is triggered, representing the "center" or the "idle position".
@@ -308,6 +309,16 @@ package citrus.input.controllers
 			
 			
 		}
+		
+		/*
+		 * Acceleration Vector
+		 */
+		public function get acceleration():Vector3D { return _a; }
+		
+		/*
+		 * Rotation Vector
+		 */
+		public function get rotation():Vector3D { return _rot; }
 		
 	}
 
