@@ -34,7 +34,7 @@ package citrus.view.spriteview {
 				throw(new Error(this+"is not allowed to zoom. please set allowZoom to true."));
 		}
 		
-		override public function zoomFit(width:Number,height:Number):void
+		override public function zoomFit(width:Number,height:Number):Number
 		{
 			if (_allowZoom)
 			{
@@ -43,7 +43,7 @@ package citrus.view.spriteview {
 					ratio = cameraLensWidth / width;
 				else
 					ratio = cameraLensHeight / height;
-				_zoom = ratio;
+				return _zoom = ratio;
 			}
 			else
 				throw(new Error(this+" is not allowed to zoom. please set allowZoom to true."));
@@ -130,24 +130,10 @@ package citrus.view.spriteview {
 		}
 
 		override public function update():void {
-
+			
 			super.update();
 			
-			if (_allowRotation)
-			{
-				var diffRot:Number = _rotation - _camProxy.rotation;
-				var velocityRot:Number = diffRot * rotationEasing;
-				_camProxy.rotation += velocityRot;
-			}
-			
-			if (_allowZoom)
-			{
-				var diffZoom:Number = _zoom - _camProxy.scale;
-				var velocityZoom:Number = diffZoom * zoomEasing;
-				_camProxy.scale += velocityZoom;
-			}
-			
-			if (_target)
+			if (_target && followTarget)
 			{
 				_targetPos.x = _target.x;
 				_targetPos.y = _target.y;
@@ -167,89 +153,138 @@ package citrus.view.spriteview {
 				_ghostTarget.y = _manualPosition.y;
 			}
 			
-			var invRotTarget:Point = (_allowRotation) ? MathUtils.rotatePoint(_ghostTarget.x, _ghostTarget.y, -_camProxy.rotation) : _ghostTarget as Point;
-				
-			_camProxy.x = -invRotTarget.x * _camProxy.scale;
-			_camProxy.y = -invRotTarget.y * _camProxy.scale;
-			
-			_camProxy.offsetX = offset.x;
-			_camProxy.offsetY = offset.y;
-			
-			_camProxy.x += _camProxy.offsetX;
-			_camProxy.y += _camProxy.offsetY;
+			if (_allowRotation)
+			{
+				var diffRot:Number = _rotation - _camProxy.rotation;
+				var velocityRot:Number = diffRot * rotationEasing;
+				_camProxy.rotation += velocityRot;
+			}
 			
 			resetAABBData();
 			
-			if (bounds && _restrictZoom)
+			if (_allowZoom)
 			{
-				var lwratio:Number = _aabbData.rect.width*_camProxy.scale / bounds.width;
-				var lhratio:Number = _aabbData.rect.height*_camProxy.scale / bounds.height;
+
+				var diffZoom:Number = mzoom - _camProxy.scale;
+				var velocityZoom:Number = diffZoom * zoomEasing;
+				_camProxy.scale += velocityZoom;
 				
-				if (_aabbData.rect.width > bounds.width)
-					_camProxy.scale = _zoom = lwratio;
-				else if (_aabbData.rect.height > bounds.height)
-					_camProxy.scale = _zoom = lhratio;
+				if (bounds && (boundsMode == BOUNDS_MODE_AABB || boundsMode == BOUNDS_MODE_ADVANCED) )
+				{
+					var lwratio:Number = (_aabbData.rect.width*_camProxy.scale ) / bounds.width;
+					var lhratio:Number = (_aabbData.rect.height*_camProxy.scale ) / bounds.height;
+					
+					if (_aabbData.rect.width >= bounds.width)
+						_camProxy.scale = mzoom = lwratio;
+					else if (_aabbData.rect.height >= bounds.height)
+						_camProxy.scale = mzoom =  lhratio;
+				}
 				
 			}
 			
-			var rotScaledOffset:Point;
+			_camProxy.x = ghostTarget.x;
+			_camProxy.y = ghostTarget.y;
 			
-			rotScaledOffset = (_allowRotation) ?
-				MathUtils.rotatePoint( offset.x / _camProxy.scale, offset.y / _camProxy.scale, _camProxy.rotation) :
-				new Point(offset.x / _camProxy.scale, offset.y / _camProxy.scale);
-			
-			// move aabb
-			_aabbData.rect.x -= rotScaledOffset.x;
-			_aabbData.rect.y -= rotScaledOffset.y;
-			
-			if ( bounds && !bounds.containsRect(_aabbData.rect) )
+			if ( bounds )
 			{
-				
-				var newAABBPos:Point = new Point(_aabbData.rect.x,_aabbData.rect.y);
-				
-				//x
-				if (_aabbData.rect.left <= bounds.left || _aabbData.rect.width >= bounds.width)
-					newAABBPos.x = bounds.left;
-				else if (_aabbData.rect.right >= bounds.right)
-					newAABBPos.x = bounds.right - _aabbData.rect.width;
-				
-				//y
-				if (_aabbData.rect.top <= bounds.top || _aabbData.rect.height >= bounds.height)
-					newAABBPos.y = bounds.top;
-				else if (_aabbData.rect.bottom >= bounds.bottom)
-					newAABBPos.y = bounds.bottom - _aabbData.rect.height;
-				
-				var newGTPos:Point = new Point(newAABBPos.x, newAABBPos.y);
-				
-				newGTPos.x -= _aabbData.offsetX;
-				newGTPos.y -= _aabbData.offsetY;
-				
-				newGTPos.x += rotScaledOffset.x;
-				newGTPos.y += rotScaledOffset.y;
-				
-				var invGT:Point;
-				invGT = (_allowRotation) ? MathUtils.rotatePoint(newGTPos.x, newGTPos.y, -_camProxy.rotation) : new Point(newGTPos.x, newGTPos.y);
-				_camProxy.x = -invGT.x * _camProxy.scale + _camProxy.offsetX;
-				_camProxy.y = -invGT.y * _camProxy.scale + _camProxy.offsetY;
-				
+				if (boundsMode == BOUNDS_MODE_AABB)
+				{
+
+					MathUtils.rotatePoint(offset.x/_camProxy.scale, offset.y/_camProxy.scale, _camProxy.rotation, _b.rotoffset);
+					
+					_b.w2 = (_aabbData.rect.width - _b.rotoffset.x) + _aabbData.offsetX;
+					_b.h2 = (_aabbData.rect.height - _b.rotoffset.y) + _aabbData.offsetY;
+					
+					_b.bl = bounds.left + ( MathUtils.abs(_aabbData.offsetX) + _b.rotoffset.x );
+					_b.bt = bounds.top + ( MathUtils.abs(_aabbData.offsetY) + _b.rotoffset.y );
+					_b.br = bounds.right - ( (_aabbData.offsetX+_aabbData.rect.width) - _b.rotoffset.x );
+					_b.bb = bounds.bottom - ( (_aabbData.offsetY+_aabbData.rect.height) - _b.rotoffset.y);
+					
+					if (_camProxy.x < _b.bl)
+						_camProxy.x = _b.bl;
+					if (_camProxy.x > _b.br)
+						_camProxy.x = _b.br;
+					if (_camProxy.y < _b.bt)
+						_camProxy.y = _b.bt;
+					if (_camProxy.y > _b.bb)
+						_camProxy.y = _b.bb;
+						
+				}else if (boundsMode == BOUNDS_MODE_OFFSET)
+				{	
+					if (_camProxy.x < bounds.left)
+						_camProxy.x = bounds.left;
+					if (_camProxy.x > bounds.right)
+						_camProxy.x = bounds.right;
+					if (_camProxy.y < bounds.top)
+						_camProxy.y = bounds.top;
+					if (_camProxy.y > bounds.bottom)
+						_camProxy.y = bounds.bottom;
+						
+				}else if (boundsMode == BOUNDS_MODE_ADVANCED)
+				{
+					
+					if (offset.x <= cameraLensWidth * 0.5) //left
+					{
+						if (offset.y <= cameraLensHeight * 0.5) //top
+							_b.diag2 = MathUtils.DistanceBetweenTwoPoints(offset.x, cameraLensWidth, offset.y, cameraLensHeight);
+						else
+							_b.diag2 = MathUtils.DistanceBetweenTwoPoints(offset.x, cameraLensWidth, offset.y, 0);
+					}else
+					{
+						if (offset.y <= cameraLensHeight * 0.5) //top
+							_b.diag2 = MathUtils.DistanceBetweenTwoPoints(offset.x, 0, offset.y, cameraLensHeight);
+						else
+							_b.diag2 = offset.length;
+					}
+					
+					_b.diag2 /= _camProxy.scale;
+					
+					if (_camProxy.x < bounds.left + _b.diag2)
+						_camProxy.x = bounds.left + _b.diag2;
+					if (_camProxy.x > bounds.right - _b.diag2)
+						_camProxy.x = bounds.right - _b.diag2;
+					if (_camProxy.y < bounds.top + _b.diag2)
+						_camProxy.y = bounds.top + _b.diag2;
+					if (_camProxy.y > bounds.bottom - _b.diag2)
+						_camProxy.y = bounds.bottom - _b.diag2;
+				}
 			}
 			
-			_viewRoot.scaleX = _viewRoot.scaleY = _camProxy.scale;
-			_viewRoot.rotation = _camProxy.rotation * 180/Math.PI;
+			if (parallaxMode == PARALLAX_MODE_TOPLEFT)
+			{
+				_m.identity();
+				_m.rotate(_camProxy.rotation);
+				_m.scale(1/_camProxy.scale, 1/_camProxy.scale);
+				_camProxy.offset = _m.transformPoint(offset);
+				_camProxy.offset.x *= -1;
+				_camProxy.offset.y *= -1;
+			}
 			
-			_viewRoot.x = _camProxy.x;
-			_viewRoot.y = _camProxy.y;
+			//reset matrix
+			_m.identity();
+			//fake pivot
+			_m.translate( -_camProxy.x, -_camProxy.y);
+			//rotation
+			_m.rotate(_camProxy.rotation);
+			//zoom
+			_m.scale(_camProxy.scale, _camProxy.scale);
+			//offset
+			_m.translate(offset.x, offset.y);
 			
-			pointFromLocal(0,0,_camPos);
+			_camPos = _m.transformPoint(_p);
+			
+			(_viewRoot as Sprite).transform.matrix = _m;
 
 		}
 		
 		public function pointFromLocal(x:Number,y:Number,resultPoint:Point = null):Point
 		{
-			return MathUtils.rotatePoint(
-			(x - _camProxy.x) /_camProxy.scale, 
-			(y - _camProxy.y) /_camProxy.scale
-			, _camProxy.rotation,resultPoint);
+			_p.setTo(x, y);
+			if(resultPoint)
+				resultPoint.copyFrom((_viewRoot as Sprite).globalToLocal(_p));
+			else
+				return (_viewRoot as Sprite).globalToLocal(_p);
+			return null;
 		}
 		
 		/**
@@ -290,14 +325,5 @@ package citrus.view.spriteview {
 			_allowRotation = value;
 		}
 		
-		override public function set restrictZoom(value:Boolean):void
-		{
-			_restrictZoom = value;
-		}
-		
-		override public function get restrictZoom():Boolean
-		{
-			return _restrictZoom;
-		}
 	}
 }

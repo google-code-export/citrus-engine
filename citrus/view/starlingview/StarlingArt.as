@@ -5,15 +5,19 @@ package citrus.view.starlingview {
 	import citrus.core.IState;
 	import citrus.physics.APhysicsEngine;
 	import citrus.system.components.ViewComponent;
+	import citrus.view.ACitrusCamera;
 	import citrus.view.ISpriteView;
 
 	import dragonBones.Armature;
 	import dragonBones.animation.WorldClock;
 
+	import spine.starling.SkeletonAnimationSprite;
+
 	import starling.core.Starling;
 	import starling.display.DisplayObject;
 	import starling.display.Image;
 	import starling.display.MovieClip;
+	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.extensions.particles.PDParticleSystem;
 	import starling.extensions.textureAtlas.DynamicAtlas;
@@ -61,11 +65,6 @@ package citrus.view.starlingview {
 		 */
 		public var loader:Loader;
 
-		/**
-		 * Set it to false if you want to prevent the art to be updated. Be careful its properties (x, y, ...) won't be able to change!
-		 */
-		public var updateArtEnabled:Boolean = true;
-
 		// properties :
 
 		private static var _loopAnimation:Dictionary = new Dictionary();
@@ -81,6 +80,7 @@ package citrus.view.starlingview {
 		private var _textureAtlas:TextureAtlas;
 
 		private var _viewHasChanged:Boolean = false; // when the view changed, the animation wasn't updated if it was the same name. This var fix that.
+		private var _updateArtEnabled:Boolean = true;
 
 		public function StarlingArt(object:ISpriteView = null) {
 
@@ -156,8 +156,13 @@ package citrus.view.starlingview {
 				(_view as Armature).dispose();
 				_content.dispose();
 
-			} else if (_content is DisplayObject)
+			} else if (_content is DisplayObject) {
+				
+				if (_view is SkeletonAnimationSprite)
+					Starling.juggler.remove(_view as SkeletonAnimationSprite);
+				
 				_content.dispose();
+			}
 
 		}
 
@@ -219,7 +224,7 @@ package citrus.view.starlingview {
 			}
 
 			_view = value;
-
+			
 			if (_view) {
 				if (_view is String) {
 					// view property is a path to an image?
@@ -255,6 +260,8 @@ package citrus.view.starlingview {
 						Starling.juggler.add(_content as MovieClip);
 					else if (_view is PDParticleSystem)
 						Starling.juggler.add(_content as PDParticleSystem);
+					else if (_view is SkeletonAnimationSprite)
+						Starling.juggler.add(_view as SkeletonAnimationSprite);
 
 				} else if (_view is Texture) {
 
@@ -273,6 +280,13 @@ package citrus.view.starlingview {
 					moveRegistrationPoint(_citrusObject.registration);
 					addChild(_content);
 					WorldClock.clock.add(_view);
+					
+				} else if (_view is uint) {
+					
+					// TODO : manage radius -> circle
+					_content = new Quad(_citrusObject.width, _citrusObject.height, _view);
+					moveRegistrationPoint(_citrusObject.registration);
+					addChild(_content);
 
 				} else
 					throw new Error("StarlingArt doesn't know how to create a graphic object from the provided CitrusObject " + citrusObject);
@@ -311,6 +325,8 @@ package citrus.view.starlingview {
 					(_content as AnimationSequence).changeAnimation(_animation, animLoop);
 				else if (_view is Armature)
 					(_view as Armature).animation.gotoAndPlay(value);
+				else if (_view is SkeletonAnimationSprite)
+					(_view as SkeletonAnimationSprite).setAnimation(_animation, animLoop);
 			}
 
 			_viewHasChanged = false;
@@ -337,9 +353,6 @@ package citrus.view.starlingview {
 
 			var physicsDebugArt:flash.display.DisplayObject;
 
-			var cam:StarlingCamera = (stateView.camera as StarlingCamera);
-			var camPosition:Point = cam.camPos;
-
 			if (_content is StarlingPhysicsDebugView) {
 
 				(_content as StarlingPhysicsDebugView).update();
@@ -348,26 +361,26 @@ package citrus.view.starlingview {
 				// So we need to move their views here, not in the StarlingView.
 				physicsDebugArt = (Starling.current.nativeStage.getChildByName("debug view") as flash.display.DisplayObject);
 
-				if (stateView.camera.target || stateView.camera.manualPosition) {
-
-					physicsDebugArt.x = cam.camProxy.x;
-					physicsDebugArt.y = cam.camProxy.y;
-					physicsDebugArt.scaleX = physicsDebugArt.scaleY = cam.camProxy.scale;
-					physicsDebugArt.rotation = cam.camProxy.rotation * 180 / Math.PI;
-				}
-
+				physicsDebugArt.transform.matrix = stateView.camera.transformMatrix;
 				physicsDebugArt.visible = _citrusObject.visible;
 
 			} else if (_physicsComponent) {
 
-				x = _physicsComponent.x + (camPosition.x * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
-				y = _physicsComponent.y + (camPosition.y * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				x = _physicsComponent.x + ( (stateView.camera.camProxy.x - _physicsComponent.x) * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+				y = _physicsComponent.y + ( (stateView.camera.camProxy.y - _physicsComponent.y) * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
 				rotation = deg2rad(_physicsComponent.rotation);
 
 			} else {
-
-				x = _citrusObject.x + (camPosition.x * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
-				y = _citrusObject.y + (camPosition.y * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				if (stateView.camera.parallaxMode == ACitrusCamera.PARALLAX_MODE_DEPTH)
+				{
+					x = _citrusObject.x + ( (stateView.camera.camProxy.x - _citrusObject.x) * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+					y = _citrusObject.y + ( (stateView.camera.camProxy.y - _citrusObject.y) * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				}
+				else
+				{
+					x = _citrusObject.x + ( (stateView.camera.camProxy.x + stateView.camera.camProxy.offset.x) * (1 - _citrusObject.parallaxX)) + _citrusObject.offsetX * scaleX;
+					y = _citrusObject.y + ( (stateView.camera.camProxy.y + stateView.camera.camProxy.offset.y) * (1 - _citrusObject.parallaxY)) + _citrusObject.offsetY;
+				}
 				rotation = deg2rad(_citrusObject.rotation);
 			}
 
@@ -416,6 +429,22 @@ package citrus.view.starlingview {
 
 		private function handleContentIOError(evt:IOErrorEvent):void {
 			throw new Error(evt.text);
+		}
+		
+		/**
+		 * Set it to false if you want to prevent the art to be updated. Be careful its properties (x, y, ...) won't be able to change!
+		 */
+		public function get updateArtEnabled():Boolean {
+			return _updateArtEnabled;
+		}
+		
+		/**
+		 * Set it to false also made the Sprite flattened!
+		 */
+		public function set updateArtEnabled(value:Boolean):void {
+			_updateArtEnabled = value;
+			
+			_updateArtEnabled ? unflatten() : flatten();
 		}
 
 	}

@@ -26,12 +26,12 @@ package citrus.input.controllers.starling {
 		
 		public function VirtualJoystick(name:String, params:Object = null)
 		{
+			graphic = new starling.display.Sprite();
 			super(name, params);
 		}
 		
 		override protected function initGraphics():void
 		{
-			graphic = new starling.display.Sprite();
 			
 			if (!back)
 			{
@@ -185,12 +185,12 @@ package citrus.input.controllers.starling {
 		
 		public function get visible():Boolean
 		{
-			return _visible;
+			return _visible = graphic.visible;;
 		}
 		
 		public function set visible(value:Boolean):void
 		{
-			graphic.visible = value;
+			graphic.visible = _visible = value;
 		}
 		
 		override public function destroy():void
