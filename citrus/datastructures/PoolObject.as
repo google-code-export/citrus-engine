@@ -219,8 +219,9 @@ package citrus.datastructures {
 
 			var tmpHead:DoublyLinkedListNode = head;
 
-			while (tmpHead != null && (tmpHead.data as _poolType).updateCallEnabled) {
-				(tmpHead.data as _poolType).update(timeDelta);
+			while (tmpHead != null) {
+				if((tmpHead.data as _poolType).updateCallEnabled)
+					(tmpHead.data as _poolType).update(timeDelta);
 				
 				//since updatePhysics is always called, we can dispose objects set to kill here.
 				if ("kill" in (tmpHead.data as _poolType) && (tmpHead.data as _poolType).kill)
