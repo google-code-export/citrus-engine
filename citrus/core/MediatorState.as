@@ -1,6 +1,5 @@
 package citrus.core {
 
-	import citrus.datastructures.DoublyLinkedListNode;
 	import citrus.datastructures.PoolObject;
 	import citrus.objects.APhysicsObject;
 	import citrus.system.Entity;
@@ -39,7 +38,7 @@ package citrus.core {
 			_objects.length = 0;
 
 			for each (var poolObject:PoolObject in _poolObjects)
-				poolObject.clear();
+				poolObject.destroy();
 
 			_poolObjects.length = 0;
 
@@ -108,6 +107,9 @@ package citrus.core {
 		 */
 		public function add(object:CitrusObject):CitrusObject {
 			
+			if (object is Entity)
+				throw new Error("Object named: " + object.name + " is an entity and should be added to the state via addEntity method.");
+			
 			for each (var objectAdded:CitrusObject in objects) 
 				if (object == objectAdded)
 					throw new Error(object.name + " is already added to the state.");
@@ -156,32 +158,6 @@ package citrus.core {
 		}
 
 		/**
-		 * Call this function each time you make an operation (add or delete) on the PoolObject to refresh its graphics.
-		 * @param poolObject the PoolObject which need to refresh its graphics.
-		 * @param nmbrToDelete a number of graphics to delete.
-		 * @param startIndex PoolObject's index position to start the deletion.
-		 */
-		public function refreshPoolObjectArt(poolObject:PoolObject, nmbrToDelete:uint = 0, startIndex:uint = 0):void {
-
-			var tmpHead:DoublyLinkedListNode = poolObject.head;
-			var i:uint, j:uint = 0;
-
-			while (tmpHead != null) {
-
-				if (nmbrToDelete > 0 && i >= startIndex && j < nmbrToDelete) {
-
-					_view.removeArt(tmpHead.data);
-					++j;
-
-				} else if (!_view.getArt(tmpHead.data))
-					_view.addArt(tmpHead.data);
-
-				tmpHead = tmpHead.next;
-				++i;
-			}
-		}
-
-		/**
 		 * When you are ready to remove an object from getting updated, viewed, and generally being existent, call this method.
 		 * Alternatively, you can just set the object's kill property to true. That's all this method does at the moment. 
 		 */
@@ -200,6 +176,27 @@ package citrus.core {
 				if (object.name == name)
 					return object;
 			}
+			
+			if (_poolObjects.length > 0)
+			{
+				var poolObject:PoolObject;
+				var found:Boolean = false;
+				for each(poolObject in _poolObjects)
+				{
+					poolObject.foreachRecycled(function(pobject:*):Boolean
+					{
+						if (pobject is CitrusObject && pobject["name"] == name)
+						{
+							object = pobject;
+							return found = true;
+						}
+						return false;
+					});
+					
+					if (found)
+						return object;
+				}
+			}
 
 			return null;
 		}
@@ -213,10 +210,25 @@ package citrus.core {
 		public function getObjectsByName(name:String):Vector.<CitrusObject> {
 
 			var objects:Vector.<CitrusObject> = new Vector.<CitrusObject>();
-
-			for each (var object:CitrusObject in _objects) {
+			var object:CitrusObject;
+			
+			for each (object in _objects) {
 				if (object.name == name)
 					objects.push(object);
+			}
+			
+			if (_poolObjects.length > 0)
+			{
+				var poolObject:PoolObject;
+				for each(poolObject in _poolObjects)
+				{
+					poolObject.foreachRecycled(function(pobject:*):Boolean
+					{
+						if (pobject is CitrusObject && pobject["name"] == name)
+							objects.push(pobject as CitrusObject);
+						return false;
+					});
+				}
 			}
 
 			return objects;
@@ -228,10 +240,32 @@ package citrus.core {
 		 * @param type The class of the object you want to get a reference to.
 		 */
 		public function getFirstObjectByType(type:Class):CitrusObject {
-
-			for each (var object:CitrusObject in _objects) {
+			var object:CitrusObject;
+			
+			for each (object in _objects) {
 				if (object is type)
 					return object;
+			}
+			
+			if (_poolObjects.length > 0)
+			{
+				var poolObject:PoolObject;
+				var found:Boolean = false;
+				for each(poolObject in _poolObjects)
+				{
+					poolObject.foreachRecycled(function(pobject:*):Boolean
+					{
+						if (pobject is type)
+						{
+							object = pobject;
+							return found = true;
+						}
+						return false;
+					});
+					
+					if (found)
+						return object;
+				}
 			}
 
 			return null;
@@ -246,10 +280,25 @@ package citrus.core {
 		public function getObjectsByType(type:Class):Vector.<CitrusObject> {
 
 			var objects:Vector.<CitrusObject> = new Vector.<CitrusObject>();
-
-			for each (var object:CitrusObject in _objects) {
+			var object:CitrusObject;
+			
+			for each (object in _objects) {
 				if (object is type) {
 					objects.push(object);
+				}
+			}
+			
+			if (_poolObjects.length > 0)
+			{
+				var poolObject:PoolObject;
+				for each(poolObject in _poolObjects)
+				{
+					poolObject.foreachRecycled(function(pobject:*):Boolean
+					{
+						if (pobject is type)
+							objects.push(pobject as CitrusObject);
+						return false;
+					});
 				}
 			}
 

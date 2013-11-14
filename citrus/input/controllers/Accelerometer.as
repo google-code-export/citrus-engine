@@ -131,6 +131,9 @@ package citrus.input.controllers
 		public function Accelerometer(name:String,params:Object = null) 
 		{
 			super(name, params);
+			
+			_updateEnabled = true;
+			
 			if (! flash.sensors.Accelerometer.isSupported)
 			{
 				trace(this, "Accelerometer is not supported");
@@ -172,23 +175,23 @@ package citrus.input.controllers
 			
 			if (triggerRawValues)
 			{
-				triggerVALUECHANGE(RAW_X, _a.x);
-				triggerVALUECHANGE(RAW_Y, _a.y);
-				triggerVALUECHANGE(RAW_Z, _a.z);
+				triggerCHANGE(RAW_X, _a.x);
+				triggerCHANGE(RAW_Y, _a.y);
+				triggerCHANGE(RAW_Z, _a.z);
 			}	
 			
 			if (triggerAxisRotation)
 			{
-				triggerVALUECHANGE(ROT_X, _rot.x);
-				triggerVALUECHANGE(ROT_Y, _rot.y);
-				triggerVALUECHANGE(ROT_Z, _rot.z);
+				triggerCHANGE(ROT_X, _rot.x);
+				triggerCHANGE(ROT_Y, _rot.y);
+				triggerCHANGE(ROT_Z, _rot.z);
 			}
 			
 			if (triggerVelocity)
 			{
-				triggerVALUECHANGE(VEL_X, (_rot.x - _prevRot.x) * _ce.stage.frameRate);
-				triggerVALUECHANGE(VEL_Y, (_rot.y - _prevRot.y) * _ce.stage.frameRate);
-				triggerVALUECHANGE(VEL_Z, (_rot.z - _prevRot.z) * _ce.stage.frameRate);
+				triggerCHANGE(VEL_X, (_rot.x - _prevRot.x) * _ce.stage.frameRate);
+				triggerCHANGE(VEL_Y, (_rot.y - _prevRot.y) * _ce.stage.frameRate);
+				triggerCHANGE(VEL_Z, (_rot.z - _prevRot.z) * _ce.stage.frameRate);
 			}
 			
 			if (triggerActions)

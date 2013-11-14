@@ -1,18 +1,25 @@
 package citrus.view.starlingview {
 
+	import citrus.core.CitrusEngine;
+	import citrus.core.starling.StarlingCitrusEngine;
+
 	import starling.core.Starling;
 	import starling.display.MovieClip;
 	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.extensions.textureAtlas.DynamicAtlas;
 	import starling.textures.TextureAtlas;
 
 	import org.osflash.signals.Signal;
 
+	import flash.display.MovieClip;
 	import flash.utils.Dictionary;
 
 	/**
 	 * The Animation Sequence class represents all object animations in one sprite sheet. You have to create your texture atlas in your state class.
 	 * Example : <code>var hero:Hero = new Hero("Hero", {x:400, width:60, height:130, view:new AnimationSequence(textureAtlas, ["walk", "duck", "idle", "jump"], "idle")});</code>
+	 * <b>Important:</b> for managing if an animation should loop, you've to set it up at <code>StarlingArt.setLoopAnimations(["fly", "fallen"])</code>. By default, the walk's 
+	 * animation is the only one looping.
 	 */
 	public class AnimationSequence extends Sprite {
 
@@ -53,18 +60,8 @@ package citrus.view.starlingview {
 			_smoothing = smoothing;
 
 			_mcSequences = new Dictionary();
-
-			for each (var animation:String in _animations) {
-
-				if (_textureAtlas.getTextures(animation).length == 0)
-					throw new Error(_textureAtlas + " doesn't have the " + animation + " animation in its TextureAtlas");
-
-				_mcSequences[animation] = new MovieClip(_textureAtlas.getTextures(animation), _animFps);
-
-				_mcSequences[animation].name = animation;
-				_mcSequences[animation].addEventListener(Event.COMPLETE, _animationComplete);
-				_mcSequences[animation].smoothing = _smoothing;
-			}
+			
+			addTextureAtlasWithAnimations(_textureAtlas, _animations);
 
 			addChild(_mcSequences[_firstAnimation]);
 			Starling.juggler.add(_mcSequences[_firstAnimation]);
@@ -79,7 +76,7 @@ package citrus.view.starlingview {
 		 * @param mc a MovieClip you would like to use.
 		 * @param animation the object's animation name as a String you would like to pick up.
 		 */
-		public function addMovieClip(mc:MovieClip, animation:String):void {
+		public function addMovieClip(mc:starling.display.MovieClip, animation:String):void {
 
 			if ((_mcSequences[animation]))
 				throw new Error(this + " already have the " + animation + " animation set up in its animations' array");
@@ -97,14 +94,14 @@ package citrus.view.starlingview {
 		 * @param textureAtlas a TextureAtlas object with your object's animations you would like to use.
 		 * @param animations an array with the object's animations as a String you would like to pick up.
 		 */
-		public function addTextureAtlasWithAnimations(textureAtlas:TextureAtlas, animations:Array):void {
+		public function addTextureAtlasWithAnimations(textureAtlas:*, animations:Array):void {
 
 			for each (var animation:String in animations) {
 
 				if (textureAtlas.getTextures(animation).length == 0)
 					throw new Error(textureAtlas + " doesn't have the " + animation + " animation in its TextureAtlas");
 
-				_mcSequences[animation] = new MovieClip(textureAtlas.getTextures(animation), _animFps);
+				_mcSequences[animation] = new starling.display.MovieClip(textureAtlas.getTextures(animation), _animFps);
 
 				_mcSequences[animation].name = animation;
 				_mcSequences[animation].addEventListener(Event.COMPLETE, _animationComplete);
@@ -129,6 +126,11 @@ package citrus.view.starlingview {
 
 				delete _mcSequences[animation];
 			}
+		}
+		
+		public function removeAllAnimations():void
+		{
+			removeAnimations(_animations);
 		}
 
 		/**
@@ -167,10 +169,7 @@ package citrus.view.starlingview {
 			removeChild(_mcSequences[_previousAnimation]);
 			Starling.juggler.remove(_mcSequences[_previousAnimation]);
 
-			for each (var animation:MovieClip in _mcSequences) {
-				animation.removeEventListener(Event.COMPLETE, _animationComplete);
-				animation.dispose();
-			}
+			removeAllAnimations();
 
 			_mcSequences = null;
 		}
@@ -181,6 +180,56 @@ package citrus.view.starlingview {
 		public function get mcSequences():Dictionary {
 			return _mcSequences;
 		}
+		
+		/**
+		 * creates an AnimationSequence from a flash movie clip
+		 * different animations should be in separate flash movie clips,
+		 * each should have their name set to whatever animation they represent.
+		 * all of those moviesclips should be added as children,in the first frame,
+		 * to the movie clip provided as an argument to this function so that
+		 * DynamicAtlas will run through each children, create animations for each
+		 * with their name as animation names to be used in the AnimationSequence that gets returned.
+		 * For more info, check out the Dynamic Texture Atlas Extension and how it renders texture atlases.
+		 * @param	swf flash movie clip instance containing instances of movie clip animations
+		 * @param	firstAnim the name of the first animation to be played
+		 * @param	animFps fps of the AnimationSequence
+		 * @param	firstAnimLoop should the first animation loop?
+		 * @param	smoothing
+		 * @return
+		 */
+		public static function fromMovieClip(swf:flash.display.MovieClip,firstAnim:String = null, animFps:int = 30, firstAnimLoop:Boolean = true, smoothing:String = "bilinear"):AnimationSequence
+		{
+			var textureAtlas:TextureAtlas = DynamicAtlas.fromMovieClipContainer(swf, (CitrusEngine.getInstance() as StarlingCitrusEngine).scaleFactor, 0, true, true);
+			var textureAtlasNames:Vector.<String> = textureAtlas.getNames();
+			
+			var sorter:Object = { };
+			
+			for each (anim in textureAtlasNames)
+			{
+				anim = anim.split("_")[0];
+				if (!(anim in sorter))
+					sorter[anim] = true;
+			}
+			
+			var anims:Array = [];
+			var anim:String;
+			
+			for (anim in sorter)
+				anims.push(anim);
+				
+			return new AnimationSequence(textureAtlas, anims,(firstAnim in sorter)? firstAnim : anims[0], animFps, firstAnimLoop,smoothing);
+		}
+		
+		/**
+		 * returns a vector of all animation names in this AnimationSequence.
+		 */
+		public function getAnimationNames():Vector.<String>{
+			var names:Vector.<String> = new Vector.<String>();
+			var name:String;
+			for (name in _mcSequences)
+				names.push(name);
+			return names;
+		}
 
 		/**
 		 * Return a clone of the current AnimationSequence. Animations added via <code>addMovieClip</code> or <code>addTextureAtlasWithAnimations</code> aren't included.
@@ -190,7 +239,7 @@ package citrus.view.starlingview {
 		}
 
 		private function _animationComplete(evt:Event):void {
-			onAnimationComplete.dispatch((evt.target as MovieClip).name);
+			onAnimationComplete.dispatch((evt.target as starling.display.MovieClip).name);
 		}
 	}
 }

@@ -4,12 +4,12 @@ package citrus.objects {
 	import awayphysics.collision.shapes.AWPCollisionShape;
 	import awayphysics.collision.shapes.AWPSphereShape;
 	import awayphysics.dynamics.AWPRigidBody;
-
-	import citrus.physics.PhysicsCollisionCategories;
 	import citrus.physics.awayphysics.AwayPhysics;
+	import citrus.physics.PhysicsCollisionCategories;
 	import citrus.view.ISpriteView;
-
 	import flash.geom.Vector3D;
+
+
 
 	/**
 	 * You should extend this class to take advantage of AwayPhysics. This class provides template methods for defining
@@ -59,7 +59,7 @@ package citrus.objects {
 			createBody();
 			createConstraint();
 		}
-
+		
 		override public function destroy():void {
 
 			_body.dispose();

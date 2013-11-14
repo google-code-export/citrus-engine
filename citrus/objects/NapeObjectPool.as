@@ -8,20 +8,17 @@ package citrus.objects
 	import citrus.physics.nape.Nape;
 	import citrus.view.ACitrusView;
 	import citrus.view.ICitrusArt;
+	import flash.utils.describeType;
 	
 	public class NapeObjectPool extends PoolObject
 	{
 		private static var stateView:ACitrusView;
 		
 		public function NapeObjectPool(pooledType:Class,defaultParams:Object, poolGrowthRate:uint = 1) 
-		{
+		{	
 			super(pooledType, defaultParams, poolGrowthRate, true);
 			
-			//test if defined pooledType class inherits from NapePhysicsObject
-			var test:Object;
-			if ((test = new pooledType("test")) is NapePhysicsObject)
-			{ test.kill = true; test = null; }
-			else
+			if (!(describeType(pooledType).factory.extendsClass.(@type == "citrus.objects::NapePhysicsObject").length() > 0))
 				throw new Error("NapePoolObject: " + String(pooledType) + " is not a NapePhysicsObject");
 				
 			stateView = CitrusEngine.getInstance().state.view;
@@ -50,6 +47,7 @@ package citrus.objects
 			np.initialize(params);
 			onCreate.dispatch((node.data as _poolType), params);
 			np.addPhysics();
+			np.body.space = null;
  			stateView.addArt(np);
 			
 			np.citrus_internal::data["updateCall"] = np.updateCallEnabled;

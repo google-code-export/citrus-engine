@@ -238,6 +238,22 @@ package citrus.datastructures {
 
 		}
 		
+		/**
+		 * check if object is free
+		 * @param	data
+		 * @return
+		 */
+		public function isDataDisposed(data:*):Boolean
+		{
+			var tmpHead:DoublyLinkedListNode = _freeListHead;
+			while (tmpHead != null) {	
+				if (tmpHead.data == data)	
+					return true;
+				tmpHead = tmpHead.next;
+			}
+			return false;
+		}
+		
 		public function updateArt(stateView:ACitrusView):void {
 
 			var tmpHead:DoublyLinkedListNode = head;
@@ -317,8 +333,7 @@ package citrus.datastructures {
 			if(n)
 				return disposeNode(n);
 			else
-				return null;
-				//throw new Error("This data is already disposed");
+				throw new Error("This data is already disposed :",data);
 		}
 
 		/**
@@ -410,17 +425,21 @@ package citrus.datastructures {
 				_freeListHead = node.next;
 				if (_freeListHead) _freeListHead.prev = null;
 				node.next = null;
+				
+				_freeCount--;
 			}
 			
-			destroy();
+			_freeListHead = null;
+			head = null;
 
 		}
 		
 		/**
 		 * after clearing, just get rid of signals etc...
 		 */
-		protected function destroy():void
+		public function destroy():void
 		{
+			clear();
 			
 			onCreate.removeAll();
 			onDestroy.removeAll();
@@ -428,9 +447,6 @@ package citrus.datastructures {
 			onRecycle.removeAll();
 			
 			_defaultParams = null;
-			
-			_freeListHead = null;
-			head = null;
 			
 			gc.length = 0;
 			gc = null;

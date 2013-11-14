@@ -9,6 +9,7 @@ package citrus.core.starling {
 	import citrus.system.Entity;
 	import citrus.system.components.ViewComponent;
 	import citrus.view.ACitrusView;
+	import citrus.view.starlingview.StarlingCamera;
 	import citrus.view.starlingview.StarlingView;
 
 	import starling.display.Sprite;
@@ -21,16 +22,16 @@ package citrus.core.starling {
 		/**
 		 * Get a direct references to the Citrus Engine in your State.
 		 */
-		protected var _ce:CitrusEngine;
+		protected var _ce:StarlingCitrusEngine;
 		
 		protected var _realState:MediatorState;
 
-		protected var _input:Input;	
+		protected var _input:Input;
 
 		public function StarlingState() {
 			
-			_ce = CitrusEngine.getInstance();
-			
+			_ce = CitrusEngine.getInstance() as StarlingCitrusEngine;
+						
 			if (!(_ce as StarlingCitrusEngine) || !(_ce as StarlingCitrusEngine).starling)
 				throw new Error("Your Main " + _ce + " class doesn't extend StarlingCitrusEngine, or you didn't call its setUpStarling function");
 
@@ -100,17 +101,6 @@ package citrus.core.starling {
 		public function addPoolObject(poolObject:PoolObject):PoolObject {
 
 			return _realState.addPoolObject(poolObject);
-		}
-
-		/**
-		 * Call this function each time you make an operation (add or delete) on the PoolObject to refresh its graphics.
-		 * @param poolObject the PoolObject which need to refresh its graphics.
-		 * @param nmbrToDelete a number of graphics to delete.
-		 * @param startIndex PoolObject's index position to start the deletion.
-		 */
-		public function refreshPoolObjectArt(poolObject:PoolObject, nmbrToDelete:uint = 0, startIndex:uint = 0):void {
-
-			_realState.refreshPoolObjectArt(poolObject, nmbrToDelete, startIndex);
 		}
 
 		/**
@@ -184,6 +174,11 @@ package citrus.core.starling {
 		 */
 		protected function createView():ACitrusView {
 			return new StarlingView(this);
+		}
+		
+		public function get camera():StarlingCamera
+		{
+			return view.camera as StarlingCamera;
 		}
 	}
 }

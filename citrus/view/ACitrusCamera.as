@@ -1,10 +1,16 @@
 package citrus.view {
 
+	import aze.motion.EazeTween;
 	import citrus.core.CitrusEngine;
+	import citrus.math.MathUtils;
+	import citrus.math.MathVector;
+	import flash.events.Event;
 
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.system.Capabilities;
+
 
 	/**
 	 * Citrus's camera.
@@ -40,7 +46,7 @@ package citrus.view {
 		 * _aabb holds the axis aligned bounding box of the camera in rect
 		 * and its relative position to it (with offsetX and offsetY)
 		 */
-		protected var _aabbData:Object = { };
+		protected var _aabbData:Object = {offsetX:0, offsetY:0, rect:new Rectangle() };
 		
 		/**
 		 * ghostTarget is the eased position of target.
@@ -86,15 +92,31 @@ package citrus.view {
 		 * The camera position to be set manually if target is not set.
 		 */
 		protected var _manualPosition:Point;
-
+		
 		/**
-		 * The distance from the top-left corner of the screen that the camera should offset the target. 
+		 * decides wether the camera will be updated by citrus engine.
+		 * If you use the camera only for multi resolution purposes or for 'non moving' states,
+		 * you may disable the camera to save some performances. In such cases, you may still call
+		 * reset() in the state's initialize() so that the camera will set itself up at the right position/zoom/rotation.
 		 */
-		public var offset:Point = new Point();
+		public var enabled:Boolean = false;
+		
+		/**
+		 * This defines the camera "center" position as a factor of the camera lens dimensions.
+		 * x and y components will be multiplied to cameraLensWidth/cameraLensHeight
+		 * to determine the position of the camera center.
+		 * values must be between 0 and 1.
+		 */
+		public var center:Point = new Point(0.5, 0.5);
+		
+		/**
+		 * real camera center position
+		 */
+		protected var offset:Point = new Point();
 
 		/**
 		 * A value between 0 and 1 that specifies the speed at which the camera catches up to the target.
-		 * 0 makes the camera not follow the target at all and 1 makes the camera follow the target exactly. 
+		 * 0 makes the camera not follow the target at all and 1 makes the camera follow the target exactly.
 		 */
 		public var easing:Point = new Point(0.25, 0.05);
 
@@ -102,6 +124,16 @@ package citrus.view {
 		 * A rectangle specifying the minimum and maximum area that the camera is allowed to follow the target in. 
 		 */
 		public var bounds:Rectangle;
+		
+		/**
+		 * defines a zone in the camera space where target will be able to move without the camera following it.
+		 * left to its default value (0,0,0,0) the camera will constantly try to move/ease to the target.
+		 * if set to 0,0,100,100, the target has to move 50px left or 50px right (in camera space) for horizontal tracking to start,
+		 * the same vertically. 
+		 * 
+		 * the deadZone's rectangle x and y values are not used.
+		 */
+		public var deadZone:Rectangle = new Rectangle();
 
 		/**
 		 * The width of the visible game screen. This will usually be the same as your stage width unless your game has a border.
@@ -124,6 +156,16 @@ package citrus.view {
 		 * helper point
 		 */
 		protected var _p:Point = new Point();
+		
+		/**
+		 * helper rectangle
+		 */
+		protected var _r:Rectangle = new Rectangle();
+		
+		/**
+		 * camera rectangle
+		 */
+		protected var _rect:Rectangle = new Rectangle();
 		
 		/**
 		 * helper object for bounds checking
@@ -194,21 +236,28 @@ package citrus.view {
 		protected function initialize():void {
 			
 			_ce = CitrusEngine.getInstance();
-			cameraLensWidth = _ce.stage.stageWidth;
-			cameraLensHeight = _ce.stage.stageHeight;	
+			cameraLensWidth = _ce.screenWidth;
+			cameraLensHeight = _ce.screenHeight;
 			
+			_ce.onStageResize.add(onResize);
+		}
+		
+		protected function onResize(w:Number, h:Number):void
+		{
+			cameraLensWidth = _ce.screenWidth;
+			cameraLensHeight = _ce.screenHeight;	
 		}
 		
 		/**
-		 * This is a non-critical helper function that allows you to quickly set all the available camera properties in one place. 
-		 * @param target The thing that the camera should follow.
-		 * @param offset The distance from the upper-left corner that you want the camera to be offset from the target.
-		 * @param bounds The rectangular bounds that the camera should not extend beyond.
-		 * @param easing The x and y percentage of distance that the camera will travel toward the target per tick. Lower numbers are slower. The number should not go beyond 1.
-		 * @param cameraLens The width and height of the visible game screen. Default is the same as your stage width and height.
+		 * This is a non-critical helper function that allows you to quickly set available camera properties in one place.
+		 * if center and easing are set to null, the default values are used.
+		 * @param target object with x and y properties that will be tracked by the camera
+		 * @param center values between 0 and 1 - x/y components will be multiplied to the cameraLensWidth/cameraLensHeight value to determine the position of the camera center.
+		 * @param bounds rectangle that determines the area the camera is allowed to move in
+		 * @param easing values between 0 and 1 - that specifies by how much distance from the target the camera should move on each update
 		 * @return this The Instance of the ACitrusCamera.
 		 */		
-		public function setUp(target:Object = null, offset:Point = null, bounds:Rectangle = null, easing:Point = null, cameraLens:Point = null):ACitrusCamera
+		public function setUp(target:Object,bounds:Rectangle = null, center:Point = null , easing:Point = null):ACitrusCamera
 		{
 			if (target)
 			{
@@ -216,17 +265,21 @@ package citrus.view {
 				_ghostTarget.x = target.x;
 				_ghostTarget.y = target.y;
 			}
-			if (offset)
-				this.offset = offset;
+			if (center)
+			{
+				if (center.x > 1) center.x = 1;
+				if (center.x < 0) center.x = 0;
+				if (center.y > 1) center.y = 1;
+				if (center.y < 0) center.y = 0;
+				
+				this.center = center;
+			}
 			if (bounds)
-				this.bounds = bounds;	
+				this.bounds = bounds;
 			if (easing)
 				this.easing = easing;
-			if (cameraLens) {
-				cameraLensWidth = cameraLens.x;
-				cameraLensHeight = cameraLens.y;
-			}
 				
+			enabled = true;
 			return this;
 		}
 		
@@ -252,16 +305,109 @@ package citrus.view {
 			zoomEasing = tmp3;
 		}
 		
+		/**
+		 * Moves from the current target to the newTarget at a linear speed, sets the camera's target to be the newTarget
+		 * then calls onComplete.
+		 * @param	newTarget any object with x/y properties
+		 * @param	speed by how much should the camera move towards the new target on each frame?
+		 * @param	onComplete
+		 */
+		public function switchToTarget(newTarget:Object, speed:Number = 10, onComplete:Function = null):void
+		{
+			var moveTarget:Point = new Point(camPos.x,camPos.y);
+			var vec:MathVector = new MathVector(0, 0);
+			
+			var oldEasing:Point = easing.clone();
+			easing.setTo(1, 1);
+			
+			var oldDeadZone:Rectangle = deadZone.clone();
+			deadZone.setTo(0, 0, 0, 0);
+			
+			target = moveTarget;
+				
+			var switchTo:Function = function(e:Event):void
+			{
+				if (!_ce.playing)
+					return;
+					
+				vec.setTo(newTarget.x - moveTarget.x, newTarget.y - moveTarget.y);
+				if(vec.length > speed)
+					vec.length = speed;
+				moveTarget.x += vec.x;
+				moveTarget.y += vec.y;
+				
+				if (MathUtils.DistanceBetweenTwoPoints(newTarget.x,moveTarget.x,newTarget.y,moveTarget.y) <= 0.1)
+				{
+					_ce.removeEventListener(Event.ENTER_FRAME, arguments.callee);
+					target = newTarget;
+					easing = oldEasing;
+					deadZone = oldDeadZone;
+					if (onComplete != null)
+						onComplete();
+				}
+			}
+			
+			_ce.addEventListener(Event.ENTER_FRAME, switchTo);
+		}
+		
+		/**
+		 * Moves from current target to newTarget using EazeTween.
+		 * function returns the EazeTween instance created.
+		 * @param	newTarget any object with x/y properties
+		 * @param	duration in seconds
+		 * @param	easingFunction with the f(x) = y format
+		 * @param	onComplete callback when the tween ends
+		 * @return  EazeTween
+		 */
+		public function tweenSwitchToTarget(newTarget:Object, duration:Number = 2, easingFunction:Function = null, onComplete:Function = null):EazeTween
+		{
+			var moveTarget:Point = new Point(camPos.x,camPos.y);
+			
+			var oldEasing:Point = easing.clone();
+			easing.setTo(1, 1);
+			
+			var oldDeadZone:Rectangle = deadZone.clone();
+			deadZone.setTo(0, 0, 0, 0);
+			
+			target = moveTarget;
+			
+			var eaze:EazeTween = new EazeTween(moveTarget, false).to(duration, { x:newTarget.x, y:newTarget.y } ).onComplete(function():void
+			{
+				target = newTarget;
+				easing = oldEasing;
+				deadZone = oldDeadZone;
+				if (onComplete != null)
+					onComplete();
+			});
+			
+			if (easingFunction != null)
+				eaze.easing(easingFunction);
+				
+			eaze.start();
+			return eaze;
+		}
+		
 		public function zoom(factor:Number):void {
 			throw(new Error("Warning: " + this + " cannot zoom."));
 		}
 		
 		/**
-		 * fit inside width and height by zooming in or out.
-		 * (centered on the target)
+		 * fits a defined area within the camera lens dimensions.
+		 * Similar to fitting a rectangle inside another rectangle by multiplying its size,
+		 * therefore keeping its aspect ratio. the factor used to fit is returned 
+		 * and set as the current target zoom factor.
+		 * 
+		 * if storeInBaseZoom is set to true, then the calculated ratio is stored in the camera's baseZoom
+		 * and from now, all zoom will be relative to that ratio (baseZoom is 1 by default and multiplied
+		 * to every zoom operations you do using the camera methods) - this helps create relative zoom effects
+		 * while keeping a base zoom when zooming at 1 where the camera would still fit the area you decided :
+		 * specially usefull for multi resolution handling.
+		 * @param width width of the area to fit inside the camera lens dimensions.
+		 * @param height height of the area to fit inside the camera lens dimensions.
+		 * @param storeInBaseZoom , whether to store the ratio into baseZoom or not.
 		 * @return calculated zoom ratio
 		 */
-		public function zoomFit(width:Number, height:Number):Number {
+		public function zoomFit(width:Number, height:Number, storeInBaseZoom:Boolean = false):Number {
 			throw(new Error("Warning: " + this + " cannot zoomFit."));
 		}
 		
@@ -291,19 +437,28 @@ package citrus.view {
 		public function update():void {
 		}
 		
+		public function destroy():void {
+			_ce.onStageResize.remove(onResize);
+		}
+		
 		/*
 		 * Getters and setters
 		 */
 		
+		/**
+		 * object with x and y properties that will be tracked by the camera
+		 */
 		public function set target(o:Object):void {	
 			_manualPosition = null;
 			_target = o;
 		}
-		
 		public function get target():Object {	
 			return _target;
 		}
 		
+		/**
+		 * the camera center position in state coordinates
+		 */
 		public function get camPos():Point {
 			return _camPos;
 		}
@@ -367,6 +522,76 @@ package citrus.view {
 		public function get transformMatrix():Matrix
 		{
 			return _m;
+		}
+		
+		/**
+		 * Check is the given coordinates in State space are contained within the camera.
+		 * 
+		 * set the area argument to define a different area of the screen, for example if you want to check
+		 * further left/right/up/down than the camera's default rectangle which is : (0,0,cameraLensWidth,cameraLensHeight)
+		 */
+		public function contains(xa:Number,ya:Number,area:Rectangle = null):Boolean
+		{
+			_p.setTo(xa, ya);
+			
+			if(!area)
+				_rect.setTo(0, 0, cameraLensWidth, cameraLensHeight);
+			else
+				_rect.copyFrom(area);
+			
+			_p.copyFrom(_m.transformPoint(_p));
+			
+			return _rect.contains(_p.x, _p.y);
+		}
+		
+		/**
+		 * Check is the given rectangle in state space is fully contained within the camera.
+		 * will return false even if partially visible, collision with borders included.
+		 * 
+		 * set the area argument to define a different area of the screen, for example if you want to check
+		 * further left/right/up/down than the camera's default rectangle which is : (0,0,cameraLensWidth,cameraLensHeight)
+		 */
+		public function containsRect(rectangle:Rectangle, area:Rectangle = null):Boolean
+		{
+			_p.setTo(rectangle.x + rectangle.width * .5, rectangle.y + rectangle.height * .5);
+			
+			if(!area)
+				_rect.setTo(0, 0, cameraLensWidth, cameraLensHeight);
+			else
+				_rect.copyFrom(area);
+			
+			_p.copyFrom(_m.transformPoint(_p));
+			_r.setTo(_p.x - rectangle.width * .5, _p.y - rectangle.height * .5, rectangle.width, rectangle.height);
+			return _rect.containsRect(_r);
+		}
+		
+		/**
+		 * Check is the given rectangle in state space intersects with the camera rectangle.
+		 * (if its partially visible, true will be returned.
+		 * 
+		 * set the area argument to define a different area of the screen, for example if you want to check
+		 * further left/right/up/down than the camera's default rectangle which is : (0,0,cameraLensWidth,cameraLensHeight)
+		 */
+		public function intersectsRect(rectangle:Rectangle, area:Rectangle = null):Boolean
+		{
+			_p.setTo(rectangle.x + rectangle.width * .5, rectangle.y + rectangle.height * .5);
+			
+			if(!area)
+				_rect.setTo(0, 0, cameraLensWidth, cameraLensHeight);
+			else
+				_rect.copyFrom(area);
+			
+			_p.copyFrom(_m.transformPoint(_p));
+			_r.setTo(_p.x - rectangle.width * .5, _p.y - rectangle.height * .5, rectangle.width, rectangle.height);
+			return _rect.intersects(_r);
+		}
+		
+		/**
+		 * returns the camera's axis aligned bounding rectangle in State space.
+		 */
+		public function getRect():Rectangle
+		{
+			return _aabbData.rect;
 		}
 		
 	}

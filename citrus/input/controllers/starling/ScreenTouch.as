@@ -3,11 +3,12 @@ package citrus.input.controllers.starling
 
 	import citrus.input.InputController;
 	import citrus.view.starlingview.StarlingView;
-
+	import starling.display.DisplayObject;
 	import starling.display.Sprite;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
+
 	
 	/**
 	 * ScreenTouch is a small InputController to get a starling touch into the input system :
@@ -19,7 +20,7 @@ package citrus.input.controllers.starling
 	public class ScreenTouch extends InputController
 	{
 		
-		protected var _touchTarget:Sprite;
+		protected var _touchTarget:DisplayObject;
 		/**
 		 * touch action is the action triggered on touch, it is jump by default.
 		 */
@@ -43,10 +44,12 @@ package citrus.input.controllers.starling
 				switch (t.phase) {
 					
 					case TouchPhase.BEGAN:
-						triggerON(touchAction, 1, defaultChannel);
+						triggerCHANGE(touchAction, 1, null, defaultChannel);
+						e.stopImmediatePropagation();
 						break;
 					case TouchPhase.ENDED:
-						triggerOFF(touchAction, 0, defaultChannel);
+						triggerOFF(touchAction, 0, null, defaultChannel);
+						e.stopImmediatePropagation();
 						break;
 				}
 			}
@@ -54,18 +57,21 @@ package citrus.input.controllers.starling
 		
 		override public function destroy():void {
 			_touchTarget.removeEventListener(TouchEvent.TOUCH, _handleTouch);
+			_touchTarget = null;
 			super.destroy();
 		}
 		
 		/**
-		 * By default, the touchTarget will be set to the state so that anything outside will not be considered.
+		 * By default, the touchTarget will be set to the state's viewroot,
+		 * accessible from the state like so:
+		 * <pre>((view as StarlingView).viewRoot as Sprite)</pre>
 		 */
-		public function get touchTarget():Sprite
+		public function get touchTarget():DisplayObject
 		{
 			return _touchTarget;
 		}
 		
-		public function set touchTarget(s:Sprite):void
+		public function set touchTarget(s:DisplayObject):void
 		{
 			if (s != _touchTarget)
 			{
