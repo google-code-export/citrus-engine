@@ -1,22 +1,21 @@
 package citrus.sounds 
 {
-
-	import citrus.core.citrus_internal;
-	
+	import citrus.events.CitrusEventDispatcher;
+	import citrus.math.MathUtils;
 	/**
 	 * CitrusSoundGroup represents a volume group with its groupID and has mute control as well.
 	 */
-	public class CitrusSoundGroup 
+	public class CitrusSoundGroup extends CitrusEventDispatcher
 	{
-		use namespace citrus_internal;
 		
 		public static const BGM:String = "BGM";
 		public static const SFX:String = "SFX";
+		public static const UI:String = "UI";
 		
 		protected var _groupID:String;
 		
-		citrus_internal var _volume:Number = 1;
-		citrus_internal var _mute:Boolean = false;
+		internal var _volume:Number = 1;
+		internal var _mute:Boolean = false;
 		
 		protected var _sounds:Vector.<CitrusSound>;
 		
@@ -32,15 +31,16 @@ package citrus.sounds
 				s.refreshSoundTransform();
 		}
 		
-		citrus_internal function addSound(s:CitrusSound):void
+		internal function addSound(s:CitrusSound):void
 		{
-			if (s.citrus_internal::group && s.citrus_internal::group.isadded(s))
-				(s.citrus_internal::group as CitrusSoundGroup).removeSound(s);
+			if (s.group && s.group.isadded(s))
+				(s.group as CitrusSoundGroup).removeSound(s);
 			s.setGroup(this);
 			_sounds.push(s);
+			s.addEventListener(CitrusSoundEvent.SOUND_LOADED, handleSoundLoaded);
 		}
 		
-		citrus_internal function isadded(sound:CitrusSound):Boolean
+		internal function isadded(sound:CitrusSound):Boolean
 		{
 			var s:CitrusSound;
 			for each(s in _sounds)
@@ -54,15 +54,26 @@ package citrus.sounds
 			return _sounds.slice();
 		}
 		
-		citrus_internal function removeSound(s:CitrusSound):void
+		public function preloadSounds():void
+		{
+			var s:CitrusSound;
+			for each(s in _sounds)
+				if(!s.loaded)	
+					s.load();
+		}
+		
+		internal function removeSound(s:CitrusSound):void
 		{
 			var si:String;
+			var cs:CitrusSound;
 			for (si in _sounds)
 			{
 				if (_sounds[si] == s)
 				{
-					CitrusSound(_sounds[si]).setGroup(null);
-					CitrusSound(_sounds[si]).refreshSoundTransform();
+					cs = _sounds[si];
+					cs.setGroup(null);
+					cs.refreshSoundTransform();
+					cs.removeEventListener(CitrusSoundEvent.SOUND_LOADED, handleSoundLoaded);
 					_sounds.splice(uint(si), 1);
 					break;
 				}
@@ -76,6 +87,23 @@ package citrus.sounds
 				if (s.name == name)
 					return s;
 			return null;
+		}
+		
+		public function getRandomSound():CitrusSound
+		{
+			var index:uint = MathUtils.randomInt(0, _sounds.length - 1);
+			return _sounds[index];
+		}
+		
+		protected function handleSoundLoaded(e:CitrusSoundEvent):void
+		{
+			var cs:CitrusSound;
+			for each(cs in _sounds)
+			{
+				if (!cs.loaded)
+					return;
+			}
+			dispatchEvent(new CitrusSoundEvent(CitrusSoundEvent.ALL_SOUNDS_LOADED, e.sound, null));
 		}
 		
 		public function set mute(val:Boolean):void
@@ -105,7 +133,7 @@ package citrus.sounds
 			return _groupID;
 		}
 		
-		citrus_internal function destroy():void
+		internal function destroy():void
 		{
 			var s:CitrusSound;
 			for each(s in _sounds)

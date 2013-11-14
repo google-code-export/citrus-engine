@@ -1,5 +1,6 @@
 package citrus.view {
 
+	import citrus.core.CitrusObject;
 	import citrus.utils.LoadManager;
 
 	import flash.utils.Dictionary;
@@ -49,6 +50,7 @@ package citrus.view {
 		
 		public function destroy():void
 		{
+			camera.destroy();
 			loadManager.destroy();
 		}
 		
@@ -76,9 +78,9 @@ package citrus.view {
 			if (art)
 				_viewObjects[citrusObject] = art;
 			
-			//Recurses through the art to see if it can find a loader to monitor
-			if (loadManager.onLoadComplete.numListeners > 0) //only do this if someone is listening
-				loadManager.add(art);
+			if (art["content"] == null)
+				loadManager.add(art, citrusObject as CitrusObject);
+			
 		}
 		
 		/**

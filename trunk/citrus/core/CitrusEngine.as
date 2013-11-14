@@ -9,8 +9,10 @@ package citrus.core {
 
 	import flash.display.MovieClip;
 	import flash.display.StageAlign;
+	import flash.display.StageDisplayState;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.events.FullScreenEvent;
 	
 	/**
 	 * CitrusEngine is the top-most class in the library. When you start your project, you should make your
@@ -21,7 +23,7 @@ package citrus.core {
 	 */	
 	public class CitrusEngine extends MovieClip
 	{
-		public static const VERSION:String = "3.1.7";
+		public static const VERSION:String = "3.1.8";
 				
 		private static var _instance:CitrusEngine;
 		
@@ -29,6 +31,12 @@ package citrus.core {
 		 * Used to pause animations in SpriteArt and StarlingArt.
 		 */
 		public var onPlayingChange:Signal;
+		
+		/**
+		 * called after a stage resize event
+		 * signal passes the new screenWidth and screenHeight as arguments.
+		 */
+		public var onStageResize:Signal;
 		
 		/**
 		 * You may use a class to store your game's data, this is already an abstract class made for that. 
@@ -49,6 +57,10 @@ package citrus.core {
 		protected var _playing:Boolean = true;
 		protected var _input:Input;
 		
+		protected var _fullScreen:Boolean = false;
+		protected var _screenWidth:int = 0;
+		protected var _screenHeight:int = 0;
+		
 		private var _startTime:Number;
 		private var _gameTime:Number;
 		
@@ -68,6 +80,7 @@ package citrus.core {
 			_instance = this;
 			
 			onPlayingChange = new Signal(Boolean);
+			onStageResize = new Signal(int,int);
 			
 			//Set up console
 			_console = new Console(9); //Opens with tab key by default
@@ -99,6 +112,8 @@ package citrus.core {
 			
 			stage.removeEventListener(Event.ACTIVATE, handleStageActivated);
 			stage.removeEventListener(Event.DEACTIVATE, handleStageDeactivated);
+			stage.removeEventListener(FullScreenEvent.FULL_SCREEN, handleStageFullscreen);
+			stage.removeEventListener(Event.RESIZE, handleStageResize);
 			
 			removeEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
@@ -226,7 +241,43 @@ package citrus.core {
 			stage.addEventListener(Event.DEACTIVATE, handleStageDeactivated);
 			stage.addEventListener(Event.ACTIVATE, handleStageActivated);
 			
+			stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleStageFullscreen);
+			stage.addEventListener(Event.RESIZE, handleStageResize);
+			
+			_fullScreen = (stage.displayState == StageDisplayState.FULL_SCREEN || stage.displayState  == StageDisplayState.FULL_SCREEN_INTERACTIVE);
+			resetScreenSize();
+			
 			_input.initialize();
+		}
+		
+		protected function handleStageFullscreen(e:FullScreenEvent):void
+		{
+			_fullScreen = e.fullScreen;
+			resetScreenSize();
+		}
+		
+		protected function handleStageResize(e:Event):void
+		{
+			resetScreenSize();
+			onStageResize.dispatch(_screenWidth, _screenHeight);
+		}
+		
+		/**
+		 * on resize or fullscreen this is called and makes sure _screenWidth/_screenHeight is correct,
+		 * it can be overriden to update other values that depend on the values of _screenWidth/_screenHeight.
+		 */
+		protected function resetScreenSize():void
+		{	
+			if (_fullScreen)
+			{
+				_screenWidth = stage.fullScreenWidth;
+				_screenHeight = stage.fullScreenHeight;
+			}
+			else
+			{
+				_screenWidth = stage.stageWidth;
+				_screenHeight = stage.stageHeight;
+			}
 		}
 		
 		/**
@@ -279,6 +330,8 @@ package citrus.core {
 					_futureState.update(timeDelta);
 			}
 			
+			_input.citrus_internal::update();
+			
 		}
 		
 		protected function handleStageDeactivated(e:Event):void
@@ -288,12 +341,16 @@ package citrus.core {
 				playing = false;
 				stage.addEventListener(Event.ACTIVATE, handleStageActivated);
 			}
+			
+			sound.pauseAll();
 		}
 		
 		protected function handleStageActivated(e:Event):void
 		{
 			playing = true;
 			stage.removeEventListener(Event.ACTIVATE, handleStageActivated);
+			
+			sound.resumeAll();
 		}
 		
 		private function handleShowConsole():void
@@ -348,6 +405,32 @@ package citrus.core {
 				trace(objectName + " property:" + paramName + "=" + object[paramName]);	
 			else
 				trace("Warning: " + objectName + " has no parameter named " + paramName + ".");
+		}
+		
+		public function get fullScreen():Boolean
+		{
+			return _fullScreen;
+		}
+		
+		public function set fullScreen(value:Boolean):void
+		{
+			if (value == _fullScreen)
+				return;
+				
+			if(value)
+				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+			else
+				stage.displayState = StageDisplayState.NORMAL;
+		}
+		
+		public function get screenWidth():int
+		{
+			return _screenWidth;
+		}
+		
+		public function get screenHeight():int
+		{
+			return _screenHeight;
 		}
 	}
 }

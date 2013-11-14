@@ -35,14 +35,6 @@ package citrus.input.controllers {
 		public function AVirtualJoystick(name:String, params:Object = null)
 		{
 			super(name, params);
-			
-			_innerradius = _radius - _knobradius;
-			
-			_x = _x ? _x : 2*_innerradius;
-			_y = _y ? _y : _ce.stage.stageHeight - 2*_innerradius;
-			
-			initActionRanges();
-			initGraphics();
 		}
 		
 		/**
@@ -153,9 +145,9 @@ package citrus.input.controllers {
 			
 			// Check registered actions on both axes
 			
-			if ((_xAxis >= -0.01 && _xAxis <= 0.01) || (_yAxis >= -0.01 && _yAxis <= 0.01))
+			if ((_xAxis >= -0.1 && _xAxis <= 0.1) || (_yAxis >= -0.1 && _yAxis <= 0.1))
 				//threshold of Axis values where no actions will be fired // actions will turned off.
-				triggerAllOFF();
+				_input.stopActionsOf(this);
 			else
 			{
 				var a:Object; //action 
@@ -168,7 +160,7 @@ package citrus.input.controllers {
 						ratio = 1 / (a.end - a.start);
 						val = _xAxis <0 ? 1 - Math.abs((_xAxis - a.start)*ratio) : Math.abs((_xAxis - a.start) * ratio);
 						if ((_xAxis >= a.start) && (_xAxis <= a.end))
-							triggerVALUECHANGE(a.name, val);
+							triggerCHANGE(a.name, val);
 						else
 							triggerOFF(a.name, 0);
 					}
@@ -179,23 +171,12 @@ package citrus.input.controllers {
 						ratio = 1 / (a.start - a.end);
 						val = _yAxis <0 ? Math.abs((_yAxis - a.end)*ratio) : 1 - Math.abs((_yAxis - a.end) * ratio);
 						if ((_yAxis >= a.start) && (_yAxis <= a.end))
-							triggerVALUECHANGE(a.name, val);
+							triggerCHANGE(a.name, val);
 						else
 							triggerOFF(a.name, 0);
 					}
 				
 			}
-		}
-		
-		protected function triggerAllOFF():void
-		{
-			var a:Object;
-			if (_xAxisActions.length > 0)
-				for each (a in _xAxisActions)
-					triggerOFF(a.name);
-			if (_yAxisActions.length > 0)
-				for each (a in _yAxisActions)
-					triggerOFF(a.name);
 		}
 		
 		protected function reset():void
@@ -204,7 +185,7 @@ package citrus.input.controllers {
 			_knobY = 0;
 			_xAxis = 0;
 			_yAxis = 0;
-			triggerAllOFF();
+			_input.stopActionsOf(this);
 		}
 		
 		public function set radius(value:int):void

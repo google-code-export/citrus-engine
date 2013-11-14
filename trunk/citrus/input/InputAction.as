@@ -10,48 +10,22 @@ package citrus.input
 		private var _name:String;
 		private var _controller:InputController;
 		private var _channel:uint;
+		private var _time:uint = 0;
 		
-		//variable properties
-		public var value:Number;
-		public var phase:uint;
+		internal var _value:Number;
+		internal var _message:String;
+		internal var _phase:uint;
 		
-		/**
-		 * Action started in this frame.
-		 * will be advanced to BEGAN on next frame.
-		 */
-		public static const BEGIN:uint = 0;
-		
-		/**
-		 * Action started in previous frame and hasn't changed value.
-		 * will be advanced to ON on next frame.
-		 */
-		public static const BEGAN:uint = 1;
-		
-		/**
-		 * The "stable" phase, action began, its value may have been changed by the VALUECHANGE trigger.
-		 * an action with this phase can only be advanced by an OFF trigger, to phase END.
-		 */
-		public static const ON:uint = 2;
-		
-		/**
-		 * Action has been triggered OFF in the current frame.
-		 * will be advanced to ENDED on next frame.
-		 */
-		public static const END:uint = 3;
-		
-		/**
-		 * Action has been triggered OFF in the previous frame, and will be disposed of in this frame.
-		 */
-		public static const ENDED:uint = 4;
-		
-		public function InputAction(name:String, controller:InputController, channel:uint = 0, value:Number = 0, phase:uint = 0)
+		public function InputAction(name:String, controller:InputController, channel:uint = 0, value:Number = 0, message:String = null, phase:uint = 0, time:uint = 0)
 		{
 			_name = name;
 			_controller = controller;
 			_channel = channel;
 			
-			this.value = value;
-			this.phase = phase;
+			_value = value;
+			_message = message;
+			_phase = phase;
+			_time = time;
 		}
 		
 		/**
@@ -59,7 +33,7 @@ package citrus.input
 		 */
 		public function clone():InputAction
 		{
-			return new InputAction(_name, _controller,_channel, value, phase);
+			return InputAction.create(_name, _controller,_channel , _value, _message, _phase, _time);
 		}
 		
 		/**
@@ -82,12 +56,98 @@ package citrus.input
 		
 		public function toString():String
 		{
-			return "[ Action # name: " + _name + " channel: " + _channel + " value: " + value + " phase: " + phase + " controller: " + _controller + " ]";
+			return "\n[ Action # name: " + _name + " channel: " + _channel + " value: " + _value + " phase: " + _phase + " controller: " + _controller + " time: " + _time + " ]";
 		}
 		
 		public function get name():String { return _name; }
+		/**
+		 * InputController that triggered this action
+		 */
 		public function get controller():InputController { return _controller; }
+		/**
+		 * action channel id.
+		 */
 		public function get channel():uint { return _channel; }
+		/**
+		 * time (in frames) the action has been 'running' in the Input system.
+		 */
+		public function get time():uint { return _time; }
+		
+		/**
+		 * value the action carries
+		 */
+		public function get value():Number { return _value; }
+		
+		/**
+		 * message the action carries
+		 */
+		public function get message():String { return _message;  }
+		
+		/**
+		 * action phase
+		 */
+		public function get phase():Number { return _phase; }
+		
+		/**
+		 * internal utiliy to keep public time read only 
+		 */
+		internal function get itime():uint { return _time; }
+		internal function set itime(val:uint):void { _time = val; }
+		
+		
+		
+		 // ------------ InputAction Pooling
+		
+		 /**
+		  * list of disposed InputActions. automatically disposed when they end in Input.as
+		  */
+		internal static var disposed:Vector.<InputAction> = new Vector.<InputAction>();
+		
+		/**
+		 * creates an InputAction either from a disposed InputAction object or a new one.
+		 */
+		public static function create(name:String, controller:InputController, channel:uint = 0, value:Number = 0, message:String = null, phase:uint = 0, time:uint = 0):InputAction
+		{
+			if (disposed.length > 0)
+				return disposed.pop().setTo(name, controller, channel, value, message, phase, time);
+			else
+				return new InputAction(name,controller,channel,value,message,phase,time);
+		}
+		
+		/**
+		 * clear the list of disposed InputActions.
+		 */
+		public static function clearDisposed():void
+		{
+			disposed.length = 0;
+		}
+		
+		/**
+		 * set all InputActions's properties (internal for recycling)
+		 */
+		internal function setTo(name:String, controller:InputController, channel:uint = 0, value:Number = 0, message:String = null, phase:uint = 0, time:uint = 0):InputAction
+		{
+			_name = name;
+			_controller = controller;
+			_channel = channel;
+			_value = value;
+			_message = message;
+			_phase = phase;
+			_time = time;
+			return this;
+		}
+		
+		public function dispose():void
+		{
+			_controller = null;
+			
+			var a:InputAction;
+			for each(a in disposed)
+				if (this == a)
+					return;
+					
+			disposed.push(this);
+		}
 	
 	}
 

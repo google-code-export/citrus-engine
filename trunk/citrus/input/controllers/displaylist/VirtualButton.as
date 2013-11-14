@@ -18,6 +18,10 @@ package citrus.input.controllers.displaylist {
 		{
 			graphic = new Sprite();
 			super(name, params);
+			_x = _x ? _x : _ce.stage.stageWidth - (_margin + 3*_buttonradius) ;
+			_y = _y ? _y : _ce.stage.stageHeight - 3*_buttonradius;
+			
+			initGraphics();
 		}
 		
 		override protected function initGraphics():void
@@ -61,7 +65,7 @@ package citrus.input.controllers.displaylist {
 			
 			if (e.type == MouseEvent.MOUSE_DOWN && button == e.target.parent)
 			{
-				triggerON(buttonAction, 1, buttonChannel);
+				triggerON(buttonAction, 1, null, buttonChannel);
 				button.removeChildAt(0);
 				button.addChild(buttonDownGraphic);					
 				
@@ -70,7 +74,7 @@ package citrus.input.controllers.displaylist {
 			
 			if (e.type == MouseEvent.MOUSE_UP && button == e.target.parent)
 			{
-				triggerOFF(buttonAction, 0, buttonChannel);
+				triggerOFF(buttonAction, 0, null, buttonChannel);
 				button.removeChildAt(0);
 				button.addChild(buttonUpGraphic);
 				

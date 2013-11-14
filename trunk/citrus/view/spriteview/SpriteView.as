@@ -1,5 +1,6 @@
 package citrus.view.spriteview {
 
+	import citrus.physics.APhysicsEngine;
 	import citrus.view.ACitrusView;
 	import citrus.view.ISpriteView;
 
@@ -38,7 +39,8 @@ package citrus.view.spriteview {
 		{
 			super.update(timeDelta);
 			
-			camera.update();
+			if(camera.enabled)
+				camera.update();
 			
 			//Update art positions
 			for each (var sprite:SpriteArt in _viewObjects)
@@ -57,6 +59,9 @@ package citrus.view.spriteview {
 		{
 			var viewObject:ISpriteView = citrusObject as ISpriteView;
 			
+			if (citrusObject is APhysicsEngine)
+				citrusObject.view = SpritePhysicsDebugView;
+				
 			var art:SpriteArt = new SpriteArt(viewObject);
 			
 			//Perform an initial update

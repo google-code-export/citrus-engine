@@ -7,6 +7,7 @@ package citrus.objects
 	import citrus.datastructures.PoolObject;
 	import citrus.view.ACitrusView;
 	import citrus.view.ICitrusArt;
+	import flash.utils.describeType;
 	
 	public class Box2DObjectPool extends PoolObject
 	{		
@@ -18,11 +19,7 @@ package citrus.objects
 		{
 			super(pooledType, defaultParams, poolGrowthRate, true);
 			
-			//test if defined pooledType class inherits from Box2DPhysicsObject
-			var test:Object;
-			if ((test = new pooledType("test")) is Box2DPhysicsObject)
-			{ test.kill = true; test = null; }
-			else
+			if (!(describeType(pooledType).factory.extendsClass.(@type == "citrus.objects::Box2DPhysicsObject").length() > 0))
 				throw new Error("Box2DPoolObject: " + String(pooledType) + " is not a Box2DPhysicsObject");
 			
 			if(!activationQueue)
@@ -54,8 +51,8 @@ package citrus.objects
 			bp.initialize(params);
 			onCreate.dispatch(bp, params);
 			bp.addPhysics();
+			bp.body.SetActive(false);
 			stateView.addArt(bp);
-			
 			bp.citrus_internal::data["updateCall"] = bp.updateCallEnabled;
 			bp.citrus_internal::data["updateArt"] = (stateView.getArt(bp) as ICitrusArt).updateArtEnabled;
 		}
@@ -75,6 +72,7 @@ package citrus.objects
 		
 		override protected function _dispose(node:DoublyLinkedListNode):void
 		{
+			trace("DISPOSED");
 			var bp:Box2DPhysicsObject = node.data as Box2DPhysicsObject;
 			activationQueue.unshift( { object:bp, activate:false } );
 			if ("pauseAnimation" in bp.view)
@@ -96,7 +94,7 @@ package citrus.objects
 		{
 			var entry:Object;
 			
-			while(entry = activationQueue.pop())
+			while((entry = activationQueue.pop()) != null)
 				entry.object.body.SetActive(entry.activate);
 			
 		}

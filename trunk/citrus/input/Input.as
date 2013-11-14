@@ -1,36 +1,44 @@
 package citrus.input {
 
+	import citrus.core.citrus_internal;
 	import citrus.core.CitrusEngine;
 	import citrus.input.controllers.Keyboard;
 
 	import org.osflash.signals.Signal;
-
-	import flash.events.Event;
 	
 	/**
 	 * A class managing input of any controllers that is an InputController.
 	 * Actions are inspired by Midi signals, but they carry an InputAction object.
-	 * "action signals" are either ON, OFF, or VALUECHANGE.
+	 * "action signals" are either ON, OFF, or CHANGE.
 	 * to track action status, and check whether action was just triggered or is still on,
 	 * actions have phases (see InputAction).
 	 **/	
 	public class Input
 	{
 		protected var _ce:CitrusEngine;
+		protected var _timeActive:int = 0;
 		protected var _enabled:Boolean = true;
 		protected var _initialized:Boolean;
 		
 		protected var _controllers:Vector.<InputController>;
 		protected var _actions:Vector.<InputAction>;
 		
+		/**
+		 * time interval to clear the InputAction's disposed list automatically.
+		 */
+		public var clearDisposedActionsInterval:uint = 480;
+		
+		/**
+		 * Lets InputControllers trigger actions.
+		 */
 		public var triggersEnabled:Boolean = true;
 		
 		protected var _routeActions:Boolean = false;
 		protected var _routeChannel:uint;
 		
-		public var actionTriggeredON:Signal;
-		public var actionTriggeredOFF:Signal;
-		public var actionTriggeredVALUECHANGE:Signal;
+		internal var actionON:Signal;
+		internal var actionOFF:Signal;
+		internal var actionCHANGE:Signal;
 		
 		//easy access to the default keyboard
 		public var keyboard:Keyboard;
@@ -40,13 +48,13 @@ package citrus.input {
 			_controllers = new Vector.<InputController>();
 			_actions = new Vector.<InputAction>();
 			
-			actionTriggeredON = new Signal();
-			actionTriggeredOFF = new Signal();
-			actionTriggeredVALUECHANGE = new Signal();
+			actionON = new Signal(InputAction);
+			actionOFF = new Signal(InputAction);
+			actionCHANGE = new Signal(InputAction);
 			
-			actionTriggeredON.add(doActionON);
-			actionTriggeredOFF.add(doActionOFF);
-			actionTriggeredVALUECHANGE.add(doActionVALUECHANGE);
+			actionON.add(doActionON);
+			actionOFF.add(doActionOFF);
+			actionCHANGE.add(doActionCHANGE);
 			
 			_ce = CitrusEngine.getInstance();
 		}
@@ -55,8 +63,6 @@ package citrus.input {
 		{
 			if (_initialized)
 				return;
-				
-			_ce.stage.addEventListener(Event.FRAME_CONSTRUCTED, update);
 			
 			//default keyboard
 			keyboard = new Keyboard("keyboard");
@@ -96,65 +102,109 @@ package citrus.input {
 		}
 		
 		/**
-		 * Returns true if the action has been triggered OFF in this frame or in the previous frame.
+		 * Returns the corresponding InputAction object if it has been triggered OFF in this frame or in the previous frame,
+		 * or null.
 		 */
-		public function hasDone(actionName:String, channel:uint = 0):Boolean
+		public function hasDone(actionName:String, channel:int = -1):InputAction
 		{
 			var a:InputAction;
 			for each (a in _actions)
-				if (a.name == actionName && (_routeActions ? (_routeChannel == channel) : a.channel == channel) && a.phase > InputAction.END)
-					return true;
-			return false;
+				if (a.name == actionName && (channel > -1 ? (_routeActions ? (_routeChannel == channel) : a.channel == channel) : true ) && a.phase == InputPhase.END)
+					return a;
+			return null;
 		}
 		
 		/**
-		 * Returns true if action has just been triggered, or is still on.
+		 * Returns the corresponding InputAction object if it has been triggered on the previous frame or is still going,
+		 * or null.
 		 */
-		public function isDoing(actionName:String, channel:uint = 0):Boolean
+		public function isDoing(actionName:String, channel:int = -1):InputAction
 		{
 			var a:InputAction;
 			for each (a in _actions)
-				if (a.name == actionName && (_routeActions ? (_routeChannel == channel) : a.channel == channel) && a.phase < InputAction.END)
-					return true;
-			return false;
+				if (a.name == actionName && (channel > -1 ? (_routeActions ? (_routeChannel == channel) : a.channel == channel) : true ) && a.time > 1 && a.phase < InputPhase.END)
+					return a;
+			return null;
 		}
 		
 		/**
-		 * Returns true if action has been triggered in this frame.
+		 * Returns the corresponding InputAction object if it has been triggered on the previous frame.
 		 */
-		public function justDid(actionName:String, channel:uint = 0):Boolean
+		public function justDid(actionName:String, channel:int = -1):InputAction
 		{
 			var a:InputAction;
 			for each (a in _actions)
-				if (a.name == actionName && (_routeActions ? (_routeChannel == channel) : a.channel == channel) && a.phase == InputAction.BEGAN)
-					return true;
-			return false;
+				if (a.name == actionName && (channel > -1 ? (_routeActions ? (_routeChannel == channel) : a.channel == channel) : true ) && a.time == 1)
+					return a;
+			return null;
 		}
 		
 		/**
-		 * Call this right after justDid, isDoing or hasDone to get the action's value in the current frame.
+		 * get an action by name from the current 'active' actions , optionnally filtered by channel, controller or phase.
+		 * returns null if no actions are found.
+		 * 
+		 * example :
+		 * <code>
+		 * var action:InputAction = _ce.input.getAction("jump",-1,null,InputPhase.ON);
+		 * if(action &amp;&amp; action.time > 120)
+		 *    trace("the jump action lasted for more than 120 frames. its value is",action.value);
+		 * </code>
+		 * 
+		 * keep doing the jump action for about 2 seconds (if running at 60 fps) and you'll see the trace.
+		 * @param	name
+		 * @param	channel -1 to include all channels.
+		 * @param	controller null to include all controllers.
+		 * @param	phase -1 to include all phases.
+		 * @return	InputAction
 		 */
-		public function getActionValue(actionName:String, channel:uint = 0):Number
+		public function getAction(name:String, channel:int = -1, controller:InputController = null, phase:int = - 1):InputAction
 		{
 			var a:InputAction;
 			for each (a in _actions)
-				if (actionName == a.name && (_routeActions ? (_routeChannel == channel) : a.channel == channel) && a.value)
-					return a.value;
-			return 0;
+				if (name == a.name && (channel == -1 ? true : (_routeActions ? (_routeChannel == channel) : a.channel == channel) ) && (controller != null ? a.controller == controller : true ) && (phase == -1 ? true : a.phase == phase ) )
+					return a;
+			return null;	
+		}
+		
+		/**
+		 * Returns a list of active actions, optionnally filtered by channel, controller or phase.
+		 * return an empty Vector.&lt;InputAction&gt; if no actions are found.
+		 * 
+		 * @param	channel -1 to include all channels.
+		 * @param	controller null to include all controllers.
+		 * @param	phase -1 to include all phases.
+		 * @return
+		 */
+		public function getActions(channel:int = -1, controller:InputController = null, phase:int = - 1):Vector.<InputAction>
+		{
+			var actions:Vector.<InputAction> = new Vector.<InputAction>;
+			var a:InputAction;
+			for each (a in _actions)
+				if ( (channel == -1 ? true : (_routeActions ? (_routeChannel == channel) : a.channel == channel)) && (controller != null ? a.controller == controller : true ) && (phase == -1 ? true : a.phase == phase ) )
+					actions.push(a)
+			return actions;
 		}
 		
 		/**
 		 * Adds a new action of phase 0 if it does not exist.
 		 */
-		private function doActionON(action:InputAction):void
+		internal function doActionON(action:InputAction):void
 		{
 			if (!triggersEnabled)
+			{
+				action.dispose();
 				return;
+			}
 			var a:InputAction;
+			
 			for each (a in _actions)
-				if (a.eq(action))
-					return;
-			action.phase = InputAction.BEGIN;
+			if (a.eq(action))
+			{
+				a._phase = InputPhase.BEGIN;
+				action.dispose();
+				return;
+			}
+			action._phase = InputPhase.BEGIN;
 			_actions[_actions.length] = action;
 		}
 		
@@ -162,42 +212,52 @@ package citrus.input {
 		 * Sets action to phase 3. will be advanced to phase 4 in next update, and finally will be removed
 		 * on the update after that.
 		 */
-		private function doActionOFF(action:InputAction):void
+		internal function doActionOFF(action:InputAction):void
 		{
 			if (!triggersEnabled)
+			{
+				action.dispose();
 				return;
-				
+			}
 			var a:InputAction;
 			for each (a in _actions)
 				if (a.eq(action))
 				{
-					a.phase = InputAction.END;
+					a._phase = InputPhase.END;
+					a._value = action._value;
+					a._message = action._message;
+					action.dispose();
 					return;
 				}
 		}
 		
 		/**
 		 * Changes the value property of an action, or adds action to list if it doesn't exist.
-		 * a continuous controller, can simply trigger ActionVALUECHANGE and never have to trigger ActionON.
+		 * a continuous controller, can simply trigger ActionCHANGE and never have to trigger ActionON.
 		 * this will take care adding the new action to the list, setting its phase to 0 so it will respond
 		 * to justDid, and then only the value will be changed. - however your continous controller DOES have
 		 * to end the action by triggering ActionOFF.
 		 */
-		private function doActionVALUECHANGE(action:InputAction):void
+		internal function doActionCHANGE(action:InputAction):void
 		{
 			if (!triggersEnabled)
+			{
+				action.dispose();
 				return;
+			}
 			var a:InputAction;
 			for each (a in _actions)
 			{
 				if (a.eq(action))
 				{
-					a.phase = InputAction.ON;
-					a.value = action.value;
+					a._phase = InputPhase.ON;
+					a._value = action._value;
+					a._message = action._message;
+					action.dispose();
 					return;
 				}
 			}
-			action.phase = InputAction.BEGIN;
+			action._phase = InputPhase.BEGIN;
 			_actions[_actions.length] = action;
 		}
 		
@@ -208,42 +268,61 @@ package citrus.input {
 		 * advances actions phases by one if not phase 2 (phase two can only be voluntarily advanced by
 		 * doActionOFF.) and removes actions of phase 4 (this happens one frame after doActionOFF was called.)
 		 */
-		protected function update(e:Event):void
+		citrus_internal function update():void
 		{
+			if (InputAction.disposed.length > 0 && _timeActive % clearDisposedActionsInterval == 0)
+				InputAction.clearDisposed();
+			_timeActive++;
+			
 			if (!_enabled)
 				return;
 			
 			var c:InputController;
 			for each (c in _controllers)
 			{
-				if (c.enabled)
+				if (c.updateEnabled && c.enabled)
 					c.update();
 			}
 			
 			var i:String;
 			for (i in _actions)
 			{
-				if (_actions[i].phase > InputAction.END)
+				InputAction(_actions[i]).itime++;
+				if (_actions[i].phase > InputPhase.END)
+				{
+					_actions[i].dispose();
 					_actions.splice(uint(i), 1);
-				else if (_actions[i].phase !== InputAction.ON)
-					_actions[i].phase++;
+				}
+				else if (_actions[i].phase !== InputPhase.ON)
+					_actions[i]._phase++;
 			}
 		
+			
 		}
 		
 		public function removeController(controller:InputController):void
 		{
 			var i:int = _controllers.lastIndexOf(controller);
-			removeActionsOf(controller);
+			stopActionsOf(controller);
 			_controllers.splice(i, 1);
 		}
 		
-		public function removeActionsOf(controller:InputController):void
+		public function stopActionsOf(controller:InputController,channel:int = -1):void
 		{
-			var i:String;
-			for (i in _actions)
-				if (_actions[i].controller == controller)
-					_actions.splice(uint(i), 1);
+			var action:InputAction;
+			for each(action in _actions)
+			{
+				if (action.controller != controller)
+					continue;
+					
+				if (channel > -1)
+				{
+					if (action.channel == channel) 
+						action._phase = InputPhase.ENDED;
+				}
+				else
+					action._phase = InputPhase.ENDED;
+			}
 		}
 		
 		public function resetActions():void
@@ -262,8 +341,8 @@ package citrus.input {
 			{
 				if (a.eq(action))
 				{
-					a.phase = action.phase;
-					a.value = action.value;
+					a._phase = action.phase;
+					a._value = action.value;
 					return;
 				}
 			}
@@ -271,15 +350,16 @@ package citrus.input {
 		}
 		
 		/**
-		 *  getActionsSnapshot returns a Vector of all actions in current frame.
+		 * returns a Vector of all actions in current frame.
+		 * actions are cloned (no longer active inside the input system) 
+		 * as opposed to using getActions().
 		 */
-		public function getActionsSnapshot():Vector.<Object>
+		public function getActionsSnapshot():Vector.<InputAction>
 		{
-			var snapshot:Vector.<Object> = new Vector.<Object>;
-			for each (var a:InputAction in _actions)
-			{
-				snapshot.push(new InputAction(a.name, a.controller, a.channel, a.value, a.phase));
-			}
+			var snapshot:Vector.<InputAction> = new Vector.<InputAction>;
+			var a:InputAction;
+			for each (a in _actions)
+				snapshot.push(a.clone());
 			return snapshot;
 		}
 		
@@ -340,67 +420,12 @@ package citrus.input {
 		{
 			destroyControllers();
 			
-			actionTriggeredON.removeAll();
-			actionTriggeredOFF.removeAll();
-			actionTriggeredVALUECHANGE.removeAll();
+			actionON.removeAll();
+			actionOFF.removeAll();
+			actionCHANGE.removeAll();
 			
-			_ce.stage.removeEventListener(Event.FRAME_CONSTRUCTED,update);
-		}
-		
-		/**
-		 * Limited backwards compatibilty for the deprecated justPressed method.
-		 * /!\ only works with default key actions defined in the default keyboard instance
-		 * (up, down, right, left, up, spacebar)
-		 * ultimately, you'll have to convert to the new system :)
-		 */
-		public function justPressed(keyCode:uint):Boolean
-		{
-			var keyboard:Keyboard = getControllerByName("keyboard") as Keyboard;
-			var actions:Vector.<Object> = keyboard.getActionsByKey(keyCode);
-			var a:Object;
-			var ia:InputAction;
-			if (actions)
-			{
-				for each (a in actions)
-					for each (ia in _actions)
-						if (ia.name == a.name && (_routeActions ? (_routeChannel == ((a.channel<0)?keyboard.defaultChannel:a.channel)) : ia.channel == ((a.channel<0)?keyboard.defaultChannel:a.channel)) && ia.phase == InputAction.BEGIN)
-							return true;
-				return false;
-			}
-			else
-			{
-				trace("Warning: you are still using justPressed(keyCode:int) for keyboard input and might get unexpected results...");
-				trace("Please use the new justDid(actionName:String, channel:uint) method and convert your code to the Input/InputController Action system !");
-				return false;
-			}
-		}
-		
-		/**
-		 * Limited backwards compatibilty for the deprecated isDown method.
-		 * /!\ only works with default key actions defined in the default keyboard instance
-		 * (up, down, right, left, up, spacebar)
-		 * ultimately, you'll have to convert to the new system :)
-		 */
-		public function isDown(keyCode:uint):Boolean
-		{
-			var keyboard:Keyboard = getControllerByName("keyboard") as Keyboard;
-			var actions:Vector.<Object> = keyboard.getActionsByKey(keyCode);
-			var a:Object;
-			var ia:InputAction;
-			if (actions)
-			{
-				for each (a in actions)
-					for each (ia in _actions)
-						if (ia.name == a.name && (_routeActions ? (_routeChannel == ((a.channel<0)?keyboard.defaultChannel:a.channel)) : ia.channel == ((a.channel<0)?keyboard.defaultChannel:a.channel)) && ia.phase < InputAction.ON)
-							return true;
-				return false;
-			}
-			else
-			{
-				trace("Warning: you are still using isDown(keyCode:int) for keyboard input and might get unexpected results...");
-				trace("Please use the new isDoing(actionName:String, channel:uint) method and convert your code to the Input/InputController Action system !");
-				return false;
-			}
+			resetActions();
+			InputAction.clearDisposed();
 		}
 	
 	}

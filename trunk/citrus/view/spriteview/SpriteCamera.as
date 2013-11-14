@@ -19,7 +19,7 @@ package citrus.view.spriteview {
 		override protected function initialize():void {
 			super.initialize();
 			
-			_aabbData = MathUtils.createAABBData(0, 0, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale, _camProxy.rotation);
+			_aabbData = MathUtils.createAABBData(0, 0, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale, _camProxy.rotation, _aabbData);
 		}
 		
 		/**
@@ -34,7 +34,8 @@ package citrus.view.spriteview {
 				throw(new Error(this+"is not allowed to zoom. please set allowZoom to true."));
 		}
 		
-		override public function zoomFit(width:Number,height:Number):Number
+		
+		override public function zoomFit(width:Number,height:Number,storeInBaseZoom:Boolean = false):Number
 		{
 			if (_allowZoom)
 			{
@@ -43,7 +44,15 @@ package citrus.view.spriteview {
 					ratio = cameraLensWidth / width;
 				else
 					ratio = cameraLensHeight / height;
-				return _zoom = ratio;
+				
+				if (storeInBaseZoom)
+				{
+					baseZoom = ratio;
+					_zoom = 1;
+					return ratio;
+				}
+				else
+					return _zoom = ratio;
 			}
 			else
 				throw(new Error(this+" is not allowed to zoom. please set allowZoom to true."));
@@ -105,26 +114,26 @@ package citrus.view.spriteview {
 			if (!_allowZoom && !_allowRotation)
 			{
 				_aabbData.offsetX = _aabbData.offsetY = 0;
-				_aabbData.rect = new Rectangle(_ghostTarget.x, _ghostTarget.y, cameraLensWidth, cameraLensHeight);
+				_aabbData.rect.setTo(_ghostTarget.x, _ghostTarget.y, cameraLensWidth, cameraLensHeight);
 				return;
 			}
 			
 			if (_allowZoom && !_allowRotation)
 			{
 				_aabbData.offsetX = _aabbData.offsetY = 0;
-				_aabbData.rect = new Rectangle(_ghostTarget.x, _ghostTarget.y, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale);
+				_aabbData.rect.setTo(_ghostTarget.x, _ghostTarget.y, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale);
 				return;
 			}
 			
 			if (_allowRotation && _allowZoom)
 			{
-				_aabbData = MathUtils.createAABBData(_ghostTarget.x , _ghostTarget.y, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale, - _camProxy.rotation);
+				_aabbData = MathUtils.createAABBData(_ghostTarget.x , _ghostTarget.y, cameraLensWidth / _camProxy.scale, cameraLensHeight / _camProxy.scale, - _camProxy.rotation, _aabbData);
 				return;
 			}
 		
 			if (!_allowZoom && _allowRotation)
 			{
-				_aabbData = MathUtils.createAABBData(_ghostTarget.x , _ghostTarget.y, cameraLensWidth, cameraLensHeight, - _camProxy.rotation);
+				_aabbData = MathUtils.createAABBData(_ghostTarget.x , _ghostTarget.y, cameraLensWidth, cameraLensHeight, - _camProxy.rotation, _aabbData);
 				return;
 			}
 		}
@@ -133,18 +142,18 @@ package citrus.view.spriteview {
 			
 			super.update();
 			
+			offset.setTo(cameraLensWidth * center.x, cameraLensHeight * center.y);
+			
 			if (_target && followTarget)
 			{
-				_targetPos.x = _target.x;
-				_targetPos.y = _target.y;
+				if (_target.x <= camPos.x - (deadZone.width * .5) / _camProxy.scale || _target.x >= camPos.x + (deadZone.width * .5) / _camProxy.scale )
+					_targetPos.x = _target.x;			
 				
-				var diffX:Number = _targetPos.x - _ghostTarget.x;
-				var diffY:Number = _targetPos.y - _ghostTarget.y;
-				var velocityX:Number = diffX * easing.x;
-				var velocityY:Number = diffY * easing.y;
-				
-				_ghostTarget.x += velocityX;
-				_ghostTarget.y += velocityY;
+				if (_target.y <= camPos.y - (deadZone.height * .5) / _camProxy.scale || _target.y >= camPos.y + (deadZone.height * .5) / _camProxy.scale)
+					_targetPos.y = _target.y;				
+					
+				_ghostTarget.x += (_targetPos.x - _ghostTarget.x) * easing.x;
+				_ghostTarget.y += (_targetPos.y - _ghostTarget.y) * easing.y;
 				
 			}
 			else if (_manualPosition)
@@ -154,20 +163,14 @@ package citrus.view.spriteview {
 			}
 			
 			if (_allowRotation)
-			{
-				var diffRot:Number = _rotation - _camProxy.rotation;
-				var velocityRot:Number = diffRot * rotationEasing;
-				_camProxy.rotation += velocityRot;
-			}
+				_camProxy.rotation += (_rotation - _camProxy.rotation) * rotationEasing;
 			
 			resetAABBData();
 			
 			if (_allowZoom)
 			{
 
-				var diffZoom:Number = mzoom - _camProxy.scale;
-				var velocityZoom:Number = diffZoom * zoomEasing;
-				_camProxy.scale += velocityZoom;
+				_camProxy.scale += (mzoom - _camProxy.scale) * zoomEasing;
 				
 				if (bounds && (boundsMode == BOUNDS_MODE_AABB || boundsMode == BOUNDS_MODE_ADVANCED) )
 				{
@@ -185,13 +188,13 @@ package citrus.view.spriteview {
 			_camProxy.x = ghostTarget.x;
 			_camProxy.y = ghostTarget.y;
 			
+			MathUtils.rotatePoint(offset.x/_camProxy.scale, offset.y/_camProxy.scale, _camProxy.rotation, _b.rotoffset);
+			
 			if ( bounds )
 			{
 				if (boundsMode == BOUNDS_MODE_AABB)
 				{
 
-					MathUtils.rotatePoint(offset.x/_camProxy.scale, offset.y/_camProxy.scale, _camProxy.rotation, _b.rotoffset);
-					
 					_b.w2 = (_aabbData.rect.width - _b.rotoffset.x) + _aabbData.offsetX;
 					_b.h2 = (_aabbData.rect.height - _b.rotoffset.y) + _aabbData.offsetY;
 					
@@ -259,6 +262,9 @@ package citrus.view.spriteview {
 				_camProxy.offset.x *= -1;
 				_camProxy.offset.y *= -1;
 			}
+			
+			_aabbData.rect.x = _camProxy.x + _aabbData.offsetX - _b.rotoffset.x;
+			_aabbData.rect.y = _camProxy.y + _aabbData.offsetY - _b.rotoffset.y;
 			
 			//reset matrix
 			_m.identity();

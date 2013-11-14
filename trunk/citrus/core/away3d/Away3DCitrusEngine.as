@@ -19,24 +19,18 @@ package citrus.core.away3d {
 	public class Away3DCitrusEngine extends CitrusEngine {
 		
 		protected var _away3D:View3D;
+		
+		protected var _antiAliasing:Number = 1;
+		protected var _enableDepthAndStencil:Boolean = false;
 
 		public function Away3DCitrusEngine() {
 			
 			super();
 		}
-		
-		override protected function handleAddedToStage(e:Event):void 
-		{
-			super.handleAddedToStage(e);
-			stage.addEventListener(Event.RESIZE, _onResize);
-		}
 
 		override public function destroy():void {
-			
-			stage.removeEventListener(Event.RESIZE, _onResize);
-			
 			if (_away3D.stage3DProxy)				
-				_away3D.stage3DProxy.addEventListener(Event.ENTER_FRAME, handleEnterFrame);
+				_away3D.stage3DProxy.removeEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
 			super.destroy();
 		}
@@ -51,7 +45,7 @@ package citrus.core.away3d {
 		public function setUpAway3D(debugMode:Boolean = false, antiAliasing:uint = 4, scene3D:Scene3D = null, stage3DProxy:Stage3DProxy = null):void {
 			
 			_away3D = new View3D(scene3D);
-			_away3D.antiAlias = antiAliasing;
+			_away3D.antiAlias = _antiAliasing = antiAliasing;
 			
 			if (stage3DProxy) {
 				_away3D.stage3DProxy = stage3DProxy;
@@ -128,10 +122,14 @@ package citrus.core.away3d {
 			super.handleEnterFrame(e);
 		}
 		
-		protected function _onResize(evt:Event):void {
-			
-			_away3D.width = stage.stageWidth;
-			_away3D.height = stage.stageHeight;
+		override protected function handleStageResize(evt:Event):void {
+			super.handleStageResize(evt);
+			if (_away3D)
+			{
+				_away3D.stage3DProxy.configureBackBuffer(stage.stageWidth, stage.stageHeight, _antiAliasing, _enableDepthAndStencil);
+				_away3D.stage3DProxy.viewPort.width = _away3D.width = stage.stageWidth;
+				_away3D.stage3DProxy.viewPort.height = _away3D.height = stage.stageHeight;
+			}
 		}
 
 	}

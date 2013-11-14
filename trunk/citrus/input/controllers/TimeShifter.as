@@ -85,6 +85,8 @@ package citrus.input.controllers {
 		public function TimeShifter(bufferInSeconds:uint)
 		{
 			super("TimeShifter Controller");
+			_updateEnabled = true;
+			
 			defaultChannel = 16;
 			
 			_maxBufferLength = bufferInSeconds * _ce.stage.frameRate;
@@ -214,7 +216,7 @@ package citrus.input.controllers {
 			var obj:Object;
 			var continuous:Object;
 			var discrete:Object;
-			var abuff:Vector.<Object> = _input.getActionsSnapshot();
+			var abuff:Vector.<InputAction> = _input.getActionsSnapshot();
 			var wbuff:Vector.<Object> = new Vector.<Object>();
 			var ic:Object;
 			var id:Object;

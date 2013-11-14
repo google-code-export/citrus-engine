@@ -1,10 +1,9 @@
 package citrus.objects {
 
-	import citrus.physics.PhysicsCollisionCategories;
 	import citrus.physics.nape.INapePhysicsObject;
 	import citrus.physics.nape.Nape;
+	import citrus.physics.PhysicsCollisionCategories;
 	import citrus.view.ISpriteView;
-
 	import nape.callbacks.CbType;
 	import nape.callbacks.InteractionCallback;
 	import nape.callbacks.PreCallback;
@@ -21,6 +20,7 @@ package citrus.objects {
 	import nape.shape.Polygon;
 	import nape.shape.Shape;
 	import nape.shape.ValidationResult;
+
 
 	/**
 	 * You should extend this class to take advantage of Nape. This class provides template methods for defining
@@ -83,6 +83,9 @@ package citrus.objects {
 		override public function destroy():void {
 			
 			_nape.space.bodies.remove(_body);
+			//_nape = null;
+			
+			//_body.userData.myData = null;
 			
 			super.destroy();
 		}
